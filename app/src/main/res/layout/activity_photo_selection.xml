@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".other.teach.MediaSelectionActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.7">
+
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/back"
+            android:textSize="30sp"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.4" >
+
+        <Button
+            android:id="@+id/button_camera"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Camera"
+            android:textSize="30sp"
+            />
+        <Button
+            android:id="@+id/button_gallery"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/Gallery"
+            android:textSize="30sp"
+            android:layout_below="@id/button_camera"
+            />
+
+
+
+    </RelativeLayout>
+
+
+</LinearLayout>

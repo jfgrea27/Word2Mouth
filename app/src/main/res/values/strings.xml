@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Word2Mouth</string>
+    <string name="back">Back</string>
+    <string name="forward">Forward</string>
+    <string name="audio">Audio</string>
+    <string name="mediaContent">MediaContent</string>
+    <string name="listen_end">End</string>
+    <string name="listen_start">Start</string>
+    <string name="record_start">Start</string>
+    <string name="record_end">End</string>
+    <string name="learn">Learn</string>
+    <string name="teach">Teach</string>
+    <string name="receive">Receive</string>
+    <string name="share">Share</string>
+    <string name="Camera">Camera</string>
+    <string name="Gallery">Gallery</string>
+    <string name="addMedia">Add Media</string>
+    />
+</resources>
