@@ -1,4 +1,4 @@
-package com.example.word2mouth.other.teach.createContent;
+package com.example.word2mouth.other.teach.createContent.video;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,27 +14,45 @@ import android.widget.VideoView;
 
 import com.example.word2mouth.R;
 import com.example.word2mouth.other.OtherActivity;
+import com.example.word2mouth.other.SelectionMediaActivity;
 
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.BitSet;
 
-public class MediaSelectionActivity extends OtherActivity {
+public class VideoSelectionActivity extends SelectionMediaActivity {
 
     private static final int RESULT_CHOOSE_VIDEO_GALLERY = 1;
     private static final int RESULT_TAKE_VIDEO_CAMERA = 2;
-
-    Button gallery;
-    Button cameraRoll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_photo_selection);
         configureBackButton();
-        configureMediaChoiceButtons();
 
-        gallery.setOnClickListener(new View.OnClickListener() {
+        configureCaptureButton();
+        configureGalleryButton();
+    }
+
+    @Override
+    protected void configureCaptureButton() {
+        captureButton = findViewById(R.id.button_camera);
+        captureButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cameraRollIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                cameraRollIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 10);
+                startActivityForResult(cameraRollIntent, RESULT_TAKE_VIDEO_CAMERA);
+            }
+        });
+
+    }
+
+    @Override
+    protected void configureGalleryButton() {
+        galleryButton = findViewById(R.id.button_gallery);
+        galleryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent galleryIntent = new Intent();
@@ -45,14 +63,7 @@ public class MediaSelectionActivity extends OtherActivity {
             }
         });
 
-        cameraRoll.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent cameraRollIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                cameraRollIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, 10);
-                startActivityForResult(cameraRollIntent, RESULT_TAKE_VIDEO_CAMERA);
-            }
-        });
+
     }
 
 
@@ -66,15 +77,11 @@ public class MediaSelectionActivity extends OtherActivity {
                 case (RESULT_CHOOSE_VIDEO_GALLERY):
                     intentSelectedImage.putExtra("video", data.getData());
                     setResult(RESULT_OK, intentSelectedImage);
+                    finish();
                     break;
 
             }
         }
     }
 
-
-    private void configureMediaChoiceButtons() {
-        gallery = findViewById(R.id.button_gallery);
-        cameraRoll = findViewById(R.id.button_camera);
-    }
 }
