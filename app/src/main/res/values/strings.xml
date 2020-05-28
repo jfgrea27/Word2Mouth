@@ -15,5 +15,10 @@
     <string name="Camera">Camera</string>
     <string name="Gallery">Gallery</string>
     <string name="addMedia">Add Media</string>
+    <string name="account">Account</string>
+    <string name="setting">Setting</string>
+    <string name="files">files</string>
+    <string name="create">Create</string>
+    <string name="content_created">Content Created</string>
     />
 </resources>

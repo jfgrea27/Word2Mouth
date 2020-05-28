@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    tools:context=".other.teach.createContent.TeachCourseSlidePageActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.7">
+
+        <EditText
+            android:id="@+id/title_slide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true">
+        </EditText>
+
+        <Button
+            android:id="@+id/button_back"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="@string/back"
+            android:textSize="30sp"
+            android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.4" >
+
+        <VideoView
+            android:id="@+id/videoView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight = "0.6">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:id="@+id/test_text"
+            android:layout_height="20dp"
+            android:layout_centerInParent="true"
+            android:layout_above="@id/button_audio">
+
+        </EditText>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:id="@+id/test_folder"
+            android:layout_height="20dp"
+            android:layout_centerInParent="true"
+            android:layout_below="@id/button_audio">
+
+        </EditText>
+
+
+        <Button
+            android:id="@+id/button_previous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:text="Backward"
+            android:textSize="30dp"
+            android:layout_alignParentStart="true" />
+
+        <Button
+            android:id="@+id/button_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:text="@string/forward"
+            android:textSize="30sp" />
+
+        <Button
+            android:id="@+id/button_audio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+
+            android:scaleType="fitCenter"
+            android:drawableLeft="@drawable/ic_record_voice_over_24px"
+          />
+
+    </RelativeLayout>
+
+</LinearLayout>

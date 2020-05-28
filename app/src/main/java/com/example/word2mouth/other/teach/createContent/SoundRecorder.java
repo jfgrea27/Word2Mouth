@@ -1,16 +1,9 @@
-package com.example.word2mouth.other.teach;
+package com.example.word2mouth.other.teach.createContent;
 
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import java.util.Random;
-
-import static android.Manifest.permission.RECORD_AUDIO;
-import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 
 public class SoundRecorder {
     String AudioSavePathInDevice = null;

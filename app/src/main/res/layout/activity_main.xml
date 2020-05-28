@@ -19,10 +19,12 @@ tools:context=".mainActivity.MainActivity">
     android:layout_height="match_parent"
     android:layout_weight="0.4" >
 
-    <TextView
+    <ListView
+        android:id="@+id/learn_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/mediaContent" />
+        android:layout_height="wrap_content" >
+    </ListView>
+
 </RelativeLayout>
 
 <RelativeLayout
@@ -30,45 +32,37 @@ tools:context=".mainActivity.MainActivity">
     android:layout_height="match_parent"
     android:layout_weight = "0.6">
 
+
     <Button
 
         android:id="@+id/button_learn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_centerHorizontal="true"
         android:text="@string/learn"
         android:textSize="30sp"
          />
 
     <Button
 
-        android:id="@+id/button_teach"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:text="@string/teach"
-        android:textSize="30sp"
-        />
-    <Button
-
         android:id="@+id/button_share"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/button_learn"
         android:text="@string/share"
-        android:textSize="30sp"
-        android:layout_alignParentEnd="true" />
+        android:textSize="30sp" />
 
     <Button
 
         android:id="@+id/button_receive"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        android:layout_below="@id/button_share"
         android:text="@string/receive"
         android:textSize="30sp"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true" />
+     />
 </RelativeLayout>
 
 </LinearLayout>

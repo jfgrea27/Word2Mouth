@@ -3,9 +3,13 @@
     package="com.example.word2mouth">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.STORAGE" />
-    <uses-feature android:name="android.hardware.camera" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -14,18 +18,19 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".other.teach.MediaSelectionActivity" />
+        <activity android:name=".other.learn.LearnCourseSlideActivity"></activity>
+        <activity android:name=".other.CourseSlidePageActivity" />
+        <activity android:name=".other.teach.main.TeachMainActivity" />
+        <activity android:name=".other.teach.createContent.MediaSelectionActivity" />
         <activity
             android:name=".mainActivity.MainActivity"
             android:label="Word2Mouth">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".other.teach.TeachActivity" />
-        <activity android:name=".other.learn.LearnActivity" />
+        <activity android:name=".other.teach.createContent.TeachCourseSlidePageActivity" />
     </application>
 
 </manifest>
