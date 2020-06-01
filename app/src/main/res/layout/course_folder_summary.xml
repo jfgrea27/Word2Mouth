@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.7">
+
+        <Button
+            android:id="@+id/end_course"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="End Course"
+            android:textSize="30sp" />
+
+    </RelativeLayout>
+
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="0.4">
+
+        <ListView
+            android:id="@+id/created_slides"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+        </ListView>
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight = "0.6">
+
+        <Button
+            android:id="@+id/button_new_slide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="New Slide"
+            android:layout_centerInParent="true"
+            android:textSize="30sp" />
+
+        ></RelativeLayout>
+
+</LinearLayout>

@@ -17,16 +17,20 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".other.learn.LearnCourseSlideActivity"></activity>
+        android:theme="@style/Theme.AppCompat.Light">
+        <activity android:name=".other.teach.createContent.CourseSlideSummaryActivity"></activity>
+        <activity android:name=".other.SelectionMediaActivity" />
+        <activity android:name=".other.teach.createContent.sound.SoundSelectionActivity" />
+        <activity android:name=".other.learn.LearnCourseSlideActivity" />
         <activity android:name=".other.CourseSlidePageActivity" />
         <activity android:name=".other.teach.main.TeachMainActivity" />
-        <activity android:name=".other.teach.createContent.MediaSelectionActivity" />
+        <activity android:name=".other.teach.createContent.video.VideoSelectionActivity" />
         <activity
             android:name=".mainActivity.MainActivity"
             android:label="Word2Mouth">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

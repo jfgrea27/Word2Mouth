@@ -1,14 +1,18 @@
 package com.example.word2mouth.mainActivity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,16 +32,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static android.view.View.*;
 
 public class MainActivity extends AppCompatActivity {
 
-    String[] mobileArray = {"Test", "Test", "Test", "Test","Test"};
-
     private Button buttonToLearn;
     private ListView learnContent;
-    private boolean contentSelected = false;
+    private Button shareButton;
+    private String selectedCourse;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         
         goToLearnButton();
+        configureSHareButtong();
         configureListView();
     }
 
@@ -69,24 +74,34 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private static final int CREATE_FILE = 10;
+
+    private void configureSHareButtong() {
+        shareButton = findViewById(R.id.button_share);
+        shareButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+    }
+
     private void goToLearnButton() {
         buttonToLearn = (Button) findViewById(R.id.button_learn);
+        buttonToLearn.setVisibility(View.INVISIBLE);
+
             buttonToLearn.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    startActivity(new Intent(MainActivity.this, LearnCourseSlideActivity.class));
-                    //TODO
-//                    if (contentSelected) {
-//                        contentSelected  = false;
-//                        startActivity(new Intent(MainActivity.this, LearnCourseMainPageActivity.class));
-//                    }
+                    Intent learnIntent = new Intent(MainActivity.this, LearnCourseSlideActivity.class);
+                    learnIntent.putExtra("course", selectedCourse);
+                    startActivity(learnIntent);
                 }
             });
     }
 
     private void configureListView() {
         ArrayAdapter adapter = new ArrayAdapter<String>(this,
-                R.layout.activity_listview, mobileArray);
+                R.layout.activity_listview, getListDirectory());
 
         learnContent = findViewById(R.id.learn_content);
         learnContent.setAdapter(adapter);
@@ -94,9 +109,19 @@ public class MainActivity extends AppCompatActivity {
         learnContent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                contentSelected = true;
+                selectedCourse = parent.getAdapter().getItem(position).toString();
+                buttonToLearn.setVisibility(VISIBLE);
             }
         });
+    }
+
+    private ArrayList<String> getListDirectory() {
+         File[] files  = getApplicationContext().getExternalFilesDir(null).listFiles();
+         ArrayList<String> directoryNames = new ArrayList<>();
+         for (File file : files) {
+             directoryNames.add(file.getName());
+         }
+         return directoryNames;
     }
 
 

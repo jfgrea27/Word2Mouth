@@ -16,6 +16,7 @@
             android:id="@+id/title_slide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text=""
             android:layout_centerInParent="true">
         </EditText>
 
@@ -46,6 +47,16 @@
             android:focusableInTouchMode="false"
             />
 
+        <Button
+            android:id="@+id/preview_video"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Preview"
+            android:visibility="invisible"
+            >
+        </Button>
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -53,42 +64,15 @@
         android:layout_height="match_parent"
         android:layout_weight = "0.6">
 
-        <EditText
-            android:layout_width="wrap_content"
-            android:id="@+id/test_text"
-            android:layout_height="20dp"
-            android:layout_centerInParent="true"
-            android:layout_above="@id/button_audio">
-
-        </EditText>
-
-        <EditText
-            android:layout_width="wrap_content"
-            android:id="@+id/test_folder"
-            android:layout_height="20dp"
-            android:layout_centerInParent="true"
-            android:layout_below="@id/button_audio">
-
-        </EditText>
 
 
-        <Button
-            android:id="@+id/button_previous"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentBottom="true"
-            android:text="Backward"
-            android:textSize="30dp"
-            android:layout_alignParentStart="true" />
 
         <Button
             android:id="@+id/button_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_above="@id/button_audio"
             android:text="@string/forward"
             android:textSize="30sp" />
 

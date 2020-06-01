@@ -12,7 +12,6 @@ import com.example.word2mouth.R;
 public abstract class CourseSlidePageActivity extends OtherActivity {
 
     protected Button nextSlide;
-    protected Button previousSlide;
     protected Button audioButton;
     protected VideoView videoView;
 
@@ -24,16 +23,6 @@ public abstract class CourseSlidePageActivity extends OtherActivity {
     }
 
     protected abstract void configureAudioButton();
-
-    protected void configurePreviousSlideButton() {
-        previousSlide = findViewById(R.id.button_previous);
-        previousSlide.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-    }
 
     protected abstract void configureVideoButton();
 

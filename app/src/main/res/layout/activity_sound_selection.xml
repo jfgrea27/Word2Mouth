@@ -30,19 +30,19 @@
         android:layout_weight="0.4" >
 
         <Button
-            android:id="@+id/button_camera"
+            android:id="@+id/button_gallery_sounds"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/Camera"
             android:textSize="30sp"
             />
         <Button
-            android:id="@+id/button_gallery"
+            android:id="@+id/button_mic"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:text="@string/Gallery"
             android:textSize="30sp"
-            android:layout_below="@id/button_camera"
+            android:layout_below="@id/button_gallery_sounds"
             />
 
     </RelativeLayout>
