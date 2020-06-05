@@ -4,6 +4,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.net.Uri;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -16,10 +19,10 @@ import java.io.OutputStream;
 public class DirectoryHandler {
 
 
-
-    public static final int VIDEO = 10;
-    public static final int AUDIO = 11;
-    public static final int TEXT = 12;
+    public static final int TITLE = 100;
+    public static final int VIDEO = 101;
+    public static final int INSTRUCTIONS = 102;
+    public static final int AUDIO = 103;
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
         File file = new File(context.getExternalFilesDir(null), courseName);
@@ -35,47 +38,68 @@ public class DirectoryHandler {
         return file;
     }
 
-    public static File createDirectoryForSlideAndReturnIt(String coursePath, int slideNumber, String slideName, Context context) {
-        File file = new File(coursePath, "/" + slideNumber+ " " + slideName) ;
-
-        int directoryNumber = 0;
-        while (file.exists()) {
-            directoryNumber++;
-            file = new File(coursePath, "/" + slideNumber +  " " + slideName + " (" + directoryNumber + ")");
-        }
+    public static File createDirectoryForSlideAndReturnIt(String coursePath, int slideNumber) {
+        File file = new File(coursePath, "/" + slideNumber);
         file.mkdirs();
         return file;
     }
 
-    public static File createVideoFileAndReturnIt(String slidePath, Uri originalPath, ContentResolver context) throws IOException {
-        InputStream in = context.openInputStream(originalPath);
-
-        String outputAddress = slidePath + "/video.3gp";
-
-        return copyFile(in, outputAddress);
+    public static File retrieveSlideDirectoryByNumber(String coursePath, int slideNumber) {
+        File slideDirectory = new File(coursePath, "/" + slideNumber);
+        if (slideDirectory.exists()) {
+            return slideDirectory;
+        } else {
+            return null;
+        }
     }
 
-    public static File createInstructionFileAndReturnIt(String slidePath, String instructions) {
-        String outputAddress = slidePath + "/instructions.txt";
+    public static File createFileForSlideContentAndReturnIt(String slidePath, @Nullable Uri originalUriPath, ContentResolver content, @Nullable String script, int requestCode) {
+        String outputAddress = slidePath;
+        switch (requestCode) {
+            case TITLE:
+                outputAddress += "/title.txt";
+                return copyTextToFile(outputAddress, script);
+            case INSTRUCTIONS:
+                outputAddress += "/instructions.txt";
+                return copyTextToFile(outputAddress, script);
 
-        File file = new File(outputAddress);
+            case VIDEO:
+                outputAddress += "/video.3gp";
+                return copyVideoToFile(outputAddress, originalUriPath, content);
+            default:
+                return null;
+        }
+    }
+
+
+
+    // Video
+    private static File copyTextToFile(String outputPath, String script) {
+        File textFile = new File(outputPath);
         try {
-            FileWriter writer = new FileWriter(file);
-            writer.append(instructions);
+            FileWriter writer = new FileWriter(textFile);
+            writer.append(script);
             writer.flush();
             writer.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return file;
+        return textFile;
     }
-    public static File retrieveSlideDirectoryByNumber(String coursePath, int slideNumber, String slideName) {
-        File slideDirectory = new File(coursePath, "/" + slideNumber +  " " + slideName);
 
-        if (slideDirectory.exists()) {
-            return slideDirectory;
-        } else {
+    private static File copyVideoToFile(String outputAddress, Uri originalUri, ContentResolver content) {
+        InputStream in = null;
+        try {
+            in = content.openInputStream(originalUri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
             return null;
+        }
+        try {
+            return copyFile(in, outputAddress);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return  null;
         }
     }
 

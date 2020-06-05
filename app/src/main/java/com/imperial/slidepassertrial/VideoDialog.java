@@ -17,14 +17,12 @@ public class VideoDialog extends DialogFragment {
     public interface OnInputListener {
         void sendInput(int choice);
     }
-
     public OnInputListener onInputListener;
-    // widgets
+
+    // Widgets
     private Button gallery;
     private Button roll;
 
-
-    private final int MAX_DURATION_VIDEO = 10;
 
     // Intent Results
     public final int CAMERA_ROLL_SELECTION = 0;
@@ -44,12 +42,6 @@ public class VideoDialog extends DialogFragment {
 
                 onInputListener.sendInput(GALLERY_SELECTION);
                 getDialog().dismiss();
-
-//                Intent galleryIntent = new Intent();
-//                galleryIntent.setType("video/*");
-//                galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-//                galleryIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, MAX_DURATION_VIDEO);
-//                startActivityForResult(Intent.createChooser(galleryIntent,"Select Video"), GALLERY_SELECTION);
             }
         });
 
@@ -61,9 +53,6 @@ public class VideoDialog extends DialogFragment {
 
                 onInputListener.sendInput(CAMERA_ROLL_SELECTION);
                 getDialog().dismiss();
-//                Intent rollIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-//                rollIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, MAX_DURATION_VIDEO);
-//                startActivityForResult(rollIntent, CAMERA_ROLL_SELECTION);
             }
         });
         return view;

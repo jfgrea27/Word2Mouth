@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -38,8 +37,10 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
     private Button nextSlide;
 
     // Slide Title
-    private EditText slideNameEditText;
-    private TextView slideNameText;
+    private EditText titleEdit;
+
+    // Instruction Buttons
+    private EditText instructionsEdit;
 
     // Video
     private VideoView videoView;
@@ -49,19 +50,23 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
     // Audio
     private Button Audio;
 
-    // Instruction Buttons
-    private TextView instructionsEdit;
 
     // Model Variables
     private int slideCounter = 0;
-    private Course course;
+    private int totalNumberSlides = 0;
     private String coursePath;
 
     // File Management
     private File currentSlideDirectory = null;
-    private Slide currentSlide = null;
+    private File titleFile = null;
     private File videoFile = null;
     private File instructionsFile = null;
+    // Requests for File Management
+    public static final int TITLE = 100;
+    public static final int VIDEO = 101;
+    public static final int INSTRUCTIONS = 102;
+    public static final int AUDIO = 103;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,12 +74,11 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
         setContentView(R.layout.activity_slide_flicking);
 
         // get Extras
-        course = new Course((String) getIntent().getExtras().get("course name"));
         coursePath = (String) getIntent().getExtras().get("course directory path");
 
         previousSlide = findViewById(R.id.button_previous);
         nextSlide = findViewById(R.id.button_next);
-        configureSlideNameEditTextAndText();
+        configureSideTitleEdit();
 
         configurePreviousButton();
         configureNextButton();
@@ -83,23 +87,23 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
         configureVideoView();
         configureVideoPreview();
         configureAudio();
-        configureInstructions();
+        configureInstructionsEdit();
 
     }
 
-    private void configureInstructions() {
+    private void configureInstructionsEdit() {
         instructionsEdit = findViewById(R.id.instructions);
     }
 
-    private void configureSlideNameEditTextAndText() {
-        slideNameEditText = findViewById(R.id.slide_title_edit);
-        slideNameText = findViewById(R.id.slide_title_text);
+    private void configureSideTitleEdit() {
+        titleEdit = findViewById(R.id.slide_title_edit);
     }
 
     private void configurePreviousButton() {
         previousSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                updateFileContent();
                 slideCounter--;
                 // reach first slide
                 if (slideCounter < 0) {
@@ -108,10 +112,11 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
                 }
                 // retrieve previously saved file data
                 else {
-                    Toast.makeText(SlideFlickingActivity.this, "Retrieve Previous", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SlideFlickingActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
                     retrieveSavedSlide();
                     updateCurrentView();
                 }
+
             }
         });
     }
@@ -120,11 +125,11 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
         nextSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                updateFileContent();
                 slideCounter++;
                 // creating a new Slide
-                if(course.size() < slideCounter) {
+                if(totalNumberSlides <= slideCounter) {
                     Toast.makeText(SlideFlickingActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
-                    saveCurrentSlide();
                     createBlankSlide();
                 }
                 // retrieve previously saved file data
@@ -133,77 +138,85 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
                     retrieveSavedSlide();
                     updateCurrentView();
                 }
+
             }
         });
 
     }
 
     private void updateCurrentView() {
-        slideNameText.setVisibility(View.VISIBLE);
-        slideNameEditText.setVisibility(View.INVISIBLE);
-        slideNameText.setText(currentSlide.getSlideName());
+        // refresh video view
         videoView.setVisibility(View.GONE);
         videoView.setVisibility(View.VISIBLE);
-        videoView.setVideoURI(video);
+
+        if (video != null) {
+            videoView.setVideoURI(video);
+        }
         videoPreview.setVisibility(View.VISIBLE);
 
     }
 
     private void createBlankSlide() {
+        // file
+        currentSlideDirectory = null;
+        // model
+        totalNumberSlides++;
+
+        // title
+        titleEdit.setText("");
+
+        // instructions
+        instructionsEdit.setText("");
+
+        // video
+        video = null;
         videoPreview.setVisibility(View.INVISIBLE);
-        videoView.setVideoURI(null);
         videoView.setVisibility(View.GONE);
         videoView.setVisibility(View.VISIBLE);
-        slideNameText.setVisibility(View.INVISIBLE);
-        slideNameEditText.setVisibility(View.VISIBLE);
-        slideNameEditText.setText("");
-        instructionsEdit.setText("");
-        currentSlideDirectory = null;
-        currentSlide = null;
     }
 
     private void retrieveSavedSlide() {
 
-        currentSlide = (Slide) course.retrieveByPosition(slideCounter);
+        currentSlideDirectory = DirectoryHandler.retrieveSlideDirectoryByNumber(coursePath, slideCounter);
 
-        currentSlideDirectory = DirectoryHandler.retrieveSlideDirectoryByNumber(coursePath, slideCounter + 1, currentSlide.getSlideName());
+        // title
+        titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
+        if(titleFile.exists()) {
+            titleEdit.setText(readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/title.txt"));
+        }
 
-        slideNameEditText.setText(currentSlide.getSlideName());
-
-        String videoPath = currentSlideDirectory.getPath() + "/video.3gp";
-        video = Uri.parse(videoPath);
-
+        // instructions
         instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
-
         if (instructionsFile.exists()) {
             instructionsEdit.setText(readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt"));
 
         }
+
+        // video
+        videoFile = new File(currentSlideDirectory.getPath() + "/video.3gp");
+        if (videoFile.exists()) {
+            video = Uri.parse(currentSlideDirectory.getPath() + "/video.3gp");
+        }
+
+
     }
 
-    private void saveCurrentSlide() {
 
-        String slideName =  slideNameEditText.getText().toString();
-        if (slideName.isEmpty()) {
-            slideName = "Untitled Slide";
-        }
-        // Saving on Course Object
-        currentSlide = new Slide(course.getCourseName(), slideName, slideCounter);
-        course.addSlide(currentSlide);
-
+    private void updateFileContent() {
         // Saving on Disk
-        currentSlideDirectory = DirectoryHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter, slideName, this);
+        currentSlideDirectory = DirectoryHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
+
+        // Title
+        String title = titleEdit.getText().toString();
+        titleFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), title, TITLE);
+
         // Instructions
         String instructions = instructionsEdit.getText().toString();
-        instructionsFile = DirectoryHandler.createInstructionFileAndReturnIt(currentSlideDirectory.getPath(), instructions);
+        instructionsFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), instructions, INSTRUCTIONS);
 
         // Video
-        try {
-            if (video != null) {
-                videoFile = DirectoryHandler.createVideoFileAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (video != null) {
+            videoFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
         }
     }
 
@@ -220,10 +233,6 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
                 VideoDialog videoDialog = new VideoDialog();
                 videoDialog.show(getSupportFragmentManager(), "Video Dialog");
 
-
-
-//                Intent fetchVideo = new Intent(SlideFlickingActivity.this, VideoSelectionActivity.class);
-//                startActivityForResult(fetchVideo, VIDEO_RESULT);
             }
         });
 
