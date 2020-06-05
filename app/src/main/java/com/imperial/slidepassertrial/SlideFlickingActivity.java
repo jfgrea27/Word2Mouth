@@ -128,7 +128,7 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
                 updateFileContent();
                 slideCounter++;
                 // creating a new Slide
-                if(totalNumberSlides <= slideCounter) {
+                if(totalNumberSlides < slideCounter) {
                     Toast.makeText(SlideFlickingActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
                     createBlankSlide();
                 }
