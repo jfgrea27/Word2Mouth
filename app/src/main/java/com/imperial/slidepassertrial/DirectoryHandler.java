@@ -78,7 +78,7 @@ public class DirectoryHandler {
         File textFile = new File(outputPath);
         try {
             FileWriter writer = new FileWriter(textFile);
-            writer.append(script);
+            writer.write(script);
             writer.flush();
             writer.close();
         } catch (IOException e) {

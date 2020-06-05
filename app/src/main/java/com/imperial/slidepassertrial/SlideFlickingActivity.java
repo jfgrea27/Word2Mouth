@@ -103,19 +103,19 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
         previousSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                updateFileContent();
-                slideCounter--;
-                // reach first slide
-                if (slideCounter < 0) {
-                    Toast.makeText(SlideFlickingActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
-                    slideCounter++;
-                }
-                // retrieve previously saved file data
-                else {
-                    Toast.makeText(SlideFlickingActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
-                    retrieveSavedSlide();
-                    updateCurrentView();
-                }
+            updateFileContent();
+            slideCounter--;
+            // reach first slide
+            if (slideCounter < 0) {
+                Toast.makeText(SlideFlickingActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
+                slideCounter++;
+            }
+            // retrieve previously saved file data
+            else {
+                Toast.makeText(SlideFlickingActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
+                retrieveSavedSlide();
+                updateCurrentView();
+            }
 
             }
         });
@@ -151,8 +151,10 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
 
         if (video != null) {
             videoView.setVideoURI(video);
+            videoPreview.setVisibility(View.VISIBLE);
+        } else {
+            videoPreview.setVisibility(View.INVISIBLE   );
         }
-        videoPreview.setVisibility(View.VISIBLE);
 
     }
 
@@ -183,22 +185,26 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
         titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
         if(titleFile.exists()) {
             titleEdit.setText(readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/title.txt"));
+
         }
 
         // instructions
         instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
         if (instructionsFile.exists()) {
             instructionsEdit.setText(readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt"));
-
         }
 
         // video
         videoFile = new File(currentSlideDirectory.getPath() + "/video.3gp");
         if (videoFile.exists()) {
             video = Uri.parse(currentSlideDirectory.getPath() + "/video.3gp");
+        } else {
+            videoView.setVideoURI(null);
+            video = null;
+            videoView.setVisibility(View.GONE);
+            videoView.setVisibility(View.VISIBLE);
+            videoPreview.setVisibility(View.INVISIBLE);
         }
-
-
     }
 
 
