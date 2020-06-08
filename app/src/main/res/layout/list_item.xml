@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants">
+
+    <ImageView
+        android:id="@+id/list_item_thumbnail"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        app:srcCompat="@drawable/ic_picture"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true" />
+
+    <TextView
+        android:id="@+id/list_item_text"
+        android:layout_width="268dp"
+        android:layout_height="64dp"
+        android:text="test"
+        android:layout_marginLeft="2dp"
+        android:layout_toRightOf="@id/list_item_thumbnail"/>
+
+    <ImageButton
+        android:id="@+id/list_item_button"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignBottom="@id/list_item_thumbnail"
+        android:layout_marginStart="287dp"
+        android:layout_marginLeft="17dp"
+        android:layout_marginBottom="5dp"
+        android:layout_toEndOf="@id/list_item_thumbnail"
+        android:layout_toRightOf="@id/list_item_text"
+        android:background="@android:color/transparent"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/ic_speak" />
+</RelativeLayout>

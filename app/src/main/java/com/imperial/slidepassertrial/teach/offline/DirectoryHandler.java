@@ -1,4 +1,4 @@
-package com.imperial.slidepassertrial;
+package com.imperial.slidepassertrial.teach.offline;
 
 import android.content.ContentResolver;
 import android.content.Context;

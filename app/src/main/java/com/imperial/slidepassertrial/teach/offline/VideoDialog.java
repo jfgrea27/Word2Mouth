@@ -1,4 +1,4 @@
-package com.imperial.slidepassertrial;
+package com.imperial.slidepassertrial.teach.offline;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -6,11 +6,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import com.imperial.slidepassertrial.R;
 
 public class VideoDialog extends DialogFragment {
 
@@ -20,8 +23,8 @@ public class VideoDialog extends DialogFragment {
     public OnInputListener onInputListener;
 
     // Widgets
-    private Button gallery;
-    private Button roll;
+    private ImageButton gallery;
+    private ImageButton roll;
 
 
     // Intent Results

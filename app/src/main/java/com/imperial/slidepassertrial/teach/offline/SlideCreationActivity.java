@@ -1,4 +1,4 @@
-package com.imperial.slidepassertrial;
+package com.imperial.slidepassertrial.teach.offline;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -13,10 +14,12 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.VideoView;
+
+import com.imperial.slidepassertrial.R;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -25,7 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class SlideFlickingActivity extends AppCompatActivity implements VideoDialog.OnInputListener {
+public class SlideCreationActivity extends AppCompatActivity implements VideoDialog.OnInputListener {
 
     // Video Choice
     public final int CAMERA_ROLL_SELECTION = 0;
@@ -33,8 +36,8 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
     private final int MAX_DURATION_VIDEO = 10;
 
     // General Activity Buttons
-    private Button previousSlide;
-    private Button nextSlide;
+    private ImageButton previousSlide;
+    private ImageButton nextSlide;
 
     // Slide Title
     private EditText titleEdit;
@@ -44,11 +47,11 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
 
     // Video
     private VideoView videoView;
-    private Button videoPreview;
+    private ImageButton videoPreview;
     private  Uri video = null;
 
     // Audio
-    private Button Audio;
+    private ImageButton Audio;
 
 
     // Model Variables
@@ -107,12 +110,12 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
             slideCounter--;
             // reach first slide
             if (slideCounter < 0) {
-                Toast.makeText(SlideFlickingActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SlideCreationActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
                 slideCounter++;
             }
             // retrieve previously saved file data
             else {
-                Toast.makeText(SlideFlickingActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
+                Toast.makeText(SlideCreationActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
                 retrieveSavedSlide();
                 updateCurrentView();
             }
@@ -129,12 +132,12 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
                 slideCounter++;
                 // creating a new Slide
                 if(totalNumberSlides < slideCounter) {
-                    Toast.makeText(SlideFlickingActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SlideCreationActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
                     createBlankSlide();
                 }
                 // retrieve previously saved file data
                 else {
-                    Toast.makeText(SlideFlickingActivity.this, "Retrieve Next Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SlideCreationActivity.this, "Retrieve Next Slide", Toast.LENGTH_SHORT).show();
                     retrieveSavedSlide();
                     updateCurrentView();
                 }
@@ -258,6 +261,7 @@ public class SlideFlickingActivity extends AppCompatActivity implements VideoDia
                 if (videoView != null) {
                     videoPreview.setVisibility(View.INVISIBLE);
                     videoView.start();
+                    videoView.setBackgroundColor(Color.TRANSPARENT);
                 }
             }
         });
