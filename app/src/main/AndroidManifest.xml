@@ -13,20 +13,22 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".learn.main.offline.SlideLearningActivity"></activity>
         <activity
             android:name=".teach.TeachActivityMain"
             android:label="@string/title_activity_teach_main"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".learn.main.LearnActivityMain"
+            android:exported="true"
             android:label="@string/title_activity_learn_main_tabbed"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:exported="true">
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <category android:name="android.intent.category.BROWSABLE"/>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
                 <category android:name="android.intent.category.LAUNCHER" />
-                <action android:name="android.intent.action.MAIN"/>
+
+                <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
         <activity

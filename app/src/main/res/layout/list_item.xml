@@ -21,6 +21,7 @@
         android:layout_width="268dp"
         android:layout_height="64dp"
         android:text="test"
+        android:textSize="20dp"
         android:layout_marginLeft="2dp"
         android:layout_toRightOf="@id/list_item_thumbnail"/>
 

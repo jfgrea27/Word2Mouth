@@ -35,25 +35,25 @@ import java.io.InputStreamReader;
 
 public class SlideCreationActivity extends AppCompatActivity implements VideoDialog.OnInputListener {
 
-    // Video Choice
-    public final int CAMERA_ROLL_SELECTION = 0;
-    public final int GALLERY_SELECTION = 1;
-    private final int MAX_DURATION_VIDEO = 10;
-
     // General Activity Buttons
     private ImageButton previousSlide;
     private ImageButton nextSlide;
 
-    // Slide Title
+    // Title
     private EditText titleEdit;
 
-    // Instruction Buttons
+    // Instructions
     private EditText instructionsEdit;
 
     // Video
     private VideoView videoView;
     private ImageButton videoPreview;
     private  Uri video = null;
+    // Video Choice
+    public final int CAMERA_ROLL_SELECTION = 0;
+    public final int GALLERY_SELECTION = 1;
+    private final int MAX_DURATION_VIDEO = 10;
+
 
     // Audio
     private ImageButton recordAudioButton;
@@ -88,7 +88,6 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         // get Extras
         coursePath = (String) getIntent().getExtras().get("course directory path");
 
-
         // Forward and Backward Buttons
         configurePreviousButton();
         configureNextButton();
@@ -96,6 +95,8 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         // Title
         configureSideTitleEdit();
 
+        // Instructions
+        configureInstructionsEdit();
 
         // Video
         configureVideoView();
@@ -104,12 +105,8 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         // Audio
         configureAudio();
 
-        // instructions
-        configureInstructionsEdit();
-
         // First slide
         updateFileContent();
-
     }
 
     private void configureInstructionsEdit() {

@@ -1,5 +1,9 @@
 package com.imperial.slidepassertrial.learn.main.offline;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -17,7 +21,9 @@ import android.widget.Toast;
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -26,10 +32,22 @@ import java.util.ArrayList;
  */
 public class LearnOfflineMainFragment extends Fragment {
 
+    // Button View
     private ImageButton learn;
     private ImageButton share;
     private ImageButton receive;
+
+
+    // ListView
     private ListView courseList;
+    private File directory;
+    private File[] fileList;
+    private  ArrayList<String> fileNames;
+    private ArrayAdapterCourseItems adapter;
+
+    // Model
+    private boolean selectedCourse = false;
+    private String courseName = null;
 
     public LearnOfflineMainFragment() {
         // Required empty public constructor
@@ -47,6 +65,13 @@ public class LearnOfflineMainFragment extends Fragment {
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        adapter.notifyDataSetChanged();
     }
 
     @Override
@@ -71,31 +96,59 @@ public class LearnOfflineMainFragment extends Fragment {
     }
 
 
-    // TODO
-    // DATA FOR THE COURSE LIST
-    // IMPROVE THE ROWS OF THE COURSE SELECTION
-    private ArrayList<String> data = new ArrayList<>();
 
     private void configureListView() {
         courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
-        generateListContent();
-        courseList.setAdapter(new ArrayAdapterCourseItems(getView().getContext(), R.layout.list_item, data));
+        configureCourseOnSystem();
+        adapter = new ArrayAdapterCourseItems(getView().getContext(), R.layout.list_item, fileNames);
+        courseList.setAdapter(adapter);
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @SuppressLint("ResourceAsColor")
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getView().getContext(), "Text about the course" + position, Toast.LENGTH_SHORT).show();
+                for (int i = 0; i < adapter.getCount(); i++) {
+                    View item = courseList.getChildAt(i);
+                    if (item != null) {
+                        item.setBackgroundColor(Color.WHITE);
+                    }
+                }
+
+                if (selectedCourse) {
+                    view.setBackgroundColor(Color.WHITE);
+                    selectedCourse = false;
+                    if (learn != null) {
+                        learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    }
+                    if (share != null) {
+                        share.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    }
+                    courseName = null;
+
+                } else {
+                    selectedCourse = true;
+                    view.setBackgroundColor(Color.LTGRAY);
+                    if (learn != null) {
+                        learn.setColorFilter(null);
+                    }
+                    if (share != null) {
+                        share.setColorFilter(null);
+                    }
+                    courseName = parent.getAdapter().getItem(position).toString();
+                }
             }
         });
     }
 
     private void configureReceiveButton() {
-        learn = getView().findViewById(R.id.learn_button);
-        learn.setOnClickListener(new View.OnClickListener() {
+        receive = getView().findViewById(R.id.receive_button);
+
+        receive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Learn Button", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Receive Button", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
 
     private void configureShareButton() {
@@ -103,24 +156,48 @@ public class LearnOfflineMainFragment extends Fragment {
         share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Share Button", Toast.LENGTH_SHORT).show();
+
+                if (selectedCourse) {
+                    Toast.makeText(getContext(), "Share Button", Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
+
+
+        if (share != null) {
+            share.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        }
     }
 
     private void configureLearnButton() {
-        receive = getView().findViewById(R.id.receive_button);
-        receive.setOnClickListener(new View.OnClickListener() {
+        learn = getView().findViewById(R.id.learn_button);
+        learn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Receive Button", Toast.LENGTH_SHORT).show();
+                if (selectedCourse) {
+                   if (courseName != null) {
+                       Intent learnIntent = new Intent(getView().getContext(), SlideLearningActivity.class);
+                       learnIntent.putExtra("course directory path", getContext().getExternalFilesDir(null).getPath() + "/" + courseName);
+                       startActivity(learnIntent);
+                   }
+                }
             }
         });
+
+
+        if (learn != null) {
+            learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        }
     }
 
-    private void generateListContent() {
-        for(int i = 0; i < 55; i++) {
-            data.add("This is row number " + i);
+    private void configureCourseOnSystem() {
+        directory = new File(getView().getContext().getExternalFilesDir(null).getPath());
+        fileList = directory.listFiles();
+        fileNames = new ArrayList<>();
+
+        for (int i = 0; i < fileList.length; i++) {
+            fileNames.add(fileList[i].getName());
         }
     }
 

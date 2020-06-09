@@ -15,21 +15,27 @@ import androidx.annotation.Nullable;
 
 import com.imperial.slidepassertrial.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ArrayAdapterCourseItems extends ArrayAdapter<String> {
 
-    private List<String> courseItems;
+    private static ArrayList<String> courseItems;
 
     private int layout;
-    public ArrayAdapterCourseItems(@NonNull Context context, int resource, @NonNull List<String> objects) {
+    public ArrayAdapterCourseItems(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
         super(context, resource, objects);
 
         layout = resource;
         courseItems = objects;
     }
 
-
+    public static String getCourseName(int position) {
+        if (position < courseItems.size() && position > -1) {
+            return courseItems.get(position);
+        }
+        return null;
+    }
 
 
     @NonNull
