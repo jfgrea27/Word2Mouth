@@ -194,10 +194,10 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         totalNumberSlides++;
 
         // title
-        titleEdit.setText("");
+        titleEdit.setText(null);
 
         // instructions
-        instructionsEdit.setText("");
+        instructionsEdit.setText(null);
 
         // audio
         audio = null;
@@ -218,15 +218,29 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         // title
         titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
         if(titleFile.exists()) {
-            titleEdit.setText(readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/title.txt"));
-
+            String string = readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/title.txt");
+            if (!string.isEmpty()) {
+                if (string.charAt(0) == '\n' && string.length() > 1) {
+                    string = string.substring(1);
+                }
+            }
+            titleEdit.setText(string);
+            titleEdit.setSelection(instructionsEdit.length());
         }
 
         // instructions
         instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
         if (instructionsFile.exists()) {
-            instructionsEdit.setText(readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt"));
+            String string = readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt");
+            if (!string.isEmpty()) {
+                if (string.charAt(0) == '\n' && string.length() > 1) {
+                    string = string.substring(1);
+                }
+            }
+            instructionsEdit.setText(string);
+            instructionsEdit.setSelection(instructionsEdit.length());
         }
+        //readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt"))
 
         // Audio
         audioFile = new File(currentSlideDirectory.getPath() + "/audio.3gp");
