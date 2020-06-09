@@ -1,9 +1,10 @@
-package com.imperial.slidepassertrial.teach.offline;
+package com.imperial.slidepassertrial.teach.offline.create;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -13,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -20,6 +22,9 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.imperial.slidepassertrial.R;
+import com.imperial.slidepassertrial.teach.offline.DirectoryHandler;
+import com.imperial.slidepassertrial.teach.offline.create.audio.AudioRecorder;
+import com.imperial.slidepassertrial.teach.offline.create.video.VideoDialog;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -51,8 +56,11 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
     private  Uri video = null;
 
     // Audio
-    private ImageButton Audio;
-
+    private ImageButton recordAudioButton;
+    private ImageButton playAudioButton;
+    private AudioRecorder recorder;
+    private MediaPlayer audioPlayer;
+    private Uri audio = null;
 
     // Model Variables
     private int slideCounter = 0;
@@ -63,6 +71,7 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
     private File currentSlideDirectory = null;
     private File titleFile = null;
     private File videoFile = null;
+    private File audioFile = null;
     private File instructionsFile = null;
     // Requests for File Management
     public static final int TITLE = 100;
@@ -74,23 +83,32 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_slide_flicking);
+        setContentView(R.layout.activity_slide_creation);
 
         // get Extras
         coursePath = (String) getIntent().getExtras().get("course directory path");
 
-        previousSlide = findViewById(R.id.button_previous);
-        nextSlide = findViewById(R.id.button_next);
-        configureSideTitleEdit();
 
+        // Forward and Backward Buttons
         configurePreviousButton();
         configureNextButton();
 
-        //Media Set Up
+        // Title
+        configureSideTitleEdit();
+
+
+        // Video
         configureVideoView();
         configureVideoPreview();
+
+        // Audio
         configureAudio();
+
+        // instructions
         configureInstructionsEdit();
+
+        // First slide
+        updateFileContent();
 
     }
 
@@ -103,6 +121,7 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
     }
 
     private void configurePreviousButton() {
+        previousSlide = findViewById(R.id.button_previous);
         previousSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -125,6 +144,7 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
     }
 
     private void configureNextButton() {
+        nextSlide = findViewById(R.id.button_next);
         nextSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -159,6 +179,12 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
             videoPreview.setVisibility(View.INVISIBLE   );
         }
 
+        if (audio != null) {
+            playAudioButton.setVisibility(View.VISIBLE);
+        } else {
+            playAudioButton.setVisibility(View.INVISIBLE);
+        }
+
     }
 
     private void createBlankSlide() {
@@ -173,12 +199,17 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         // instructions
         instructionsEdit.setText("");
 
+        // audio
+        audio = null;
+        playAudioButton.setVisibility(View.INVISIBLE);
+
         // video
         video = null;
         videoPreview.setVisibility(View.INVISIBLE);
         videoView.setVisibility(View.GONE);
         videoView.setVisibility(View.VISIBLE);
     }
+
 
     private void retrieveSavedSlide() {
 
@@ -197,7 +228,16 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
             instructionsEdit.setText(readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt"));
         }
 
-        // video
+        // Audio
+        audioFile = new File(currentSlideDirectory.getPath() + "/audio.3gp");
+        if (audioFile.exists()) {
+            audio = Uri.parse(currentSlideDirectory.getPath() + "/audio.3gp");
+        } else {
+            audio = null;
+            playAudioButton.setVisibility(View.INVISIBLE);
+        }
+
+        // Video
         videoFile = new File(currentSlideDirectory.getPath() + "/video.3gp");
         if (videoFile.exists()) {
             video = Uri.parse(currentSlideDirectory.getPath() + "/video.3gp");
@@ -223,14 +263,52 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         String instructions = instructionsEdit.getText().toString();
         instructionsFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), instructions, INSTRUCTIONS);
 
+        // Audio
+        audioFile = DirectoryHandler.createFileForSlideContentAndReturnIt(coursePath + "/" + slideCounter, null, getContentResolver(), null, AUDIO );
+
         // Video
         if (video != null) {
             videoFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
         }
     }
 
-    private void configureAudio() {
 
+    private void configureAudio() {
+        recorder = new AudioRecorder();
+
+        // play button
+        playAudioButton = findViewById(R.id.button_play_audio);
+        // record button
+        recordAudioButton = findViewById(R.id.button_audio);
+        recordAudioButton.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        Toast.makeText(SlideCreationActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                        recorder.startRecording(audioFile.getPath());
+                        return true;
+                    case MotionEvent.ACTION_UP:
+                        Toast.makeText(SlideCreationActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                        recorder.stopRecording();
+                        audio = Uri.fromFile(audioFile);
+                        playAudioButton.setVisibility(View.VISIBLE);
+                        break;
+                }
+                return false;
+            }
+        });
+
+
+        playAudioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (audio != null) {
+                    audioPlayer = MediaPlayer.create(SlideCreationActivity.this, audio);
+                    audioPlayer.start();
+                }
+            }
+        });
     }
 
     private void configureVideoView() {

@@ -62,7 +62,9 @@ public class DirectoryHandler {
             case INSTRUCTIONS:
                 outputAddress += "/instructions.txt";
                 return copyTextToFile(outputAddress, script);
-
+            case AUDIO:
+                outputAddress += "/audio.3gp";
+                return new File(outputAddress);
             case VIDEO:
                 outputAddress += "/video.3gp";
                 return copyVideoToFile(outputAddress, originalUriPath, content);
@@ -72,8 +74,7 @@ public class DirectoryHandler {
     }
 
 
-
-    // Video
+    // Text
     private static File copyTextToFile(String outputPath, String script) {
         File textFile = new File(outputPath);
         try {
@@ -87,6 +88,8 @@ public class DirectoryHandler {
         return textFile;
     }
 
+
+    // Video
     private static File copyVideoToFile(String outputAddress, Uri originalUri, ContentResolver content) {
         InputStream in = null;
         try {

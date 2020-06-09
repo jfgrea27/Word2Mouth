@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
+import com.imperial.slidepassertrial.teach.offline.create.SlideCreationActivity;
 
 import java.io.File;
 import java.util.ArrayList;

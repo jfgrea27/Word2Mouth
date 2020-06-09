@@ -1,4 +1,4 @@
-package com.imperial.slidepassertrial.teach.offline;
+package com.imperial.slidepassertrial.teach.offline.create.video;
 
 import android.content.Context;
 import android.os.Bundle;

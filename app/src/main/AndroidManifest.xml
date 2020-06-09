@@ -23,12 +23,14 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:exported="true">
             <intent-filter>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.MAIN"/>
             </intent-filter>
         </activity>
         <activity
-            android:name=".teach.offline.SlideCreationActivity"
+            android:name=".teach.offline.create.SlideCreationActivity"
             android:screenOrientation="portrait" />
     </application>
 

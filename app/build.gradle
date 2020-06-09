@@ -3,8 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 29
     buildToolsVersion "29.0.3"
-
-    defaultConfig {
+   defaultConfig {
         applicationId "com.imperial.slidepassertrial"
         minSdkVersion 16
         targetSdkVersion 29
@@ -38,5 +37,4 @@ dependencies {
     testImplementation ("org.jmock:jmock-junit4:2.6.0") {
         exclude group:"junit"
     }
-
 }

@@ -84,7 +84,7 @@
             android:layout_width="115dp"
             android:layout_height="74dp"
             android:layout_alignParentRight="true"
-            android:src="@drawable/ic_next_arrow"
+            app:srcCompat="@drawable/ic_next_arrow"
             android:scaleType="fitCenter"
             android:background="@color/colorWhite"
             android:textSize="30sp" />
@@ -97,7 +97,18 @@
             android:layout_centerHorizontal="true"
             android:scaleType="fitCenter"
             android:background="@color/colorWhite"
-            android:src="@drawable/ic_microphone" />
+            app:srcCompat="@drawable/ic_microphone" />
+
+        <ImageButton
+            android:id="@+id/button_play_audio"
+            android:layout_width="115dp"
+            android:layout_height="74dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/button_audio"
+            android:background="@color/colorWhite"
+            android:scaleType="fitCenter"
+            app:srcCompat="@drawable/ic_play_button_black"
+            android:visibility="invisible"/>
 
         <ImageButton
             android:id="@+id/button_previous"
@@ -107,7 +118,7 @@
             android:layout_centerHorizontal="true"
             android:scaleType="fitCenter"
             android:background="@color/colorWhite"
-            android:src="@drawable/ic_back_arrow"
+            app:srcCompat="@drawable/ic_back_arrow"
 
             android:textSize="30sp" />
 
