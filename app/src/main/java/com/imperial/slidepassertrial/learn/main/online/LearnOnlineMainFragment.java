@@ -15,7 +15,6 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.imperial.slidepassertrial.R;
-import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
 
 import java.util.ArrayList;
 
@@ -73,15 +72,15 @@ public class LearnOnlineMainFragment extends Fragment {
     private ArrayList<String> data = new ArrayList<>();
 
     private void configureListView() {
-        courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
-        generateListContent();
-        courseList.setAdapter(new ArrayAdapterCourseItems(getView().getContext(), R.layout.list_item, data));
-        courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getView().getContext(), "Text about the course" + position, Toast.LENGTH_SHORT).show();
-            }
-        });
+//        courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
+//        generateListContent();
+//        courseList.setAdapter(new Ar(getView().getContext(), R.layout.list_item, data));
+//        courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                Toast.makeText(getView().getContext(), "Text about the course" + position, Toast.LENGTH_SHORT).show();
+//            }
+//        });
     }
 
 

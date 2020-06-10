@@ -2,9 +2,7 @@ package com.imperial.slidepassertrial.teach.offline;
 
 import android.content.ContentResolver;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.net.Uri;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -23,6 +21,8 @@ public class DirectoryHandler {
     public static final int VIDEO = 101;
     public static final int INSTRUCTIONS = 102;
     public static final int AUDIO = 103;
+    private static final int IMAGE = 104;
+
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
         File file = new File(context.getExternalFilesDir(null), courseName);
@@ -40,6 +40,12 @@ public class DirectoryHandler {
 
     public static File createDirectoryForSlideAndReturnIt(String coursePath, int slideNumber) {
         File file = new File(coursePath, "/" + slideNumber);
+        file.mkdirs();
+        return file;
+    }
+
+    public static File createDirectoryForMetaData(String coursePath) {
+        File file = new File(coursePath, "/" + "meta");
         file.mkdirs();
         return file;
     }
@@ -68,13 +74,16 @@ public class DirectoryHandler {
             case VIDEO:
                 outputAddress += "/video.3gp";
                 return copyVideoToFile(outputAddress, originalUriPath, content);
+            case IMAGE:
+                outputAddress += "/thumbnail.jpg";
+                return copyVideoToFile(outputAddress, originalUriPath, content);
             default:
                 return null;
         }
     }
 
-
     // Text
+
     private static File copyTextToFile(String outputPath, String script) {
         File textFile = new File(outputPath);
         try {
@@ -88,8 +97,8 @@ public class DirectoryHandler {
         return textFile;
     }
 
-
     // Video
+
     private static File copyVideoToFile(String outputAddress, Uri originalUri, ContentResolver content) {
         InputStream in = null;
         try {
@@ -125,5 +134,4 @@ public class DirectoryHandler {
             output.write(buffer, 0, bytesRead);
         }
     }
-
 }

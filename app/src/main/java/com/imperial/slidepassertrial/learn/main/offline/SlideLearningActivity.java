@@ -2,12 +2,10 @@ package com.imperial.slidepassertrial.learn.main.offline;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -15,14 +13,10 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.imperial.slidepassertrial.R;
+import com.imperial.slidepassertrial.shared.FileReader;
 import com.imperial.slidepassertrial.teach.offline.DirectoryHandler;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class SlideLearningActivity extends AppCompatActivity {
 
@@ -68,7 +62,7 @@ public class SlideLearningActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_slide_learning);
+        setContentView(R.layout.activity_learn_slide);
 
         coursePath = (String) getIntent().getExtras().get("course directory path");
 
@@ -174,25 +168,24 @@ public class SlideLearningActivity extends AppCompatActivity {
         // title
         titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
         if(titleFile.exists()) {
-            String string = readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/title.txt");
-            if (!string.isEmpty()) {
-                if (string.charAt(0) == '\n' && string.length() > 1) {
-                    string = string.substring(1);
-                }
+            String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/title.txt");
+            if (text.isEmpty()) {
+                titleView.setText("");
+            } else {
+                titleView.setText(text);
             }
-            titleView.setText(string);
         }
+
 
         // instructions
         instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
         if (instructionsFile.exists()) {
-            String string = readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt");
-            if (!string.isEmpty()) {
-                if (string.charAt(0) == '\n' && string.length() > 1) {
-                    string = string.substring(1);
-                }
+            String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/instructions.txt");
+            if (text.isEmpty()) {
+                instructionsView.setText("");
+            } else {
+                instructionsView.setText(text);
             }
-            instructionsView.setText(string);
         }
 
         // Audio
@@ -248,36 +241,5 @@ public class SlideLearningActivity extends AppCompatActivity {
                 }
             }
         });
-    }
-
-    private String readFromFile(Context context, String filePath) {
-
-        String ret = "";
-
-        try {
-            File file = new File(filePath);
-            FileInputStream inputStream = new FileInputStream(file);
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append("\n").append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-
-        return ret;
     }
 }

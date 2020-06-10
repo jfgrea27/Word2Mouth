@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".learn.main.offline.SlideLearningActivity"></activity>
+        <activity android:name=".teach.offline.create.TeachCourseCreationSummaryActivity"></activity>
+        <activity android:name=".learn.main.offline.SlideLearningActivity" />
         <activity
             android:name=".teach.TeachActivityMain"
             android:label="@string/title_activity_teach_main"
@@ -32,7 +33,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".teach.offline.create.SlideCreationActivity"
+            android:name=".teach.offline.create.TeachCourseCreationSlideActivity"
             android:screenOrientation="portrait" />
     </application>
 

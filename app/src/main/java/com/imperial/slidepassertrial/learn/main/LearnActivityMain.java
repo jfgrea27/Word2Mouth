@@ -43,6 +43,12 @@ public class LearnActivityMain extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+       recreate();
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

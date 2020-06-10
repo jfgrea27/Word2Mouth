@@ -3,6 +3,8 @@ package com.imperial.slidepassertrial.teach.offline;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,7 +23,9 @@ import android.widget.Toast;
 
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
-import com.imperial.slidepassertrial.teach.offline.create.SlideCreationActivity;
+import com.imperial.slidepassertrial.shared.CourseItem;
+import com.imperial.slidepassertrial.shared.FileReader;
+import com.imperial.slidepassertrial.teach.offline.create.TeachCourseCreationSummaryActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,8 +37,17 @@ import java.util.ArrayList;
  */
 public class TeachOfflineMainFragment extends Fragment {
 
-    private ImageButton create;
+    // View
+    private ImageButton create = null;
+    private ImageButton edit = null;
     private ListView courseList;
+
+
+    // Model
+    private boolean selectedCourse = false;
+
+    private ArrayList<CourseItem> localCourses = null;
+
 
     public TeachOfflineMainFragment() {
         // Required empty public constructor
@@ -71,19 +84,17 @@ public class TeachOfflineMainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         configureCreateButton();
+        configureEditButton();
         configureListView();
     }
 
 
-    // TODO
-    // DATA FOR THE COURSE LIST
-    // IMPROVE THE ROWS OF THE COURSE SELECTION
-    private ArrayList<String> data = new ArrayList<>();
-
     private void configureListView() {
         courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
-        generateListContent();
-        courseList.setAdapter(new ArrayAdapterCourseItems(getView().getContext(), R.layout.list_item, data));
+
+        localCourses = retrieveLocalCourses();
+
+        courseList.setAdapter(new ArrayAdapterCourseItems(getContext(), R.layout.list_item, localCourses));
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -92,8 +103,23 @@ public class TeachOfflineMainFragment extends Fragment {
         });
     }
 
+    private void configureEditButton() {
+        edit = getView().findViewById(R.id.edit_button);
 
-    // TODO
+        if (edit!= null) {
+            edit.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        }
+
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedCourse) {
+                    // TODO
+                }
+            }
+        });
+    }
+
     private void configureCreateButton() {
 
         create = getView().findViewById(R.id.create_button);
@@ -103,10 +129,10 @@ public class TeachOfflineMainFragment extends Fragment {
             File courseDirectory;
             @Override
             public void onClick(View v) {
-
                 AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
                 builder.setTitle("Course Name");
                 final EditText input = new EditText(getView().getContext());
+                input.setHint("Type Course Name");
                 input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
                 builder.setView(input);
 
@@ -123,7 +149,7 @@ public class TeachOfflineMainFragment extends Fragment {
                     }
 
                     private void intentToCreateCourseAndStartActivity() {
-                        Intent createIntent = new Intent(getView().getContext(), SlideCreationActivity.class);
+                        Intent createIntent = new Intent(getView().getContext(), TeachCourseCreationSummaryActivity.class);
                         createIntent.putExtra("course name", courseDirectory.getName());
                         createIntent.putExtra("course directory path", courseDirectory.getPath());
                         startActivity(createIntent);
@@ -137,17 +163,23 @@ public class TeachOfflineMainFragment extends Fragment {
                     }
                 });
                 builder.show();
-
-
-
             }
         });
     }
 
-    private void generateListContent() {
-        for(int i = 0; i < 55; i++) {
-            data.add("This is row number " + i);
-        }
-    }
+    private ArrayList<CourseItem> retrieveLocalCourses() {
+        ArrayList<CourseItem> courseItems = new ArrayList<>();
 
+        File directory = getView().getContext().getExternalFilesDir(null);
+
+        File[] courses = directory.listFiles();
+
+        for (File f : courses) {
+            String courseName = FileReader.readTextFromFile(f.getPath()+ "/meta/title.txt");
+
+            CourseItem courseItem= new CourseItem(courseName, f.getPath());
+            courseItems.add(courseItem);
+        }
+        return courseItems;
+    }
 }

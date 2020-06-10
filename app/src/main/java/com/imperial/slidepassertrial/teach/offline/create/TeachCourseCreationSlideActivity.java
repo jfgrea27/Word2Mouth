@@ -4,8 +4,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.MediaPlayer;
@@ -13,7 +11,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -22,18 +19,14 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.imperial.slidepassertrial.R;
+import com.imperial.slidepassertrial.shared.FileReader;
 import com.imperial.slidepassertrial.teach.offline.DirectoryHandler;
 import com.imperial.slidepassertrial.teach.offline.create.audio.AudioRecorder;
-import com.imperial.slidepassertrial.teach.offline.create.video.VideoDialog;
+import com.imperial.slidepassertrial.teach.offline.create.video.ImageDialog;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
-public class SlideCreationActivity extends AppCompatActivity implements VideoDialog.OnInputListener {
+public class TeachCourseCreationSlideActivity extends AppCompatActivity implements ImageDialog.OnInputListener {
 
     // General Activity Buttons
     private ImageButton previousSlide;
@@ -83,7 +76,7 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_slide_creation);
+        setContentView(R.layout.activity_teach_course_slide_creation);
 
         // get Extras
         coursePath = (String) getIntent().getExtras().get("course directory path");
@@ -126,12 +119,12 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
             slideCounter--;
             // reach first slide
             if (slideCounter < 0) {
-                Toast.makeText(SlideCreationActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TeachCourseCreationSlideActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
                 slideCounter++;
             }
             // retrieve previously saved file data
             else {
-                Toast.makeText(SlideCreationActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TeachCourseCreationSlideActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
                 retrieveSavedSlide();
                 updateCurrentView();
             }
@@ -149,12 +142,12 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
                 slideCounter++;
                 // creating a new Slide
                 if(totalNumberSlides < slideCounter) {
-                    Toast.makeText(SlideCreationActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachCourseCreationSlideActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
                     createBlankSlide();
                 }
                 // retrieve previously saved file data
                 else {
-                    Toast.makeText(SlideCreationActivity.this, "Retrieve Next Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachCourseCreationSlideActivity.this, "Retrieve Next Slide", Toast.LENGTH_SHORT).show();
                     retrieveSavedSlide();
                     updateCurrentView();
                 }
@@ -166,8 +159,10 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
 
     private void updateCurrentView() {
         // refresh video view
-        videoView.setVisibility(View.GONE);
-        videoView.setVisibility(View.VISIBLE);
+        if (videoView != null) {
+            videoView.setVisibility(View.GONE);
+            videoView.setVisibility(View.VISIBLE);
+        }
 
         if (video != null) {
             videoView.setVideoURI(video);
@@ -215,29 +210,26 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         // title
         titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
         if(titleFile.exists()) {
-            String string = readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/title.txt");
-            if (!string.isEmpty()) {
-                if (string.charAt(0) == '\n' && string.length() > 1) {
-                    string = string.substring(1);
-                }
+            String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/title.txt");
+            if (text.isEmpty()) {
+                titleEdit.setText("");
+            } else {
+                titleEdit.setText(text);
+                titleEdit.setSelection(instructionsEdit.length());
             }
-            titleEdit.setText(string);
-            titleEdit.setSelection(instructionsEdit.length());
         }
 
         // instructions
         instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
         if (instructionsFile.exists()) {
-            String string = readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt");
-            if (!string.isEmpty()) {
-                if (string.charAt(0) == '\n' && string.length() > 1) {
-                    string = string.substring(1);
-                }
+            String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/instructions.txt");
+            if (text.isEmpty()) {
+                instructionsEdit.setText("");
+            } else {
+                instructionsEdit.setText(text);
+                instructionsEdit.setSelection(instructionsEdit.length());
             }
-            instructionsEdit.setText(string);
-            instructionsEdit.setSelection(instructionsEdit.length());
         }
-        //readFromFile(getApplicationContext(),currentSlideDirectory.getPath() + "/instructions.txt"))
 
         // Audio
         audioFile = new File(currentSlideDirectory.getPath() + "/audio.3gp");
@@ -275,7 +267,7 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         instructionsFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), instructions, INSTRUCTIONS);
 
         // Audio
-        audioFile = DirectoryHandler.createFileForSlideContentAndReturnIt(coursePath + "/" + slideCounter, null, getContentResolver(), null, AUDIO );
+        audioFile = DirectoryHandler.createFileForSlideContentAndReturnIt(coursePath + "/" + slideCounter, null, getContentResolver(), null, AUDIO);
 
         // Video
         if (video != null) {
@@ -296,11 +288,11 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
             public boolean onTouch(View v, MotionEvent event) {
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
-                        Toast.makeText(SlideCreationActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachCourseCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
                         recorder.startRecording(audioFile.getPath());
                         return true;
                     case MotionEvent.ACTION_UP:
-                        Toast.makeText(SlideCreationActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachCourseCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
                         recorder.stopRecording();
                         audio = Uri.fromFile(audioFile);
                         playAudioButton.setVisibility(View.VISIBLE);
@@ -315,7 +307,7 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
             @Override
             public void onClick(View v) {
                 if (audio != null) {
-                    audioPlayer = MediaPlayer.create(SlideCreationActivity.this, audio);
+                    audioPlayer = MediaPlayer.create(TeachCourseCreationSlideActivity.this, audio);
                     audioPlayer.start();
                 }
             }
@@ -328,8 +320,8 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
             @Override
             public void onClick(View v) {
 
-                VideoDialog videoDialog = new VideoDialog();
-                videoDialog.show(getSupportFragmentManager(), "Video Dialog");
+                ImageDialog imageDialog = new ImageDialog();
+                imageDialog.show(getSupportFragmentManager(), "Video Dialog");
 
             }
         });
@@ -408,34 +400,5 @@ public class SlideCreationActivity extends AppCompatActivity implements VideoDia
         }
     }
 
-    private String readFromFile(Context context, String filePath) {
 
-        String ret = "";
-
-        try {
-            File file = new File(filePath);
-            FileInputStream inputStream = new FileInputStream(file);
-
-            if ( inputStream != null ) {
-                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-                String receiveString = "";
-                StringBuilder stringBuilder = new StringBuilder();
-
-                while ( (receiveString = bufferedReader.readLine()) != null ) {
-                    stringBuilder.append("\n").append(receiveString);
-                }
-
-                inputStream.close();
-                ret = stringBuilder.toString();
-            }
-        }
-        catch (FileNotFoundException e) {
-            Log.e("login activity", "File not found: " + e.toString());
-        } catch (IOException e) {
-            Log.e("login activity", "Can not read file: " + e.toString());
-        }
-
-        return ret;
-    }
 }

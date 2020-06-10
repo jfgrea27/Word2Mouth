@@ -14,11 +14,15 @@
         <ListView
             android:id="@+id/list_view_course_offline"
             android:layout_width="match_parent"
-            android:layout_height="495dp"
+            android:layout_height="321dp"
+            app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
             app:layout_constraintTop_toTopOf="parent"
-            tools:layout_editor_absoluteX="-5dp">
+            app:layout_constraintVertical_bias="0.0"
+            tools:layout_editor_absoluteX="0dp">
 
         </ListView>
+
+
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/relativeLayout"
@@ -32,17 +36,38 @@
                 android:id="@+id/create_button"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginBottom="80dp"
+                android:layout_marginBottom="84dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/todo"
                 android:paddingTop="25dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.286"
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@drawable/ic_create">
 
             </ImageButton>
+
+
+            <ImageButton
+                android:id="@+id/edit_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="84dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/todo"
+                android:paddingTop="25dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.311"
+                app:layout_constraintStart_toEndOf="@+id/create_button"
+                app:srcCompat="@drawable/ic_edit">
+
+            </ImageButton>
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

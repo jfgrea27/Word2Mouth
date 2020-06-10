@@ -1,6 +1,10 @@
 package com.imperial.slidepassertrial.shared;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.media.MediaPlayer;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,57 +19,91 @@ import androidx.annotation.Nullable;
 
 import com.imperial.slidepassertrial.R;
 
+import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
-public class ArrayAdapterCourseItems extends ArrayAdapter<String> {
-
-    private static ArrayList<String> courseItems;
+public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
+    private static ArrayList<CourseItem> courseItems;
 
     private int layout;
-    public ArrayAdapterCourseItems(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
+    private Context context;
+    public ArrayAdapterCourseItems(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
         courseItems = objects;
+        this.context = context;
     }
 
-    public static String getCourseName(int position) {
-        if (position < courseItems.size() && position > -1) {
-            return courseItems.get(position);
-        }
-        return null;
-    }
 
 
     @NonNull
     @Override
-    public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        ViewHolder mainViewHolder = null;
+    public View getView(final int position, @Nullable View convertView, @NonNull final ViewGroup parent) {
+        ArrayAdapterCourseItems.ViewHolder mainViewHolder = null;
+
+        File thumbnailFile;
+        final File audioFile;
+        Uri audioUri = null;
 
         if(convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(layout, parent, false);
 
-            ViewHolder viewhHolder = new ViewHolder();
+            ArrayAdapterCourseItems.ViewHolder viewhHolder = new ArrayAdapterCourseItems.ViewHolder();
 
             viewhHolder.thumbnail = convertView.findViewById(R.id.list_item_thumbnail);
+            thumbnailFile = new File(courseItems.get(position).getThumbnail().getPath());
+            if (thumbnailFile.exists()) {
+                viewhHolder.thumbnail.setImageURI(Uri.parse(thumbnailFile.getPath()));
+            }
+
+
             viewhHolder.title = convertView.findViewById(R.id.list_item_text);
-            viewhHolder.audio = convertView.findViewById(R.id.list_item_button);
+            viewhHolder.title.setText(courseItems.get(position).getCourseName());
+
+            viewhHolder.audio = convertView.findViewById(R.id.list_audio_button);
+            audioFile = new File(courseItems.get(position).getAudio().getPath());
+            if (audioFile.exists()) {
+                audioUri =  Uri.parse(courseItems.get(position).getAudio().getPath());
+            }
+
+
             convertView.setTag(viewhHolder);
         }
-        mainViewHolder = (ViewHolder) convertView.getTag();
+
+        mainViewHolder = (ArrayAdapterCourseItems.ViewHolder) convertView.getTag();
+
+        final Uri finalAudioUri = audioUri;
+        final ViewHolder finalMainViewHolder = mainViewHolder;
         mainViewHolder.audio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Audio for the Course", Toast.LENGTH_SHORT).show();
+
+                MediaPlayer player;
+                if (finalAudioUri != null) {
+                    finalMainViewHolder.audio.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    player = MediaPlayer.create(getContext(), finalAudioUri);
+                    player.start();
+
+                    player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            finalMainViewHolder.audio.setColorFilter(null);
+                        }
+                    });
+                } else {
+                    Toast.makeText(getContext(), "No audio File", Toast.LENGTH_SHORT).show();
+                }
+
+
             }
+
+
         });
-        mainViewHolder.title.setText(getItem(position));
+
         return convertView;
-
     }
-
 
     public class ViewHolder {
         ImageView thumbnail;

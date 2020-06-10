@@ -20,10 +20,11 @@ import android.widget.Toast;
 
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
+import com.imperial.slidepassertrial.shared.CourseItem;
+import com.imperial.slidepassertrial.shared.FileReader;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -42,10 +43,11 @@ public class LearnOfflineMainFragment extends Fragment {
     private ListView courseList;
     private File directory;
     private File[] fileList;
-    private  ArrayList<String> fileNames;
     private ArrayAdapterCourseItems adapter;
 
     // Model
+    private ArrayList<CourseItem> localCourses = null;
+
     private boolean selectedCourse = false;
     private String courseName = null;
 
@@ -67,12 +69,6 @@ public class LearnOfflineMainFragment extends Fragment {
         return fragment;
     }
 
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        adapter.notifyDataSetChanged();
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,8 +95,11 @@ public class LearnOfflineMainFragment extends Fragment {
 
     private void configureListView() {
         courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
-        configureCourseOnSystem();
-        adapter = new ArrayAdapterCourseItems(getView().getContext(), R.layout.list_item, fileNames);
+
+        localCourses = retrieveLocalCourses();
+
+        adapter = new ArrayAdapterCourseItems(getContext(), R.layout.list_item, localCourses);
+
         courseList.setAdapter(adapter);
         courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @SuppressLint("ResourceAsColor")
@@ -191,17 +190,21 @@ public class LearnOfflineMainFragment extends Fragment {
         }
     }
 
-    private void configureCourseOnSystem() {
-        directory = new File(getView().getContext().getExternalFilesDir(null).getPath());
-        fileList = directory.listFiles();
-        fileNames = new ArrayList<>();
 
-        for (int i = 0; i < fileList.length; i++) {
-            fileNames.add(fileList[i].getName());
+    private ArrayList<CourseItem> retrieveLocalCourses() {
+        ArrayList<CourseItem> courseItems = new ArrayList<>();
+
+        File directory = getView().getContext().getExternalFilesDir(null);
+
+        File[] courses = directory.listFiles();
+
+        for (File f : courses) {
+            String courseName = FileReader.readTextFromFile(f.getPath()+ "/meta/title.txt");
+
+            CourseItem courseItem= new CourseItem(courseName, f.getPath());
+            courseItems.add(courseItem);
         }
+        return courseItems;
     }
-
-
-
 
 }

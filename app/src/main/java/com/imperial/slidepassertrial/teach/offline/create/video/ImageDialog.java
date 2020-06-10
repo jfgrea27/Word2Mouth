@@ -15,7 +15,7 @@ import androidx.fragment.app.DialogFragment;
 
 import com.imperial.slidepassertrial.R;
 
-public class VideoDialog extends DialogFragment {
+public class ImageDialog extends DialogFragment {
 
     public interface OnInputListener {
         void sendInput(int choice);
