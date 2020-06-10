@@ -84,14 +84,17 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
                 if (finalAudioUri != null) {
                     finalMainViewHolder.audio.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                     player = MediaPlayer.create(getContext(), finalAudioUri);
-                    player.start();
+                    if (player != null) {
+                        player.start();
 
-                    player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            finalMainViewHolder.audio.setColorFilter(null);
-                        }
-                    });
+                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                finalMainViewHolder.audio.setColorFilter(null);
+                            }
+                        });
+                    }
+
                 } else {
                     Toast.makeText(getContext(), "No audio File", Toast.LENGTH_SHORT).show();
                 }

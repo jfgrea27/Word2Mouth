@@ -99,7 +99,8 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         configureAudio();
 
         // First slide
-        updateFileContent();
+        initialSetUp();
+        retrieveSavedSlide();
     }
 
     private void configureInstructionsEdit() {
@@ -235,6 +236,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         audioFile = new File(currentSlideDirectory.getPath() + "/audio.3gp");
         if (audioFile.exists()) {
             audio = Uri.parse(currentSlideDirectory.getPath() + "/audio.3gp");
+            playAudioButton.setVisibility(View.VISIBLE);
         } else {
             audio = null;
             playAudioButton.setVisibility(View.INVISIBLE);
@@ -244,6 +246,8 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         videoFile = new File(currentSlideDirectory.getPath() + "/video.3gp");
         if (videoFile.exists()) {
             video = Uri.parse(currentSlideDirectory.getPath() + "/video.3gp");
+            videoView.setVideoURI(video);
+            videoPreview.setVisibility(View.VISIBLE);
         } else {
             videoView.setVideoURI(null);
             video = null;
@@ -253,6 +257,18 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         }
     }
 
+    private void initialSetUp() {
+        // Saving on Disk
+        currentSlideDirectory = DirectoryHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
+
+        // Audio
+        audioFile = DirectoryHandler.createFileForSlideContentAndReturnIt(coursePath + "/" + slideCounter, null, getContentResolver(), null, AUDIO);
+
+        // Video
+        if (video != null) {
+            videoFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
+        }
+    }
 
     private void updateFileContent() {
         // Saving on Disk
@@ -260,6 +276,9 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
 
         // Title
         String title = titleEdit.getText().toString();
+        if (title.equals("")) {
+            title = "Untitled Slide";
+        }
         titleFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), title, TITLE);
 
         // Instructions

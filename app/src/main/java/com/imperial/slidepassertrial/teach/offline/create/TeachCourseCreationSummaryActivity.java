@@ -241,6 +241,9 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                 case GALLERY_SELECTION:
                     Toast.makeText(this, "Image Returned ", Toast.LENGTH_SHORT).show();
                     imageUri= data.getData();
+                    if (imageUri != null) {
+                        DirectoryHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
+                    }
                     thumbnail.setImageURI(imageUri);
                     break;
 

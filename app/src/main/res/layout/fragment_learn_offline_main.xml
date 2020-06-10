@@ -14,36 +14,37 @@
     <ListView
         android:id="@+id/list_view_course_offline"
         android:layout_width="match_parent"
-        android:layout_height="321dp"
+        android:layout_height="374dp"
         app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
-        tools:layout_editor_absoluteX="0dp">
+        android:focusable="false"
+        app:layout_constraintVertical_bias="0.0">
 
     </ListView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="209dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_height="182dp"
         android:background="@color/design_default_color_on_primary"
-        tools:layout_editor_absoluteX="2dp">
+        app:layout_constraintBottom_toBottomOf="parent"
+        tools:layout_editor_absoluteX="6dp">
 
         <ImageButton
             android:id="@+id/share_button"
-            android:contentDescription="@string/share"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginLeft="24dp"
-            android:layout_marginBottom="80dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginBottom="40dp"
             android:background="@android:color/transparent"
+            android:contentDescription="@string/share"
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toEndOf="@+id/learn_button"
-            app:srcCompat="@drawable/ic_share"
-            android:layout_marginStart="24dp">
+            app:srcCompat="@drawable/ic_share">
 
         </ImageButton>
 
@@ -51,22 +52,22 @@
             android:id="@+id/receive_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginBottom="80dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="40dp"
+            android:layout_toEndOf="@id/share_button"
             android:layout_toRightOf="@id/share_button"
             android:background="@android:color/transparent"
-            android:paddingStart="30dp"
-            android:paddingTop="25dp"
+            android:contentDescription="@string/todo"
 
+            android:paddingStart="30dp"
+            android:paddingLeft="30dp"
+            android:paddingTop="25dp"
+            android:paddingRight="30dp"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/learn_button"
-            app:srcCompat="@drawable/ic_receive"
-            android:contentDescription="@string/todo"
-            android:layout_toEndOf="@id/share_button"
-            android:paddingRight="30dp"
-            android:paddingLeft="30dp">
+            app:srcCompat="@drawable/ic_receive">
 
         </ImageButton>
 
@@ -75,13 +76,14 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_below="@id/share_button"
-            android:layout_marginBottom="80dp"
+            android:layout_marginBottom="40dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/todo"
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/ic_learn">
 

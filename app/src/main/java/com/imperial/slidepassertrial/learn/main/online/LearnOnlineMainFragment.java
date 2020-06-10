@@ -62,26 +62,8 @@ public class LearnOnlineMainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         configureDownloadButton();
-        configureListView();
     }
 
-
-    // TODO
-    // DATA FOR THE COURSE LIST
-    // IMPROVE THE ROWS OF THE COURSE SELECTION
-    private ArrayList<String> data = new ArrayList<>();
-
-    private void configureListView() {
-//        courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
-//        generateListContent();
-//        courseList.setAdapter(new Ar(getView().getContext(), R.layout.list_item, data));
-//        courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(getView().getContext(), "Text about the course" + position, Toast.LENGTH_SHORT).show();
-//            }
-//        });
-    }
 
 
     private void configureDownloadButton() {
@@ -94,11 +76,6 @@ public class LearnOnlineMainFragment extends Fragment {
         });
     }
 
-    private void generateListContent() {
-        for(int i = 0; i < 55; i++) {
-            data.add("This is row number " + i);
-        }
-    }
 
 
 }

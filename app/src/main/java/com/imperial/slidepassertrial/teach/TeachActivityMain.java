@@ -36,6 +36,13 @@ public class TeachActivityMain extends AppCompatActivity {
         tabs.getTabAt(1).setIcon(R.drawable.ic_offline_online_1);
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        recreate();
+    }
+
+
 
     private void setToolBar() {
         androidx.appcompat.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.teach_toolbar);
