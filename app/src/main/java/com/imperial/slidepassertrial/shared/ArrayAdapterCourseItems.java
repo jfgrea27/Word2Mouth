@@ -113,10 +113,6 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
 
         });
 
-
-
-
-
         return convertView;
     }
 
@@ -132,10 +128,18 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
         return position;
     }
 
+    public void notifyDeleted() {
+        notifyDataSetChanged();
+    }
+
     public class ViewHolder {
         ImageView thumbnail;
         TextView title;
+
         ImageButton audio;
+        public String getCourseName() {
+            return title.getText().toString();
+        }
 
     }
 

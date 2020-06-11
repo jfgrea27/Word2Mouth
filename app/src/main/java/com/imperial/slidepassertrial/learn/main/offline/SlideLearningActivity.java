@@ -14,7 +14,7 @@ import android.widget.VideoView;
 
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.FileReader;
-import com.imperial.slidepassertrial.teach.offline.FileHandler;
+import com.imperial.slidepassertrial.shared.FileHandler;
 
 import java.io.File;
 
@@ -67,7 +67,8 @@ public class SlideLearningActivity extends AppCompatActivity {
         coursePath = (String) getIntent().getExtras().get("course directory path");
 
         courseFolder = new File(coursePath);
-        totalNumberSlides = courseFolder.listFiles().length;
+        // meta
+        totalNumberSlides = courseFolder.listFiles().length - 1;
 
 
         // Forward and Backward Buttons
@@ -126,7 +127,7 @@ public class SlideLearningActivity extends AppCompatActivity {
             public void onClick(View v) {
                 slideCounter++;
                 // creating a new Slide
-                if(totalNumberSlides == slideCounter) {
+                if(totalNumberSlides <= slideCounter) {
                     Toast.makeText(SlideLearningActivity.this, "End Of Slide Show", Toast.LENGTH_SHORT).show();
                     slideCounter--;
                 }
@@ -146,6 +147,8 @@ public class SlideLearningActivity extends AppCompatActivity {
         if (videoView != null) {
             videoView.setVisibility(View.GONE);
             videoView.setVisibility(View.VISIBLE);
+        } else{
+            videoView.setVisibility(View.INVISIBLE);
         }
 
         if (video != null) {

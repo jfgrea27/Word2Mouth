@@ -20,7 +20,7 @@ import android.widget.VideoView;
 
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.FileReader;
-import com.imperial.slidepassertrial.teach.offline.FileHandler;
+import com.imperial.slidepassertrial.shared.FileHandler;
 import com.imperial.slidepassertrial.teach.offline.create.audio.AudioRecorder;
 import com.imperial.slidepassertrial.teach.offline.create.video.ImageDialog;
 
@@ -81,6 +81,12 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         coursePath = (String) getIntent().getExtras().get("course directory path");
         totalNumberSlides = (int) getIntent().getExtras().get("number of slides");
 
+        try {
+            slideCounter = (int) getIntent().getExtras().get("slide number");
+        } catch (Exception e) {
+
+        }
+
         // Forward and Backward Buttons
         configurePreviousButton();
         configureNextButton();
@@ -98,9 +104,14 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         // Audio
         configureAudio();
 
+
         // First slide
-        initialSetUp();
+        if (slideCounter == 0) {
+            initialSetUp();
+        }
+
         retrieveSavedSlide();
+
     }
 
     private void configureInstructionsEdit() {

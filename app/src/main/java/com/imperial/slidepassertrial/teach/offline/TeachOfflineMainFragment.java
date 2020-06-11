@@ -1,5 +1,6 @@
 package com.imperial.slidepassertrial.teach.offline;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -24,6 +25,7 @@ import android.widget.Toast;
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
 import com.imperial.slidepassertrial.shared.CourseItem;
+import com.imperial.slidepassertrial.shared.FileHandler;
 import com.imperial.slidepassertrial.shared.FileReader;
 import com.imperial.slidepassertrial.teach.offline.create.TeachCourseCreationSummaryActivity;
 
@@ -40,14 +42,20 @@ public class TeachOfflineMainFragment extends Fragment {
     // View
     private ImageButton create = null;
     private ImageButton edit = null;
+    private ImageButton delete = null;
     private ListView courseList;
+
 
 
     // Model
     private boolean selectedCourse = false;
+    private CourseItem courseItem = null;
+    private String courseName = null;
+    private File courseDirectory = null;
 
+    // Adapter for the ListView
     private ArrayList<CourseItem> localCourses = null;
-
+    private ArrayAdapterCourseItems adapter = null;
 
     public TeachOfflineMainFragment() {
         // Required empty public constructor
@@ -85,6 +93,7 @@ public class TeachOfflineMainFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         configureCreateButton();
         configureEditButton();
+        configureDeleteButton();
         configureListView();
     }
 
@@ -94,13 +103,56 @@ public class TeachOfflineMainFragment extends Fragment {
 
         localCourses = retrieveLocalCourses();
 
-        courseList.setAdapter(new ArrayAdapterCourseItems(getContext(), R.layout.list_item, localCourses));
-        courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getView().getContext(), "Text about the course" + position, Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (localCourses.size() > 0) {
+            adapter = new ArrayAdapterCourseItems(getContext(), R.layout.list_item, localCourses);
+            courseList.setAdapter(adapter);
+            courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @SuppressLint("ResourceAsColor")
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        View item = courseList.getChildAt(i);
+                        if (item != null) {
+                            item.setBackgroundColor(Color.WHITE);
+                        }
+                    }
+
+                    if (selectedCourse) {
+                        view.setBackgroundColor(Color.WHITE);
+                        selectedCourse = false;
+                        if (delete != null) {
+                            delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                        }
+
+                        if (edit != null) {
+                            edit.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                        }
+
+                        if (create != null) {
+                            create.setColorFilter(null);
+                        }
+                        courseName = null;
+
+                    } else {
+                        selectedCourse = true;
+                        view.setBackgroundColor(Color.LTGRAY);
+                        if (delete != null) {
+                            delete.setColorFilter(null);
+                        }
+                        if (edit != null) {
+                            edit.setColorFilter(null);
+                        }
+
+                        if (create != null) {
+                            create.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                        }
+
+                        courseItem = (CourseItem) parent.getAdapter().getItem(position);
+                        courseName = courseItem.getCourseName();
+                    }
+                }
+            });
+        }
     }
 
     private void configureEditButton() {
@@ -114,19 +166,48 @@ public class TeachOfflineMainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (selectedCourse) {
-                    // TODO
+                    Intent createIntent = new Intent(getView().getContext(), TeachCourseCreationSummaryActivity.class);
+                    createIntent.putExtra("course name", courseName);
+                    createIntent.putExtra("course directory path", getView().getContext().getExternalFilesDir(null) + "/" + courseName);
+                    startActivity(createIntent);
                 }
             }
         });
     }
+
+    private void configureDeleteButton() {
+        delete = getView().findViewById(R.id.delete_button);
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedCourse) {
+                    if (courseName != null) {
+                        File courseFile = new File(getView().getContext().getExternalFilesDir(null) + "/" + courseName);
+                        if (courseFile.exists()) {
+                            Toast.makeText(getView().getContext(), "Deleting Course: " + courseName, Toast.LENGTH_SHORT).show();
+                            FileHandler.deleteRecursive(courseFile);
+                            adapter.remove(courseItem);
+                            adapter.notifyDataSetChanged();
+                            adapter.notifyDataSetInvalidated();
+                        }
+                    }
+                }
+                delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+            }
+        });
+
+        if (delete != null) {
+            delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        }
+    }
+
 
     private void configureCreateButton() {
 
         create = getView().findViewById(R.id.create_button);
 
         create.setOnClickListener(new View.OnClickListener() {
-            String courseName = "";
-            File courseDirectory;
             @Override
             public void onClick(View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());

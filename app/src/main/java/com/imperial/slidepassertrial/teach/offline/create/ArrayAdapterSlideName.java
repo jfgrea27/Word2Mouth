@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.imperial.slidepassertrial.R;
+import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 public class ArrayAdapterSlideName extends ArrayAdapter<String> {
 
     private static ArrayList<String> slideNames;
-
+    private ViewHolder holder = null;
     private int layout;
     private Context context;
     public ArrayAdapterSlideName(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
@@ -41,21 +42,37 @@ public class ArrayAdapterSlideName extends ArrayAdapter<String> {
         final File audioFile;
         Uri audioUri = null;
 
+
         if(convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(layout, parent, false);
 
-            ArrayAdapterSlideName.ViewHolder viewhHolder = new ArrayAdapterSlideName.ViewHolder();
+            holder = new ArrayAdapterSlideName.ViewHolder();
 
-            viewhHolder.slideName = convertView.findViewById(R.id.list_item_text);
-            viewhHolder.slideName.setText(position + ". " + slideNames.get(position));
+            holder.slideName = convertView.findViewById(R.id.list_item_text);
 
-            convertView.setTag(viewhHolder);
+
+            convertView.setTag(holder);
+        } else {
+            holder = (ArrayAdapterSlideName.ViewHolder) convertView.getTag();
         }
 
-        mainViewHolder = (ArrayAdapterSlideName.ViewHolder) convertView.getTag();
+        holder.slideName.setText(position + ". " + slideNames.get(position));
 
         return convertView;
+    }
+
+
+    @Override
+    public int getViewTypeCount() {
+
+        return getCount();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        return position;
     }
 
     public class ViewHolder {

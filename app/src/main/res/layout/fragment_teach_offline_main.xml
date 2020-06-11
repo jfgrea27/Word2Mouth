@@ -33,41 +33,57 @@
             android:background="@color/design_default_color_on_primary"
             tools:layout_editor_absoluteX="2dp">
 
+
             <ImageButton
                 android:id="@+id/create_button"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginBottom="84dp"
+                android:layout_marginBottom="72dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/todo"
                 android:paddingTop="25dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.286"
+                app:layout_constraintHorizontal_bias="0.163"
                 app:layout_constraintStart_toStartOf="parent"
                 app:srcCompat="@drawable/ic_create">
 
             </ImageButton>
 
-
             <ImageButton
                 android:id="@+id/edit_button"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
-                android:layout_marginBottom="84dp"
+                android:layout_marginBottom="72dp"
                 android:background="@android:color/transparent"
                 android:contentDescription="@string/todo"
                 android:paddingTop="25dp"
                 android:scaleType="fitCenter"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.311"
+                app:layout_constraintHorizontal_bias="0.839"
                 app:layout_constraintStart_toEndOf="@+id/create_button"
                 app:srcCompat="@drawable/ic_edit">
 
             </ImageButton>
 
+            <ImageButton
+                android:id="@+id/delete_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginBottom="72dp"
+                android:background="@android:color/transparent"
+                android:contentDescription="@string/todo"
+                android:paddingTop="25dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.549"
+                app:layout_constraintStart_toStartOf="parent"
+                app:srcCompat="@drawable/ic_delete">
+
+            </ImageButton>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

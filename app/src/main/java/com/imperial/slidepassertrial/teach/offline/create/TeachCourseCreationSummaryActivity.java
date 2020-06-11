@@ -4,9 +4,12 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -21,13 +24,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imperial.slidepassertrial.R;
+import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
+import com.imperial.slidepassertrial.shared.CourseItem;
 import com.imperial.slidepassertrial.shared.FileReader;
-import com.imperial.slidepassertrial.teach.offline.FileHandler;
+import com.imperial.slidepassertrial.shared.FileHandler;
 import com.imperial.slidepassertrial.teach.offline.create.audio.AudioRecorder;
 import com.imperial.slidepassertrial.teach.offline.create.video.ImageDialog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
@@ -54,10 +60,12 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     // List View of Slides
     private ListView slides = null;
 
-    // Create Button
-    private ImageButton create = null;
+    private ArrayList<String> localSlides = null;
+    private ArrayAdapterSlideName adapter = null;
+    private boolean selectedSlide = false;
 
     // File
+    private static final int TITLE = 100;
     private File metaDirectory = null;
     private File audioFile = null;
     private String courseDirectoryPath = null;
@@ -69,11 +77,13 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
     public static final int AUDIO = 103;
     private static final int IMAGE = 104;
-    private static final int TITLE = 100;
 
+    private int slideNumber = 0;
 
-
-    private ArrayList<String> localSlides;
+    // Bottom View Button
+    private ImageButton delete = null;
+    private ImageButton edit = null;
+    private ImageButton create = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,6 +113,9 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         configureListViewSlides();
 
         configureCreateButton();
+        configureDeleteButton();
+        configureEditButton();
+
     }
 
     private void configureListViewSlides() {
@@ -110,11 +123,49 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
         localSlides = retrieveLocalSlides();
 
-        slides.setAdapter(new ArrayAdapterSlideName(TeachCourseCreationSummaryActivity.this, R.layout.list_slide, localSlides));
+        adapter = new ArrayAdapterSlideName(TeachCourseCreationSummaryActivity.this, R.layout.list_slide, localSlides);
+        slides.setAdapter(adapter);
         slides.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(TeachCourseCreationSummaryActivity.this, "Slide number" + position, Toast.LENGTH_SHORT).show();
+
+                for (int i = 0; i < adapter.getCount(); i++) {
+                    View item = slides.getChildAt(i);
+                        if (item != null) {
+                            item.setBackgroundColor(Color.WHITE);
+                        }
+                }
+
+                if (selectedSlide) {
+                    view.setBackgroundColor(Color.WHITE);
+                    selectedSlide = false;
+                    if (delete != null) {
+                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    }
+                    if (edit != null) {
+                        edit.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    }
+                    if (create != null) {
+                        create.setColorFilter(null);
+                    }
+                    slideNumber = 0 ;
+
+                } else {
+                    selectedSlide = true;
+                    view.setBackgroundColor(Color.LTGRAY);
+                    if (delete != null) {
+                        delete.setColorFilter(null);
+                    }
+                    if (edit != null) {
+                        edit.setColorFilter(null);
+                    }
+
+                    if (create != null) {
+                        create.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    }
+
+                    slideNumber = position;
+                 }
             }
         });
 
@@ -127,7 +178,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         File directory = new File(courseDirectoryPath);
 
         File[] slidesFiles = directory.listFiles();
-        numberOfSlides = slidesFiles.length;
+        numberOfSlides = slidesFiles.length - 1;
 
         for (File f : slidesFiles) {
             String slideName;
@@ -212,7 +263,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     }
 
     private void configureCreateButton() {
-        create = findViewById(R.id.course_create_button);
+        create = findViewById(R.id.create_button);
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -220,10 +271,76 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                 Intent createFirstSlideIntent = new Intent(TeachCourseCreationSummaryActivity.this, TeachCourseCreationSlideActivity.class);
                 createFirstSlideIntent.putExtra("course directory path", courseDirectoryPath);
                 // take into account the meta file
-                createFirstSlideIntent.putExtra("number of slides", numberOfSlides - 1);
+                createFirstSlideIntent.putExtra("number of slides", numberOfSlides);
                 startActivity(createFirstSlideIntent);
             }
         });
+    }
+
+    private void configureEditButton() {
+        edit = findViewById(R.id.edit_button);
+
+        edit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (selectedSlide && slideNumber > 0) {
+                    Intent editIntent = new Intent(TeachCourseCreationSummaryActivity.this, TeachCourseCreationSlideActivity.class);
+                    // starts at 0
+                    editIntent.putExtra("slide number", slideNumber - 1);
+                    // meta not included
+                    editIntent.putExtra("course directory path", courseDirectoryPath);
+                    editIntent.putExtra("number of slides", numberOfSlides);
+                    startActivity(editIntent);
+                }
+            }
+        });
+
+        if (edit != null) {
+            edit.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        }
+    }
+
+    private void configureDeleteButton() {
+        delete = findViewById(R.id.delete_button);
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int currentItem = slideNumber - 1;
+                int nextItem = currentItem + 1;
+
+                File currentItemFile = null;
+                File nextItemFile = null;
+
+                while (nextItem < numberOfSlides) {
+                    currentItemFile = new File(courseDirectoryPath + "/" + currentItem);
+                    nextItemFile = new File(courseDirectoryPath + "/" + nextItem);
+
+                    try {
+                        FileHandler.copyDirectoryOneLocationToAnotherLocation(nextItemFile, currentItemFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    currentItem++;
+                    nextItem++;
+                }
+
+                currentItemFile = new File(courseDirectoryPath + "/" + currentItem);
+
+                if (currentItemFile.exists()) {
+                    FileHandler.deleteRecursive(currentItemFile);
+                    adapter.remove(adapter.getItem(currentItem));
+                    adapter.notifyDataSetChanged();
+                    adapter.notifyDataSetInvalidated();
+                }
+            }
+        });
+
+
+        if (delete != null) {
+            delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        }
     }
 
     private void saveMetaData() {
@@ -248,7 +365,6 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         if (resultCode == RESULT_OK && data != null) {
             switch (requestCode) {
                 case GALLERY_SELECTION:
-                    Toast.makeText(this, "Image Returned ", Toast.LENGTH_SHORT).show();
                     imageUri= data.getData();
                     if (imageUri != null) {
                         InputStream imageStream = null;
@@ -267,19 +383,19 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                     break;
 
                 case CAMERA_ROLL_SELECTION: {
-                    imageUri = data.getData();
-                    bitMapImage = null;
-                    if (imageUri != null) {
-                        InputStream imageStream = null;
-                        try {
-                            imageStream = getContentResolver().openInputStream(imageUri);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        bitMapImage = BitmapFactory.decodeStream(imageStream);
+                    bitMapImage = (Bitmap) data.getExtras().get("data");
 
-                        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
-                    }
+//                    imageUri = Uri.fromFile(new File(metaDirectory + "/thumbnail.jpg"));
+//
+//                    if (imageUri != null) {
+//                        InputStream imageStream = null;
+//                        try {
+//                            imageStream = getContentResolver().openInputStream(imageUri);
+//                        } catch (FileNotFoundException e) {
+//                            e.printStackTrace();
+//                        }
+//                        bitMapImage = BitmapFactory.decodeStream(imageStream);
+//                    }
                     if (bitMapImage != null) {
                         thumbnail.setImageBitmap(bitMapImage);
                     }
