@@ -5,6 +5,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -19,14 +21,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imperial.slidepassertrial.R;
-import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
-import com.imperial.slidepassertrial.shared.CourseItem;
 import com.imperial.slidepassertrial.shared.FileReader;
-import com.imperial.slidepassertrial.teach.offline.DirectoryHandler;
+import com.imperial.slidepassertrial.teach.offline.FileHandler;
 import com.imperial.slidepassertrial.teach.offline.create.audio.AudioRecorder;
 import com.imperial.slidepassertrial.teach.offline.create.video.ImageDialog;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 public class TeachCourseCreationSummaryActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
@@ -59,7 +61,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     private File metaDirectory = null;
     private File audioFile = null;
     private String courseDirectoryPath = null;
-
+    private int numberOfSlides = 0;
 
     private Uri imageUri = null;
     private Uri audioUri = null;
@@ -68,6 +70,9 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     public static final int AUDIO = 103;
     private static final int IMAGE = 104;
     private static final int TITLE = 100;
+
+
+
     private ArrayList<String> localSlides;
 
     @Override
@@ -80,10 +85,10 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         courseDirectoryPath = (String) getIntent().getExtras().get("course directory path");
 
         // File
-        metaDirectory = DirectoryHandler.createDirectoryForMetaData(courseDirectoryPath);
+        metaDirectory = FileHandler.createDirectoryForMetaData(courseDirectoryPath);
         // Creating audioFile
-        audioFile = DirectoryHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, AUDIO );
-        DirectoryHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseName, TITLE);
+        audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, AUDIO );
+        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseName, TITLE);
 
         // Name
         configureCourseName();
@@ -122,6 +127,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         File directory = new File(courseDirectoryPath);
 
         File[] slidesFiles = directory.listFiles();
+        numberOfSlides = slidesFiles.length;
 
         for (File f : slidesFiles) {
             String slideName;
@@ -213,6 +219,8 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                 saveMetaData();
                 Intent createFirstSlideIntent = new Intent(TeachCourseCreationSummaryActivity.this, TeachCourseCreationSlideActivity.class);
                 createFirstSlideIntent.putExtra("course directory path", courseDirectoryPath);
+                // take into account the meta file
+                createFirstSlideIntent.putExtra("number of slides", numberOfSlides - 1);
                 startActivity(createFirstSlideIntent);
             }
         });
@@ -220,14 +228,14 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
     private void saveMetaData() {
         if (imageUri != null) {
-            DirectoryHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
+            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
         }
 
         if (audioUri != null) {
-            DirectoryHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), audioUri, getContentResolver(), null, AUDIO);
+            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), audioUri, getContentResolver(), null, AUDIO);
         }
 
-        DirectoryHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, null, courseName, TITLE);
+        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, null, courseName, TITLE);
 
     }
 
@@ -236,19 +244,45 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Bitmap bitMapImage = null;
         if (resultCode == RESULT_OK && data != null) {
             switch (requestCode) {
                 case GALLERY_SELECTION:
                     Toast.makeText(this, "Image Returned ", Toast.LENGTH_SHORT).show();
                     imageUri= data.getData();
                     if (imageUri != null) {
-                        DirectoryHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
+                        InputStream imageStream = null;
+                        try {
+                            imageStream = getContentResolver().openInputStream(imageUri);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        bitMapImage = BitmapFactory.decodeStream(imageStream);
+
+                        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
                     }
-                    thumbnail.setImageURI(imageUri);
+                    if (bitMapImage != null) {
+                        thumbnail.setImageBitmap(bitMapImage);
+                    }
                     break;
 
                 case CAMERA_ROLL_SELECTION: {
-                    //TODO
+                    imageUri = data.getData();
+                    bitMapImage = null;
+                    if (imageUri != null) {
+                        InputStream imageStream = null;
+                        try {
+                            imageStream = getContentResolver().openInputStream(imageUri);
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        bitMapImage = BitmapFactory.decodeStream(imageStream);
+
+                        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
+                    }
+                    if (bitMapImage != null) {
+                        thumbnail.setImageBitmap(bitMapImage);
+                    }
                     break;
                 }
                 default:

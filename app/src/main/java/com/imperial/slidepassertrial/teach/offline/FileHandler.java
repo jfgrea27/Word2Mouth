@@ -2,10 +2,13 @@ package com.imperial.slidepassertrial.teach.offline;
 
 import android.content.ContentResolver;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.provider.MediaStore;
 
 import androidx.annotation.Nullable;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -14,7 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class DirectoryHandler {
+public class FileHandler {
 
 
     public static final int TITLE = 100;
@@ -134,4 +137,5 @@ public class DirectoryHandler {
             output.write(buffer, 0, bytesRead);
         }
     }
+
 }

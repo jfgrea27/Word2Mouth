@@ -20,7 +20,7 @@ import android.widget.VideoView;
 
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.FileReader;
-import com.imperial.slidepassertrial.teach.offline.DirectoryHandler;
+import com.imperial.slidepassertrial.teach.offline.FileHandler;
 import com.imperial.slidepassertrial.teach.offline.create.audio.AudioRecorder;
 import com.imperial.slidepassertrial.teach.offline.create.video.ImageDialog;
 
@@ -72,7 +72,6 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
     public static final int INSTRUCTIONS = 102;
     public static final int AUDIO = 103;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +79,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
 
         // get Extras
         coursePath = (String) getIntent().getExtras().get("course directory path");
+        totalNumberSlides = (int) getIntent().getExtras().get("number of slides");
 
         // Forward and Backward Buttons
         configurePreviousButton();
@@ -142,7 +142,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
                 updateFileContent();
                 slideCounter++;
                 // creating a new Slide
-                if(totalNumberSlides < slideCounter) {
+                if(totalNumberSlides <= slideCounter) {
                     Toast.makeText(TeachCourseCreationSlideActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
                     createBlankSlide();
                 }
@@ -206,7 +206,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
 
     private void retrieveSavedSlide() {
 
-        currentSlideDirectory = DirectoryHandler.retrieveSlideDirectoryByNumber(coursePath, slideCounter);
+        currentSlideDirectory = FileHandler.retrieveSlideDirectoryByNumber(coursePath, slideCounter);
 
         // title
         titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
@@ -259,38 +259,38 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
 
     private void initialSetUp() {
         // Saving on Disk
-        currentSlideDirectory = DirectoryHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
+        currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
 
         // Audio
-        audioFile = DirectoryHandler.createFileForSlideContentAndReturnIt(coursePath + "/" + slideCounter, null, getContentResolver(), null, AUDIO);
+        audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
 
         // Video
         if (video != null) {
-            videoFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
+            videoFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
         }
     }
 
     private void updateFileContent() {
         // Saving on Disk
-        currentSlideDirectory = DirectoryHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
+        currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
 
         // Title
         String title = titleEdit.getText().toString();
         if (title.equals("")) {
             title = "Untitled Slide";
         }
-        titleFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), title, TITLE);
+        titleFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), title, TITLE);
 
         // Instructions
         String instructions = instructionsEdit.getText().toString();
-        instructionsFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), instructions, INSTRUCTIONS);
+        instructionsFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), instructions, INSTRUCTIONS);
 
         // Audio
-        audioFile = DirectoryHandler.createFileForSlideContentAndReturnIt(coursePath + "/" + slideCounter, null, getContentResolver(), null, AUDIO);
+        audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
 
         // Video
         if (video != null) {
-            videoFile = DirectoryHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
+            videoFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
         }
     }
 
@@ -305,6 +305,8 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         recordAudioButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+                currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
+                audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
                 switch (event.getAction()){
                     case MotionEvent.ACTION_DOWN:
                         Toast.makeText(TeachCourseCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();

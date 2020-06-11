@@ -4,16 +4,19 @@
 xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
-android:layout_width="fill_parent"
-android:layout_height="80dp">
+android:layout_width="match_parent"
+    android:descendantFocusability="blocksDescendants"
+android:layout_height="match_parent">
 
     <ImageButton
         android:id="@+id/list_item_thumbnail"
-        android:layout_width="80dp"
-        android:layout_height="match_parent"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_gravity="start"
         android:background="@android:color/transparent"
         android:scaleType="fitXY"
+        android:layout_centerVertical="true"
+        android:focusable="false"
         app:srcCompat="@drawable/ic_picture" />
 
     <TextView
@@ -31,11 +34,13 @@ android:layout_height="80dp">
 
     <ImageButton
         android:id="@+id/list_audio_button"
-        android:layout_width="80dp"
-        android:layout_height="match_parent"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
         android:background="@android:color/transparent"
         android:scaleType="fitXY"
+        android:focusable="false"
         app:srcCompat="@drawable/ic_speak"/>
 
 </RelativeLayout>

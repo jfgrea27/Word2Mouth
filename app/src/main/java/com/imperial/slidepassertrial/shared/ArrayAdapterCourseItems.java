@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,6 +28,9 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
 
     private int layout;
     private Context context;
+
+    private ViewHolder holder = new ViewHolder();
+
     public ArrayAdapterCourseItems(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
         super(context, resource, objects);
 
@@ -40,49 +44,53 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull final ViewGroup parent) {
-        ArrayAdapterCourseItems.ViewHolder mainViewHolder = null;
-
-        File thumbnailFile;
-        final File audioFile;
-        Uri audioUri = null;
 
         if(convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
             convertView = inflater.inflate(layout, parent, false);
 
-            ArrayAdapterCourseItems.ViewHolder viewhHolder = new ArrayAdapterCourseItems.ViewHolder();
+            holder = new ViewHolder();
 
-            viewhHolder.thumbnail = convertView.findViewById(R.id.list_item_thumbnail);
-            thumbnailFile = new File(courseItems.get(position).getThumbnail().getPath());
-            if (thumbnailFile.exists()) {
-                viewhHolder.thumbnail.setImageURI(Uri.parse(thumbnailFile.getPath()));
-            }
-
-
-            viewhHolder.title = convertView.findViewById(R.id.list_item_text);
-            viewhHolder.title.setText(courseItems.get(position).getCourseName());
-
-            viewhHolder.audio = convertView.findViewById(R.id.list_audio_button);
-            audioFile = new File(courseItems.get(position).getAudio().getPath());
-            if (audioFile.exists()) {
-                audioUri =  Uri.parse(courseItems.get(position).getAudio().getPath());
-            }
-
-
-            convertView.setTag(viewhHolder);
+            holder.audio = convertView.findViewById(R.id.list_audio_button);
+            holder.thumbnail = convertView.findViewById(R.id.list_item_thumbnail);
+            holder.title = convertView.findViewById(R.id.list_item_text);
+            convertView.setTag(holder);
+        } else {
+            holder = (ViewHolder) convertView.getTag();
         }
 
-        mainViewHolder = (ArrayAdapterCourseItems.ViewHolder) convertView.getTag();
+
+        File thumbnailFile;
+        final File audioFile = new File(courseItems.get(position).getAudio().getPath());
+        Uri audioUri = null;
+
+
+        thumbnailFile = new File(courseItems.get(position).getThumbnail().getPath());
+        if (thumbnailFile.exists()) {
+            holder.thumbnail.setImageURI(Uri.parse(thumbnailFile.getPath()));
+        }
+
+
+        holder.title.setText(courseItems.get(position).getCourseName());
+
+       // audio
+        if (audioFile.exists()) {
+            audioUri =  Uri.parse(courseItems.get(position).getAudio().getPath());
+        }
+
 
         final Uri finalAudioUri = audioUri;
-        final ViewHolder finalMainViewHolder = mainViewHolder;
-        mainViewHolder.audio.setOnClickListener(new View.OnClickListener() {
+
+
+
+        final ViewHolder finalHolder = holder;
+        holder.audio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 MediaPlayer player;
                 if (finalAudioUri != null) {
-                    finalMainViewHolder.audio.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    finalHolder.audio.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                     player = MediaPlayer.create(getContext(), finalAudioUri);
                     if (player != null) {
                         player.start();
@@ -90,7 +98,7 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
                         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mp) {
-                                finalMainViewHolder.audio.setColorFilter(null);
+                                finalHolder.audio.setColorFilter(null);
                             }
                         });
                     }
@@ -105,7 +113,23 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
 
         });
 
+
+
+
+
         return convertView;
+    }
+
+    @Override
+    public int getViewTypeCount() {
+
+        return getCount();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+
+        return position;
     }
 
     public class ViewHolder {

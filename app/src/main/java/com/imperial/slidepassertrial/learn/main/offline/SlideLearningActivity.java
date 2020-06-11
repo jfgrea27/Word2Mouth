@@ -14,7 +14,7 @@ import android.widget.VideoView;
 
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.FileReader;
-import com.imperial.slidepassertrial.teach.offline.DirectoryHandler;
+import com.imperial.slidepassertrial.teach.offline.FileHandler;
 
 import java.io.File;
 
@@ -163,7 +163,7 @@ public class SlideLearningActivity extends AppCompatActivity {
     }
 
     private void retrieveSlide() {
-        currentSlideDirectory = DirectoryHandler.retrieveSlideDirectoryByNumber(coursePath, slideCounter);
+        currentSlideDirectory = FileHandler.retrieveSlideDirectoryByNumber(coursePath, slideCounter);
 
         // title
         titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");

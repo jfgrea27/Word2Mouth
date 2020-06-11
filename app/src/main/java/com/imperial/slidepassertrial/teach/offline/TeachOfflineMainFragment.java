@@ -144,7 +144,7 @@ public class TeachOfflineMainFragment extends Fragment {
                         if (courseName.isEmpty()) {
                             courseName = "Untitled Course";
                         }
-                        courseDirectory = DirectoryHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
+                        courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
                         intentToCreateCourseAndStartActivity();
                     }
 
