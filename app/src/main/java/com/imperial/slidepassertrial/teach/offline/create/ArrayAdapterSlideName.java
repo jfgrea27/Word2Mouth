@@ -12,7 +12,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.imperial.slidepassertrial.R;
-import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
 
 import java.io.File;
 import java.util.ArrayList;

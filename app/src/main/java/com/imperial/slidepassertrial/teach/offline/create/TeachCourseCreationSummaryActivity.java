@@ -152,19 +152,23 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
                 } else {
                     selectedSlide = true;
-                    view.setBackgroundColor(Color.LTGRAY);
-                    if (delete != null) {
-                        delete.setColorFilter(null);
-                    }
-                    if (edit != null) {
-                        edit.setColorFilter(null);
-                    }
-
-                    if (create != null) {
-                        create.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                    }
 
                     slideNumber = position;
+                    view.setBackgroundColor(Color.LTGRAY);
+
+                    if (slideNumber > 0) {
+                        if (delete != null) {
+                            delete.setColorFilter(null);
+                        }
+                        if (edit != null) {
+                            edit.setColorFilter(null);
+                        }
+
+                        if (create != null) {
+                            create.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                        }
+                    }
+
                  }
             }
         });
@@ -306,34 +310,38 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                int currentItem = slideNumber - 1;
-                int nextItem = currentItem + 1;
 
-                File currentItemFile = null;
-                File nextItemFile = null;
+                if (slideNumber - 1 > -1) {
+                    int currentItem = slideNumber - 1;
+                    int nextItem = currentItem + 1;
 
-                while (nextItem < numberOfSlides) {
-                    currentItemFile = new File(courseDirectoryPath + "/" + currentItem);
-                    nextItemFile = new File(courseDirectoryPath + "/" + nextItem);
+                    File currentItemFile = null;
+                    File nextItemFile = null;
 
-                    try {
-                        FileHandler.copyDirectoryOneLocationToAnotherLocation(nextItemFile, currentItemFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    while (nextItem < numberOfSlides) {
+                        currentItemFile = new File(courseDirectoryPath + "/" + currentItem);
+                        nextItemFile = new File(courseDirectoryPath + "/" + nextItem);
+
+                        try {
+                            FileHandler.copyDirectoryOneLocationToAnotherLocation(nextItemFile, currentItemFile);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        currentItem++;
+                        nextItem++;
                     }
 
-                    currentItem++;
-                    nextItem++;
+                    currentItemFile = new File(courseDirectoryPath + "/" + currentItem);
+
+                    if (currentItemFile.exists()) {
+                        FileHandler.deleteRecursive(currentItemFile);
+                        adapter.remove(adapter.getItem(currentItem));
+                        adapter.notifyDataSetChanged();
+                        adapter.notifyDataSetInvalidated();
+                    }
                 }
 
-                currentItemFile = new File(courseDirectoryPath + "/" + currentItem);
-
-                if (currentItemFile.exists()) {
-                    FileHandler.deleteRecursive(currentItemFile);
-                    adapter.remove(adapter.getItem(currentItem));
-                    adapter.notifyDataSetChanged();
-                    adapter.notifyDataSetInvalidated();
-                }
             }
         });
 
