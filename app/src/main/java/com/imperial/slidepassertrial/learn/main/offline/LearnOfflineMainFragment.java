@@ -126,6 +126,9 @@ public class LearnOfflineMainFragment extends Fragment {
                         if (delete != null) {
                             delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                         }
+                        if(receive != null) {
+                            receive.setColorFilter(null);
+                        }
                         courseName = null;
 
                     } else {
@@ -140,6 +143,10 @@ public class LearnOfflineMainFragment extends Fragment {
                         if (delete != null) {
                             delete.setColorFilter(null);
                         }
+                        if(receive != null) {
+                            receive.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                        }
+
                         courseItem = (CourseItem) parent.getAdapter().getItem(position);
                         courseName = courseItem.getCourseName();
                     }
@@ -155,7 +162,9 @@ public class LearnOfflineMainFragment extends Fragment {
         receive.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Receive Button", Toast.LENGTH_SHORT).show();
+                if (!selectedCourse) {
+                    Toast.makeText(getContext(), "Receive Button", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -219,6 +228,9 @@ public class LearnOfflineMainFragment extends Fragment {
                         }
                     }
                 }
+                selectedCourse = false;
+                learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                share.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                 delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
             }
         });

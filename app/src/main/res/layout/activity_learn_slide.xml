@@ -89,7 +89,7 @@
             android:layout_centerHorizontal="true"
             android:scaleType="fitCenter"
             android:background="@color/colorWhite"
-            app:srcCompat="@drawable/ic_hear" />
+            app:srcCompat="@drawable/ic_speak" />
 
         <ImageButton
             android:id="@+id/button_previous"

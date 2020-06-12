@@ -22,7 +22,7 @@ android:layout_height="match_parent">
     <TextView
         android:id="@+id/list_item_text"
         android:layout_width="155dp"
-        android:layout_height="43dp"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:layout_marginLeft="70dp"
         android:layout_marginEnd="26dp"

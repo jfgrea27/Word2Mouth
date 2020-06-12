@@ -4,16 +4,20 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:backgroundTint="@color/colorAccent"
     tools:context=".learn.main.LearnActivityMain">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:backgroundTint="@color/colorAccent"
         android:theme="@style/AppTheme.AppBarOverlay">
 
         <include
             android:id="@+id/teach_toolbar"
-            layout="@layout/toolbar">
+            layout="@layout/toolbar"
+            android:layout_height="46dp"
+            android:layout_width="match_parent">
 
         </include>
 
@@ -22,7 +26,7 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary" />
+            android:backgroundTint="@color/colorAccent" />
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager.widget.ViewPager

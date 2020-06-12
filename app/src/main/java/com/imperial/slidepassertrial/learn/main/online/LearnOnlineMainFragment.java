@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -26,7 +28,7 @@ import java.util.ArrayList;
 public class LearnOnlineMainFragment extends Fragment {
 
     private ImageButton download;
-    private ListView courseList;
+    private WebView onlineCoursesView;
 
     public LearnOnlineMainFragment() {
         // Required empty public constructor
@@ -39,7 +41,7 @@ public class LearnOnlineMainFragment extends Fragment {
      * @return A new instance of fragment LearnOnlineMainFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static LearnOnlineMainFragment newInstance(String param1, String param2) {
+    public static LearnOnlineMainFragment newInstance() {
         LearnOnlineMainFragment fragment = new LearnOnlineMainFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
@@ -47,9 +49,7 @@ public class LearnOnlineMainFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -62,8 +62,20 @@ public class LearnOnlineMainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         configureDownloadButton();
+        configureWebView();
     }
 
+
+    private void configureWebView() {
+        onlineCoursesView = (WebView) getView().findViewById(R.id.online_courses_web);
+
+        onlineCoursesView.getSettings().setLoadsImagesAutomatically(true);
+        onlineCoursesView.setWebViewClient(new WebViewClient());
+        onlineCoursesView.getSettings().setJavaScriptEnabled(true);
+        onlineCoursesView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        onlineCoursesView.loadUrl("https://www.google.com/");
+
+    }
 
 
     private void configureDownloadButton() {

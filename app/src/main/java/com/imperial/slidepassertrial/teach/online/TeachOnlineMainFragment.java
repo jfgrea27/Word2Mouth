@@ -9,6 +9,8 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -26,7 +28,7 @@ import java.util.ArrayList;
 public class TeachOnlineMainFragment extends Fragment {
 
     private ImageButton upload;
-    private ListView courseList;
+    private WebView onlineCoursesView;
 
     public TeachOnlineMainFragment() {
         // Required empty public constructor
@@ -63,26 +65,20 @@ public class TeachOnlineMainFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         configureUploadButton();
-        configureListView();
+        configureWebView();
     }
 
+    private void configureWebView() {
+        onlineCoursesView = (WebView) getView().findViewById(R.id.online_courses_web);
 
-    // TODO
-    // DATA FOR THE COURSE LIST
-    // IMPROVE THE ROWS OF THE COURSE SELECTION
-    private ArrayList<String> data = new ArrayList<>();
+        onlineCoursesView.getSettings().setLoadsImagesAutomatically(true);
+        onlineCoursesView.setWebViewClient(new WebViewClient());
+        onlineCoursesView.getSettings().setJavaScriptEnabled(true);
+        onlineCoursesView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
+        onlineCoursesView.loadUrl("https://www.google.com/");
 
-    private void configureListView() {
-//        courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
-//        generateListContent();
-//        courseList.setAdapter(new ArrayAdapterStringItems(getView().getContext(), R.layout.list_item, data));
-//        courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Toast.makeText(getView().getContext(), "Text about the course" + position, Toast.LENGTH_SHORT).show();
-//            }
-//        });
     }
+
 
 
     private void configureUploadButton() {
@@ -95,9 +91,4 @@ public class TeachOnlineMainFragment extends Fragment {
         });
     }
 
-    private void generateListContent() {
-        for(int i = 0; i < 55; i++) {
-            data.add("This is row number " + i);
-        }
-    }
 }

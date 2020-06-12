@@ -230,6 +230,13 @@ public class SlideLearningActivity extends AppCompatActivity {
 
     private void configureVideoView() {
         videoView = findViewById(R.id.video_view_learn);
+
+        videoView.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                videoButton.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     private void configureWatchVideoButton() {
