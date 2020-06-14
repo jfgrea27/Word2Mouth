@@ -1,11 +1,15 @@
 package com.imperial.slidepassertrial.teach.offline.create;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -33,11 +37,23 @@ import com.imperial.slidepassertrial.teach.offline.create.video.ImageDialog;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 
 public class TeachCourseCreationSummaryActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
+
+    // Permissions
+    private final int CAMERA_PERMISSION = 1;
+    private final int AUDIO_RECORDING_PERMISSION = 2;
+    private final int READ_WRITE_PERMISSION = 3;
+
+    private boolean hasInternetAccess = false;
+    private boolean hasReadWriteStorageAccess = false;
+    private boolean hasAudioRecordingPermission = false;
+    private boolean hasCameraPermission = false;
+
 
     // Video Choice
     public final int CAMERA_ROLL_SELECTION = 0;
@@ -74,8 +90,8 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     private Uri imageUri = null;
     private Uri audioUri = null;
 
-
     public static final int AUDIO = 103;
+
     private static final int IMAGE = 104;
 
     private int slideNumber = 0;
@@ -94,11 +110,27 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         courseName = (String) getIntent().getExtras().get("course name");
         courseDirectoryPath = (String) getIntent().getExtras().get("course directory path");
 
-        // File
-        metaDirectory = FileHandler.createDirectoryForMetaData(courseDirectoryPath);
-        // Creating audioFile
-        audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, AUDIO );
-        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseName, TITLE);
+        // Permissions
+        getPermissions();
+
+        if (hasReadWriteStorageAccess) {
+            // File
+            metaDirectory = FileHandler.createDirectoryForMetaData(courseDirectoryPath);
+            // Creating audioFile
+            audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, AUDIO );
+            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseName, TITLE);
+
+
+            // List of Slides
+            configureListViewSlides();
+            configureCreateButton();
+            configureDeleteButton();
+            configureEditButton();
+
+        } else {
+            finish();
+        }
+
 
         // Name
         configureCourseName();
@@ -109,15 +141,74 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         // Audio
         configureAudio();
 
-        // List of Slides
-        configureListViewSlides();
-
-        configureCreateButton();
-        configureDeleteButton();
-        configureEditButton();
-
     }
 
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        recreate();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        saveMetaData();
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Permissions
+
+    private void getPermissions() {
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
+            Toast.makeText(this, "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
+        } else{
+            hasReadWriteStorageAccess = true;
+        }
+
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)){
+            Toast.makeText(this, "Please allow access to Audio", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_RECORDING_PERMISSION);
+        } else{
+            hasAudioRecordingPermission = true;
+        }
+
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
+            Toast.makeText(this, "Please allow access to Camera", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
+        } else{
+            hasCameraPermission = true;
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == READ_WRITE_PERMISSION) {
+            if(permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    permissions[1].equals(Manifest.permission.READ_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                hasReadWriteStorageAccess = true;
+            }
+        }
+
+        if (requestCode == AUDIO_RECORDING_PERMISSION) {
+            if(permissions[0].equals(Manifest.permission.RECORD_AUDIO) && grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
+                hasAudioRecordingPermission = true;
+            }
+        }
+
+        if (requestCode == CAMERA_PERMISSION) {
+            if(permissions[0].equals(Manifest.permission.CAMERA) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                hasCameraPermission = true;
+            }
+        }
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // UI
+
+    // List of Slides
     private void configureListViewSlides() {
         slides = findViewById(R.id.slide_list_view);
 
@@ -197,38 +288,32 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         return slideNames;
 
     }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        recreate();
-    }
-
-    private void configureCourseName() {
-        name = findViewById(R.id.list_item_text);
-        name.setText(courseName);
-    }
-
+    // Audio Button
 
     private void configureAudio() {
         recorder = new AudioRecorder();
         // play button
         audioPreview = findViewById(R.id.course_audio_play);
         audioButton = findViewById(R.id.list_audio_button);
+
         audioButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        Toast.makeText(TeachCourseCreationSummaryActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
-                        recorder.startRecording(audioFile.getPath());
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        Toast.makeText(TeachCourseCreationSummaryActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
-                        recorder.stopRecording();
-                        audioUri = Uri.fromFile(audioFile);
-                        audioPreview.setVisibility(View.VISIBLE);
-                        break;
+                if (hasAudioRecordingPermission) {
+                    switch (event.getAction()){
+                        case MotionEvent.ACTION_DOWN:
+                            Toast.makeText(TeachCourseCreationSummaryActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                            recorder.startRecording(audioFile.getPath());
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            Toast.makeText(TeachCourseCreationSummaryActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                            recorder.stopRecording();
+                            audioUri = Uri.fromFile(audioFile);
+                            audioPreview.setVisibility(View.VISIBLE);
+                            break;
+                    }
+                } else {
+                    Toast.makeText(TeachCourseCreationSummaryActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }
@@ -238,7 +323,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
             @Override
             public void onClick(View v) {
                 if (audioUri != null) {
-                     player = MediaPlayer.create(TeachCourseCreationSummaryActivity.this, audioUri);
+                    player = MediaPlayer.create(TeachCourseCreationSummaryActivity.this, audioUri);
                     player.start();
                 }
             }
@@ -247,24 +332,86 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
     }
 
-
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        saveMetaData();
-    }
-
+    // Thumbnail
     private void configureCourseThumbnail() {
         thumbnail = findViewById(R.id.list_item_thumbnail);
+
         thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImageDialog imageDialog = new ImageDialog();
-                imageDialog.show(getSupportFragmentManager(), "Video Dialog");
+                if (hasCameraPermission) {
+                    ImageDialog imageDialog = new ImageDialog();
+                    imageDialog.show(getSupportFragmentManager(), "Video Dialog");
+                } else {
+                    Toast.makeText(TeachCourseCreationSummaryActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
 
+                }
             }
         });
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK && data != null) {
+            switch (requestCode) {
+                case GALLERY_SELECTION:
+                    imageUri= data.getData();
+                    if (imageUri != null) {
+                        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
+                    }
+                    break;
+
+                case CAMERA_ROLL_SELECTION: {
+                    Bitmap bitMapImage = null;
+                    bitMapImage = (Bitmap) data.getExtras().get("data");
+
+                    imageUri = Uri.fromFile(new File(metaDirectory + "/thumbnail.jpg"));
+
+                    if (imageUri != null) {
+                        try {
+                            FileOutputStream out = new FileOutputStream(metaDirectory + "/thumbnail.jpg");
+                            bitMapImage.compress(Bitmap.CompressFormat.JPEG, 100, out);
+
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }
+                        if (bitMapImage != null) {
+                            thumbnail.setImageBitmap(bitMapImage);
+                        }
+                        break;
+                    }
+                }
+                default:
+                    throw new IllegalStateException("Unexpected value: " + requestCode);
+            }
+        }
+    }
+
+    @Override
+    public void sendInput(int choice) {
+        switch (choice) {
+            case GALLERY_SELECTION: {
+                Toast.makeText(this, "Opening Galleries", Toast.LENGTH_SHORT).show();
+                Intent galleryIntent = new Intent();
+                galleryIntent.setType("image/*");
+                galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                startActivityForResult(Intent.createChooser(galleryIntent,"Select Image"), GALLERY_SELECTION);
+                break;
+            }
+            case CAMERA_ROLL_SELECTION: {
+                Toast.makeText(this, "Opening Camera Roll", Toast.LENGTH_SHORT).show();
+                Intent rollIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                startActivityForResult(rollIntent, CAMERA_ROLL_SELECTION);
+                break;
+            }
+        }
+    }
+
+
+    // Create Button
 
     private void configureCreateButton() {
         create = findViewById(R.id.create_button);
@@ -281,6 +428,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         });
     }
 
+    // Edit Button
     private void configureEditButton() {
         edit = findViewById(R.id.edit_button);
 
@@ -304,6 +452,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         }
     }
 
+    // Delete Button
     private void configureDeleteButton() {
         delete = findViewById(R.id.delete_button);
 
@@ -351,6 +500,19 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         }
     }
 
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Model
+
+    private void configureCourseName() {
+        name = findViewById(R.id.list_item_text);
+        name.setText(courseName);
+    }
+
+
+    // Saving Data for Course Selection
     private void saveMetaData() {
         if (imageUri != null) {
             FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
@@ -365,76 +527,9 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     }
 
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Bitmap bitMapImage = null;
-        if (resultCode == RESULT_OK && data != null) {
-            switch (requestCode) {
-                case GALLERY_SELECTION:
-                    imageUri= data.getData();
-                    if (imageUri != null) {
-                        InputStream imageStream = null;
-                        try {
-                            imageStream = getContentResolver().openInputStream(imageUri);
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        bitMapImage = BitmapFactory.decodeStream(imageStream);
-
-                        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
-                    }
-                    if (bitMapImage != null) {
-                        thumbnail.setImageBitmap(bitMapImage);
-                    }
-                    break;
-
-                case CAMERA_ROLL_SELECTION: {
-                    bitMapImage = (Bitmap) data.getExtras().get("data");
-
-//                    imageUri = Uri.fromFile(new File(metaDirectory + "/thumbnail.jpg"));
-//
-//                    if (imageUri != null) {
-//                        InputStream imageStream = null;
-//                        try {
-//                            imageStream = getContentResolver().openInputStream(imageUri);
-//                        } catch (FileNotFoundException e) {
-//                            e.printStackTrace();
-//                        }
-//                        bitMapImage = BitmapFactory.decodeStream(imageStream);
-//                    }
-                    if (bitMapImage != null) {
-                        thumbnail.setImageBitmap(bitMapImage);
-                    }
-                    break;
-                }
-                default:
-                    throw new IllegalStateException("Unexpected value: " + requestCode);
-            }
-        }
-    }
 
 
-    @Override
-    public void sendInput(int choice) {
-        switch (choice) {
-            case GALLERY_SELECTION: {
-                Toast.makeText(this, "Opening Galleries", Toast.LENGTH_SHORT).show();
-                Intent galleryIntent = new Intent();
-                galleryIntent.setType("image/*");
-                galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                startActivityForResult(Intent.createChooser(galleryIntent,"Select Image"), GALLERY_SELECTION);
-                break;
-            }
-            case CAMERA_ROLL_SELECTION: {
-                Toast.makeText(this, "Opening Camera Roll", Toast.LENGTH_SHORT).show();
-                Intent rollIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(rollIntent, CAMERA_ROLL_SELECTION);
-                break;
-            }
-        }
-    }
+
 
 
 }

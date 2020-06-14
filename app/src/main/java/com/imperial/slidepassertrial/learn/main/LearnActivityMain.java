@@ -1,11 +1,15 @@
 package com.imperial.slidepassertrial.learn.main;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -20,6 +24,7 @@ import com.imperial.slidepassertrial.teach.TeachActivityMain;
 
 public class LearnActivityMain extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,11 +35,13 @@ public class LearnActivityMain extends AppCompatActivity {
 
 
         setToolBar();
+
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         tabs.getTabAt(0).setIcon(R.drawable.ic_offline_online_0);
         tabs.getTabAt(1).setIcon(R.drawable.ic_offline_online_1);
     }
+
 
     private void setToolBar() {
         androidx.appcompat.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.learn_toolbar);
@@ -63,7 +70,8 @@ public class LearnActivityMain extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.teach:
-                startActivity(new Intent(LearnActivityMain.this, TeachActivityMain.class));
+                Intent intent = new Intent(LearnActivityMain.this, TeachActivityMain.class);
+                startActivity(intent);
                 return true;
             case R.id.setting:
                 Toast.makeText(this, "Setting - TO DO", Toast.LENGTH_SHORT).show();
@@ -71,4 +79,5 @@ public class LearnActivityMain extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 }

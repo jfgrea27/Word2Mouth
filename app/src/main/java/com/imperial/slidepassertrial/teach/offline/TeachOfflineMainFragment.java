@@ -1,15 +1,18 @@
 package com.imperial.slidepassertrial.teach.offline;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.text.InputType;
@@ -23,10 +26,12 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.imperial.slidepassertrial.R;
+import com.imperial.slidepassertrial.learn.main.LearnActivityMain;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
 import com.imperial.slidepassertrial.shared.CourseItem;
 import com.imperial.slidepassertrial.shared.FileHandler;
 import com.imperial.slidepassertrial.shared.FileReader;
+import com.imperial.slidepassertrial.teach.TeachActivityMain;
 import com.imperial.slidepassertrial.teach.offline.create.TeachCourseCreationSummaryActivity;
 
 import java.io.File;
@@ -38,6 +43,10 @@ import java.util.ArrayList;
  * create an instance of this fragment.
  */
 public class TeachOfflineMainFragment extends Fragment {
+
+    // Permissions
+    private static final int READ_WRITE_PERMISSION = 1;
+    private boolean hasReadWriteStorageAccess = false;
 
     // View
     private ImageButton create = null;
@@ -91,13 +100,53 @@ public class TeachOfflineMainFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        configureCreateButton();
-        configureEditButton();
-        configureDeleteButton();
-        configureListView();
+
+        getPermissions();
+
+        if (hasNecessaryPermissions()) {
+            configureCreateButton();
+            configureEditButton();
+
+            configureDeleteButton();
+            configureListView();
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Permissions
+    private void getPermissions() {
+
+        if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
+            Toast.makeText(getView().getContext(), "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
+        } else {
+            hasReadWriteStorageAccess = true;
+        }
     }
 
 
+    private boolean hasNecessaryPermissions() {
+        return hasReadWriteStorageAccess;
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == READ_WRITE_PERMISSION) {
+            if(permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    permissions[1].equals(Manifest.permission.READ_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                hasReadWriteStorageAccess = true;
+            }
+        }
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // UI
+
+    // List Of Courses
     private void configureListView() {
         courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
 
@@ -155,6 +204,23 @@ public class TeachOfflineMainFragment extends Fragment {
         }
     }
 
+    private ArrayList<CourseItem> retrieveLocalCourses() {
+        ArrayList<CourseItem> courseItems = new ArrayList<>();
+
+        File directory = getView().getContext().getExternalFilesDir(null);
+
+        File[] courses = directory.listFiles();
+
+        for (File f : courses) {
+            String courseName = FileReader.readTextFromFile(f.getPath()+ "/meta/title.txt");
+
+            CourseItem courseItem= new CourseItem(courseName, f.getPath());
+            courseItems.add(courseItem);
+        }
+        return courseItems;
+    }
+    // Edit Button
+
     private void configureEditButton() {
         edit = getView().findViewById(R.id.edit_button);
 
@@ -174,6 +240,8 @@ public class TeachOfflineMainFragment extends Fragment {
             }
         });
     }
+
+    // Delete Button
 
     private void configureDeleteButton() {
         delete = getView().findViewById(R.id.delete_button);
@@ -202,6 +270,7 @@ public class TeachOfflineMainFragment extends Fragment {
         }
     }
 
+    // Create Button
 
     private void configureCreateButton() {
 
@@ -246,21 +315,5 @@ public class TeachOfflineMainFragment extends Fragment {
                 builder.show();
             }
         });
-    }
-
-    private ArrayList<CourseItem> retrieveLocalCourses() {
-        ArrayList<CourseItem> courseItems = new ArrayList<>();
-
-        File directory = getView().getContext().getExternalFilesDir(null);
-
-        File[] courses = directory.listFiles();
-
-        for (File f : courses) {
-            String courseName = FileReader.readTextFromFile(f.getPath()+ "/meta/title.txt");
-
-            CourseItem courseItem= new CourseItem(courseName, f.getPath());
-            courseItems.add(courseItem);
-        }
-        return courseItems;
     }
 }

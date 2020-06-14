@@ -128,10 +128,6 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
         return position;
     }
 
-    public void notifyDeleted() {
-        notifyDataSetChanged();
-    }
-
     public class ViewHolder {
         ImageView thumbnail;
         TextView title;

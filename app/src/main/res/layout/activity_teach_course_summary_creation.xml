@@ -24,36 +24,63 @@
     </TextView>
 
     <RelativeLayout
-        android:id="@+id/list_item_view"
-        android:layout_width="wrap_content"
-        android:layout_below="@+id/textView"
-        android:layout_height="80dp"
+        android:id="@+id/course_thumbnail"
+        android:layout_width="match_parent"
+        android:layout_height="102dp"
+        android:layout_below="@id/textView"
+        android:layout_marginTop="0dp"
+        android:descendantFocusability="blocksDescendants"
         android:orientation="horizontal">
 
-        <include
-            android:id="@+id/course_summary"
-            layout="@layout/list_item"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+        <ImageButton
+            android:id="@+id/list_item_thumbnail"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_centerVertical="true"
+            android:layout_gravity="start"
+            android:background="@android:color/transparent"
+            android:focusable="false"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/ic_picture" />
 
-        </include>
+        <TextView
+            android:id="@+id/list_item_text"
+            android:layout_width="155dp"
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true"
+            android:layout_marginLeft="70dp"
+            android:layout_marginEnd="26dp"
+            android:layout_marginRight="26dp"
+            android:layout_toStartOf="@+id/list_audio_button"
+            android:layout_toLeftOf="@+id/list_audio_button"
+            android:layout_toRightOf="@id/list_item_thumbnail"
+            android:textSize="20dp" />
 
+        <ImageButton
+            android:id="@+id/list_audio_button"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:focusable="false"
+            android:scaleType="fitXY"
+            app:srcCompat="@drawable/ic_speak" />
 
     </RelativeLayout>
 
-
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/audio_play_layer"
         android:layout_width="match_parent"
         android:orientation="vertical"
-        android:layout_below="@+id/list_item_view"
+        android:layout_below="@+id/course_thumbnail"
         android:layout_height="wrap_content">
 
         <ImageButton
             android:id="@+id/course_audio_play"
+            android:layout_alignParentRight="true"
             android:layout_width="41dp"
             android:layout_height="47dp"
-            android:layout_below="@+id/course_summary"
             android:background="@color/colorWhite"
             android:scaleType="fitCenter"
             android:layout_gravity="end"
@@ -62,7 +89,7 @@
 
 
 
-    </LinearLayout>
+    </RelativeLayout>
 
 
     <LinearLayout
@@ -70,11 +97,12 @@
         android:layout_width="match_parent"
         android:id="@+id/list_view_slides"
         android:layout_height="wrap_content">
+
         <ListView
-            android:layout_below="@id/audio_play_layer"
             android:id="@+id/slide_list_view"
             android:layout_width="match_parent"
             android:layout_height="300dp"
+            android:layout_below="@id/audio_play_layer"
             android:layout_marginTop="8dp"
             app:layout_constraintVertical_bias="0.806"
             tools:layout_editor_absoluteX="0dp">

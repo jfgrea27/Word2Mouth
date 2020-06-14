@@ -20,6 +20,7 @@ import com.imperial.slidepassertrial.teach.ui.main.SectionsPagerAdapter;
 
 public class TeachActivityMain extends AppCompatActivity {
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,6 +36,7 @@ public class TeachActivityMain extends AppCompatActivity {
         tabs.getTabAt(0).setIcon(R.drawable.ic_offline_online_0);
         tabs.getTabAt(1).setIcon(R.drawable.ic_offline_online_1);
     }
+
 
     @Override
     protected void onRestart() {
@@ -77,4 +79,5 @@ public class TeachActivityMain extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 }

@@ -1,69 +1,76 @@
-<<<<<<< Original<?xml version="1.0" encoding="utf-8"?><manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
 package="com.imperial.slidepassertrial">
 
-<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.RECORD_AUDIO" />
-<uses-permission android:name="android.permission.STORAGE" />
 
-<uses-permission
-    android:required="true"
-    android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission
-    android:required="true"
-    android:name="android.permission.ACCESS_WIFI_STATE" />
-<uses-permission
-    android:required="true"
-    android:name="android.permission.CHANGE_WIFI_STATE" />
-<uses-permission
-    android:required="true"
-    android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.STORAGE" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:required="true"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:required="true"/>
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"
+    android:required="true"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"
+        android:required="true"/>
 
 
-<application
-    android:allowBackup="true"
-    android:screenOrientation="portrait"
-    android:icon="@mipmap/ic_launcher"
-    android:roundIcon="@mipmap/ic_launcher_round"
-    android:supportsRtl="true"
-    android:theme="@style/AppTheme">
-    <activity
-        android:name=".teach.offline.create.TeachCourseCreationSummaryActivity"
-        android:screenOrientation="portrait">
 
-    </activity>
-    <activity
-        android:name=".learn.main.offline.SlideLearningActivity"
-        android:screenOrientation="portrait" />
-    <activity
-        android:name=".teach.TeachActivityMain"
-        android:label="@string/title_activity_teach_main"
+    <application
+        android:allowBackup="true"
         android:screenOrientation="portrait"
-        android:theme="@style/AppTheme.NoActionBar" />
-    <activity
-        android:name=".learn.main.LearnActivityMain"
-        android:exported="true"
-        android:label="@string/title_activity_learn_main_tabbed"
-        android:screenOrientation="portrait"
-        android:theme="@style/AppTheme.NoActionBar">
-        <intent-filter>
-            <category android:name="android.intent.category.DEFAULT" />
-            <category android:name="android.intent.category.BROWSABLE" />
-            <category android:name="android.intent.category.LAUNCHER" />
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".teach.offline.create.TeachCourseCreationSummaryActivity"
+            android:screenOrientation="portrait">
 
-            <action android:name="android.intent.action.MAIN" />
-        </intent-filter>
-    </activity>
-    <activity
-        android:name=".teach.offline.create.TeachCourseCreationSlideActivity"
-        android:screenOrientation="portrait" />
-</application>
+        </activity>
+        <activity
+            android:name=".learn.main.offline.SlideLearningActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".teach.TeachActivityMain"
+            android:label="@string/title_activity_teach_main"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".learn.main.LearnActivityMain"
+            android:exported="true"
+            android:label="@string/title_activity_learn_main_tabbed"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.LAUNCHER" />
 
-</manifest>=======
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-<application>
-    <activity android:name="com.imperial.slidepassertrial.learn.main.offline.p2p.P2PCourseSharingActivity"></activity>
-</application>
-</manifest>>>>>>>> Added
+        <activity android:name="com.imperial.slidepassertrial.learn.main.offline.p2p.WifiDirectCourseSharingActivity"
+            android:screenOrientation="portrait">
+        </activity>
+
+
+        <activity
+            android:name=".teach.offline.create.TeachCourseCreationSlideActivity"
+            android:screenOrientation="portrait" />
+
+        <receiver android:name=".learn.main.offline.p2p.ArrayAdapterWifiP2PDevices" />
+    </application>
+
+</manifest>

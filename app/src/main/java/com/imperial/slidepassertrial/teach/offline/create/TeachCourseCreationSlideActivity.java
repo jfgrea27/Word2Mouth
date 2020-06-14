@@ -1,10 +1,14 @@
 package com.imperial.slidepassertrial.teach.offline.create;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -27,6 +31,17 @@ import com.imperial.slidepassertrial.teach.offline.create.video.ImageDialog;
 import java.io.File;
 
 public class TeachCourseCreationSlideActivity extends AppCompatActivity implements ImageDialog.OnInputListener {
+
+    // Permissions
+    private final int CAMERA_PERMISSION = 1;
+    private final int AUDIO_RECORDING_PERMISSION = 2;
+    private final int READ_WRITE_PERMISSION = 3;
+
+    private boolean hasInternetAccess = false;
+    private boolean hasReadWriteStorageAccess = false;
+    private boolean hasAudioRecordingPermission = false;
+    private boolean hasCameraPermission = false;
+
 
     // General Activity Buttons
     private ImageButton previousSlide;
@@ -77,25 +92,30 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teach_course_slide_creation);
 
-        // get Extras
+        // get Intents
         coursePath = (String) getIntent().getExtras().get("course directory path");
         totalNumberSlides = (int) getIntent().getExtras().get("number of slides");
-
         try {
             slideCounter = (int) getIntent().getExtras().get("slide number");
         } catch (Exception e) {
 
         }
 
-        // Forward and Backward Buttons
-        configurePreviousButton();
-        configureNextButton();
+        getPermissions();
 
-        // Title
-        configureSideTitleEdit();
+        // Text
+        if (hasReadWriteStorageAccess) {
+            // Forward and Backward Buttons
+            configurePreviousButton();
+            configureNextButton();
+            // Title
+            configureSideTitleEdit();
 
-        // Instructions
-        configureInstructionsEdit();
+            // Instructions
+            configureInstructionsEdit();
+        } else {
+            finish();
+        }
 
         // Video
         configureVideoView();
@@ -105,22 +125,69 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         configureAudio();
 
 
+
         // First slide
         if (slideCounter == 0) {
             initialSetUp();
         }
 
         retrieveSavedSlide();
-
     }
 
-    private void configureInstructionsEdit() {
-        instructionsEdit = findViewById(R.id.instructions);
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Permissions
+
+    private void getPermissions() {
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
+            Toast.makeText(this, "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
+        } else{
+            hasReadWriteStorageAccess = true;
+        }
+
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
+            Toast.makeText(this, "Please allow access to Audio", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_RECORDING_PERMISSION);
+        } else{
+            hasAudioRecordingPermission = true;
+        }
+
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) ){
+            Toast.makeText(this, "Please allow access to Camera", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
+        } else{
+            hasCameraPermission = true;
+        }
     }
 
-    private void configureSideTitleEdit() {
-        titleEdit = findViewById(R.id.slide_title_edit);
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == READ_WRITE_PERMISSION) {
+            if(permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    permissions[1].equals(Manifest.permission.READ_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                hasReadWriteStorageAccess = true;
+            }
+        }
+
+        if (requestCode == AUDIO_RECORDING_PERMISSION) {
+            if(permissions[0].equals(Manifest.permission.RECORD_AUDIO) && grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
+                hasAudioRecordingPermission = true;
+            }
+        }
+
+        if (requestCode == CAMERA_PERMISSION) {
+            if(permissions[0].equals(Manifest.permission.CAMERA) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                hasCameraPermission = true;
+            }
+        }
     }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    // UI
 
     private void configurePreviousButton() {
         previousSlide = findViewById(R.id.button_previous);
@@ -268,44 +335,20 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         }
     }
 
-    private void initialSetUp() {
-        // Saving on Disk
-        currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
 
-        // Audio
-        audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
 
-        // Video
-        if (video != null) {
-            videoFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
-        }
+    // Text Title
+    private void configureSideTitleEdit() {
+        titleEdit = findViewById(R.id.slide_title_edit);
     }
 
-    private void updateFileContent() {
-        // Saving on Disk
-        currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
-
-        // Title
-        String title = titleEdit.getText().toString();
-        if (title.equals("")) {
-            title = "Untitled Slide";
-        }
-        titleFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), title, TITLE);
-
-        // Instructions
-        String instructions = instructionsEdit.getText().toString();
-        instructionsFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), instructions, INSTRUCTIONS);
-
-        // Audio
-        audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
-
-        // Video
-        if (video != null) {
-            videoFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
-        }
+    // Text Instructions
+    private void configureInstructionsEdit() {
+        instructionsEdit = findViewById(R.id.instructions);
     }
 
 
+    // Audio
     private void configureAudio() {
         recorder = new AudioRecorder();
 
@@ -316,19 +359,24 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         recordAudioButton.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
-                audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
-                switch (event.getAction()){
-                    case MotionEvent.ACTION_DOWN:
-                        Toast.makeText(TeachCourseCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
-                        recorder.startRecording(audioFile.getPath());
-                        return true;
-                    case MotionEvent.ACTION_UP:
-                        Toast.makeText(TeachCourseCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
-                        recorder.stopRecording();
-                        audio = Uri.fromFile(audioFile);
-                        playAudioButton.setVisibility(View.VISIBLE);
-                        break;
+                if (hasAudioRecordingPermission) {
+                    currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
+                    audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
+                    switch (event.getAction()){
+                        case MotionEvent.ACTION_DOWN:
+                            Toast.makeText(TeachCourseCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                            recorder.startRecording(audioFile.getPath());
+                            return true;
+                        case MotionEvent.ACTION_UP:
+                            Toast.makeText(TeachCourseCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                            recorder.stopRecording();
+                            audio = Uri.fromFile(audioFile);
+                            playAudioButton.setVisibility(View.VISIBLE);
+                            break;
+                    }
+                } else {
+                    Toast.makeText(TeachCourseCreationSlideActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
+
                 }
                 return false;
             }
@@ -346,14 +394,21 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         });
     }
 
+
+    // Video
     private void configureVideoView() {
         videoView = findViewById(R.id.videoview);
         videoView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                ImageDialog imageDialog = new ImageDialog();
-                imageDialog.show(getSupportFragmentManager(), "Video Dialog");
+                if (hasCameraPermission) {
+                    ImageDialog imageDialog = new ImageDialog();
+                    imageDialog.show(getSupportFragmentManager(), "Video Dialog");
+                } else {
+                    Toast.makeText(TeachCourseCreationSlideActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
+
+                }
 
             }
         });
@@ -366,6 +421,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         });
     }
 
+    // Video preview
     private void configureVideoPreview() {
         videoPreview = findViewById(R.id.preview_video);
         videoPreview.setOnClickListener(new View.OnClickListener() {
@@ -380,11 +436,9 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         });
 
     }
-
     private void setPreviewButton() {
         videoPreview.setVisibility(View.VISIBLE);
     }
-
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -432,5 +486,45 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         }
     }
 
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Model
+    private void initialSetUp() {
+        // Saving on Disk
+        currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
+
+        // Audio
+        audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
+
+        // Video
+        if (video != null) {
+            videoFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
+        }
+    }
+
+    private void updateFileContent() {
+        // Saving on Disk
+        currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
+
+        // Title
+        String title = titleEdit.getText().toString();
+        if (title.equals("")) {
+            title = "Untitled Slide";
+        }
+        titleFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), title, TITLE);
+
+        // Instructions
+        String instructions = instructionsEdit.getText().toString();
+        instructionsFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), instructions, INSTRUCTIONS);
+
+        // Audio
+        audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
+
+        // Video
+        if (video != null) {
+            videoFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
+        }
+    }
 
 }
