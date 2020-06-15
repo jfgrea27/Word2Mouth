@@ -12,9 +12,11 @@ import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -29,6 +31,7 @@ import android.widget.Toast;
 import com.imperial.slidepassertrial.R;
 
 
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +63,6 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
     private boolean wifiP2PEnabled = false;
 
 
-
     private String[] deviceNameArray;
     private WifiP2pDevice[] deviceArray;
 
@@ -68,7 +70,7 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
     private String courseName = null;
     private String coursePath = null;
 
-    private WifiP2pConfig config = new WifiP2pConfig();
+    private WifiP2pConfig config;
 
     public void setIsWifiP2pEnabled(boolean state) {
         wifiP2PEnabled = state;
@@ -113,10 +115,10 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
     private void getPermissions() {
 
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
             Toast.makeText(this, "Please allow access to Storage", Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
-        } else{
+        } else {
             hasReadWriteStorageAccess = true;
         }
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
@@ -124,8 +126,8 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.CHANGE_WIFI_STATE) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_NETWORK_STATE) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED))
-        { ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED)) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_WIFI_STATE,
                     Manifest.permission.CHANGE_WIFI_STATE,
                     Manifest.permission.INTERNET,
@@ -144,7 +146,7 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == WIFI_DIRECT_PERMISSIONS) {
-            if(permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && (grantResults[0] == PackageManager.PERMISSION_GRANTED) &&
+            if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && (grantResults[0] == PackageManager.PERMISSION_GRANTED) &&
                     permissions[1].equals(Manifest.permission.ACCESS_WIFI_STATE) && (grantResults[1] == PackageManager.PERMISSION_GRANTED) &&
                     permissions[2].equals(Manifest.permission.CHANGE_WIFI_STATE) && (grantResults[2] == PackageManager.PERMISSION_GRANTED) &&
                     permissions[3].equals(Manifest.permission.INTERNET) && (grantResults[3] == PackageManager.PERMISSION_GRANTED) &&
@@ -156,7 +158,7 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
             }
         }
         if (requestCode == READ_WRITE_PERMISSION) {
-            if(permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+            if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
                     permissions[1].equals(Manifest.permission.READ_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 hasReadWriteStorageAccess = true;
             }
@@ -170,34 +172,41 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
         devicesList = findViewById(R.id.list_devices);
 
 
-       // devicesList.setAdapter(new ArrayAdapterWifiP2PDevices(this, R.layout.row_device, peers));
 
+        devicesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                connectToPeer(position);
+
+            }
+
+            private void connectToPeer(int position) {
+                config = new WifiP2pConfig();
+                final WifiP2pDevice peerDevice = peers.get(position);
+
+                config.deviceAddress = peerDevice.deviceAddress;
+                config.wps.setup = WpsInfo.PBC;
+
+                if (ActivityCompat.checkSelfPermission(WifiDirectCourseSharingActivity.this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    wifiManager.connect(wifiChannel, config, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+                            Toast.makeText(WifiDirectCourseSharingActivity.this, "Successfully Connected to " + peerDevice.deviceName, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void onFailure(int reason) {
+                            Toast.makeText(WifiDirectCourseSharingActivity.this, "Connect failed. Retry.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                }
+            }
+        });
     }
 
     private ArrayAdapterWifiP2PDevices getListAdapter() {
         return getListAdapter();
-    }
-
-    public WifiP2pDevice getDevice() {
-        return device;
-    }
-
-    private static String getDeviceStatus(int deviceStatus) {
-        switch (deviceStatus) {
-            case WifiP2pDevice.AVAILABLE:
-                return "Available";
-            case WifiP2pDevice.INVITED:
-                return "Invited";
-            case WifiP2pDevice.CONNECTED:
-                return "Connected";
-            case WifiP2pDevice.FAILED:
-                return "Failed";
-            case WifiP2pDevice.UNAVAILABLE:
-                return "Unavailable";
-            default:
-                return "Unknown";
-
-        }
     }
 
     private void configureWifiManager() {
@@ -255,6 +264,7 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
 
             devicesList.setAdapter(new ArrayAdapterWifiP2PDevices(WifiDirectCourseSharingActivity.this, R.layout.row_device, peers));
            if (peers.size() == 0) {
+               Toast.makeText(WifiDirectCourseSharingActivity.this, "No Device Found", Toast.LENGTH_SHORT).show();
            } else {
            }
 
@@ -264,5 +274,27 @@ public class WifiDirectCourseSharingActivity extends AppCompatActivity{
     public void updateThisDevice(WifiP2pDevice device) {
         this.device = device;
     }
+
+    private String connectionStatus = new String();
+
+    private WifiP2pManager.ConnectionInfoListener connectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+        @Override
+        public void onConnectionInfoAvailable(WifiP2pInfo info) {
+            // InetAddress from WifiP2pInfo struct.
+            String groupOwnerAddress = info.groupOwnerAddress.getHostAddress();
+
+            // After the group negotiation, we can determine the group owner.
+            if (info.groupFormed && info.isGroupOwner) {
+                Toast.makeText(WifiDirectCourseSharingActivity.this, "Host", Toast.LENGTH_SHORT).show();
+            } else if (info.groupFormed) {
+                Toast.makeText(WifiDirectCourseSharingActivity.this, "Client", Toast.LENGTH_SHORT).show();
+            }
+        }
+    };
+
+    public WifiP2pManager.ConnectionInfoListener getConnectionInfoListener() {
+        return connectionInfoListener;
+    }
+
 
 }

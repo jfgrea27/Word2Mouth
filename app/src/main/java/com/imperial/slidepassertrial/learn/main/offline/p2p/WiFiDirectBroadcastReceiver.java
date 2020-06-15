@@ -5,6 +5,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.widget.Toast;
@@ -39,12 +41,20 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     activity.setIsWifiP2pEnabled(false);
                 }
             } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-                Toast.makeText(activity, "123", Toast.LENGTH_SHORT).show();
 
                 if (manager != null) {
 
                     manager.requestPeers(channel, peerListListener);
                 }
+
+//
+//                ConnectivityManager connectivityManager = (ConnectivityManager) activity.getSystemService(Context.CONNECTIVITY_SERVICE);
+//                NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+
+//                if (activeNetwork != null) {
+//
+//                    manager.requestConnectionInfo(channel, activity.getConnectionInfoListener());
+//                }
             } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
 
 

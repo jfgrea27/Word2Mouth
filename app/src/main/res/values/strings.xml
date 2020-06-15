@@ -9,8 +9,13 @@
     <string name="title_activity_learn_main_tabbed">LearnActivityMainTabbed</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="share">share</string>
-    <string name="todo">TODO</string>
     <string name="title_activity_teach_main">TeachActivityMain</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
+    <string name="title">Title</string>
+    <string name="instructions">Instructions</string>
+    <string name="course_summary">Course Summary</string>
+    <string name="todo">TODO</string>
+    <string name="video_selector">Video Selector</string>
+    <string name="gallery">Gallery</string>
 </resources>

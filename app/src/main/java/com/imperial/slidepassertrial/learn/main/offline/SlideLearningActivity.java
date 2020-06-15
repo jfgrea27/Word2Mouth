@@ -168,49 +168,51 @@ public class SlideLearningActivity extends AppCompatActivity {
     private void retrieveSlide() {
         currentSlideDirectory = FileHandler.retrieveSlideDirectoryByNumber(coursePath, slideCounter);
 
-        // title
-        titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
-        if(titleFile.exists()) {
-            String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/title.txt");
-            if (text.isEmpty()) {
-                titleView.setText("");
+        if (currentSlideDirectory != null) {
+            // title
+            titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
+            if(titleFile.exists()) {
+                String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/title.txt");
+                if (text.isEmpty()) {
+                    titleView.setText("");
+                } else {
+                    titleView.setText(text);
+                }
+            }
+
+            // instructions
+            instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
+            if (instructionsFile.exists()) {
+                String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/instructions.txt");
+                if (text.isEmpty()) {
+                    instructionsView.setText("");
+                } else {
+                    instructionsView.setText(text);
+                }
+            }
+
+            // Audio
+            audioFile = new File(currentSlideDirectory.getPath() + "/audio.3gp");
+            if (audioFile.exists()) {
+                audio = Uri.parse(currentSlideDirectory.getPath() + "/audio.3gp");
             } else {
-                titleView.setText(text);
+                audio = null;
+                audioButton.setVisibility(View.INVISIBLE);
+            }
+
+            // Video
+            videoFile = new File(currentSlideDirectory.getPath() + "/video.3gp");
+            if (videoFile.exists()) {
+                video = Uri.parse(currentSlideDirectory.getPath() + "/video.3gp");
+            } else {
+                videoView.setVideoURI(null);
+                video = null;
+                videoView.setVisibility(View.GONE);
+                videoView.setVisibility(View.VISIBLE);
+                videoButton.setVisibility(View.INVISIBLE);
             }
         }
 
-
-        // instructions
-        instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
-        if (instructionsFile.exists()) {
-            String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/instructions.txt");
-            if (text.isEmpty()) {
-                instructionsView.setText("");
-            } else {
-                instructionsView.setText(text);
-            }
-        }
-
-        // Audio
-        audioFile = new File(currentSlideDirectory.getPath() + "/audio.3gp");
-        if (audioFile.exists()) {
-            audio = Uri.parse(currentSlideDirectory.getPath() + "/audio.3gp");
-        } else {
-            audio = null;
-            audioButton.setVisibility(View.INVISIBLE);
-        }
-
-        // Video
-        videoFile = new File(currentSlideDirectory.getPath() + "/video.3gp");
-        if (videoFile.exists()) {
-            video = Uri.parse(currentSlideDirectory.getPath() + "/video.3gp");
-        } else {
-            videoView.setVideoURI(null);
-            video = null;
-            videoView.setVisibility(View.GONE);
-            videoView.setVisibility(View.VISIBLE);
-            videoButton.setVisibility(View.INVISIBLE);
-        }
     }
 
     private void configureAudio() {
