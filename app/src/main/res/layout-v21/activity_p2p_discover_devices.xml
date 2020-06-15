@@ -24,31 +24,32 @@
     </TextView>
 
 
-    <LinearLayout
-        android:layout_below="@+id/textView"
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/list_view_slides"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView">
+
         <ListView
-            android:layout_below="@id/textView"
             android:id="@+id/list_devices"
             android:layout_width="match_parent"
-            android:layout_height="400dp"
-            android:layout_marginTop="8dp"
-            app:layout_constraintVertical_bias="0.806"
-            tools:layout_editor_absoluteX="0dp">
+            android:layout_height="304dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
         </ListView>
-    </LinearLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
-        android:layout_height="209dp"
-        android:layout_below="@id/list_view_slides"
-        android:layout_marginTop="12dp"
-        android:background="@color/design_default_color_on_primary"
-        tools:layout_editor_absoluteX="2dp">
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/list_view_slides"
+        android:layout_alignBottom="@+id/list_view_slides"
+        android:layout_marginBottom="-260dp"
+        android:background="@color/design_default_color_on_primary">
 
         <ImageButton
             android:id="@+id/delete_button"

@@ -261,6 +261,9 @@ public class TeachOfflineMainFragment extends Fragment {
                         }
                     }
                 }
+                selectedCourse = false;
+                edit.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                create.setColorFilter(null);
                 delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
             }
         });

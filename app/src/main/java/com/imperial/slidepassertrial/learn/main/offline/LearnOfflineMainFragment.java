@@ -275,6 +275,7 @@ public class LearnOfflineMainFragment extends Fragment {
                             Intent learnIntent = new Intent(getView().getContext(), SlideLearningActivity.class);
                             learnIntent.putExtra("course directory path",  getView().getContext().getExternalFilesDir(null) + "/" + courseName);
                             startActivity(learnIntent);
+                            startActivity(learnIntent);
                         }
                     }
                 } else {
