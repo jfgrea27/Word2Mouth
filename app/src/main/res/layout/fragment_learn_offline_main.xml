@@ -22,6 +22,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
+
         </ListView>
 
         <ImageButton
@@ -33,11 +34,10 @@
             android:contentDescription="@string/todo"
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toTopOf="@+id/delete_button"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/share_button"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/guideline3"
+            app:layout_constraintStart_toEndOf="@+id/delete_button"
             app:srcCompat="@drawable/ic_learn">
 
         </ImageButton>
@@ -52,34 +52,10 @@
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/share_button"
-            app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/receive_button"
-            app:srcCompat="@drawable/ic_delete">
-
-        </ImageButton>
-
-        <ImageButton
-            android:id="@+id/receive_button"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_toEndOf="@id/share_button"
-            android:layout_toRightOf="@id/share_button"
-            android:background="@android:color/transparent"
-            android:contentDescription="@string/todo"
-
-            android:paddingStart="5dp"
-            android:paddingLeft="5dp"
-            android:paddingTop="5dp"
-            android:paddingRight="5dp"
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="@+id/delete_button"
-            app:layout_constraintEnd_toStartOf="@+id/delete_button"
+            app:layout_constraintEnd_toStartOf="@+id/learn_button"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/learn_button"
-            app:layout_constraintVertical_bias="0.92"
-            app:srcCompat="@drawable/ic_receive">
+            app:srcCompat="@drawable/ic_delete">
 
         </ImageButton>
 
@@ -87,31 +63,16 @@
             android:id="@+id/share_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:background="@android:color/transparent"
 
-            android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="@+id/delete_button"
+            android:background="@android:color/transparent"
+            android:scaleType="fitXY"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/delete_button"
-            app:layout_constraintTop_toBottomOf="@+id/learn_button"
-            app:layout_constraintVertical_bias="0.92"
+            app:layout_constraintStart_toEndOf="@+id/learn_button"
             app:srcCompat="@drawable/ic_share">
 
         </ImageButton>
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_begin="355dp" />
-
-        <androidx.constraintlayout.widget.Barrier
-            android:id="@+id/barrier2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:barrierDirection="top" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

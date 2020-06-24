@@ -71,6 +71,7 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
         }
 
 
+        // Title Course
         holder.title.setText(courseItems.get(position).getCourseName());
 
        // audio
@@ -136,7 +137,6 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
         public String getCourseName() {
             return title.getText().toString();
         }
-
     }
 
 }

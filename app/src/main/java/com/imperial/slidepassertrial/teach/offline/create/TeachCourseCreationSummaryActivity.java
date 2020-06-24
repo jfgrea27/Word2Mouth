@@ -7,11 +7,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
@@ -28,8 +26,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imperial.slidepassertrial.R;
-import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
-import com.imperial.slidepassertrial.shared.CourseItem;
 import com.imperial.slidepassertrial.shared.FileReader;
 import com.imperial.slidepassertrial.shared.FileHandler;
 import com.imperial.slidepassertrial.teach.offline.create.audio.AudioRecorder;
@@ -39,7 +35,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 
 public class TeachCourseCreationSummaryActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
@@ -414,7 +409,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     // Create Button
 
     private void configureCreateButton() {
-        create = findViewById(R.id.create_button);
+        create = findViewById(R.id.upload_button);
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -476,6 +471,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        localSlides.set(currentItem, localSlides.get(nextItem));
 
                         currentItem++;
                         nextItem++;

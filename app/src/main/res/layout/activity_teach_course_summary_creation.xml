@@ -128,7 +128,7 @@
 
 
         <ImageButton
-            android:id="@+id/create_button"
+            android:id="@+id/upload_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_centerInParent="true"
@@ -157,7 +157,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.839"
-            app:layout_constraintStart_toEndOf="@+id/create_button"
+            app:layout_constraintStart_toEndOf="@+id/upload_button"
             app:srcCompat="@drawable/ic_edit">
 
         </ImageButton>

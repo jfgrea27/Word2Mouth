@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.StrictMode;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +22,9 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.imperial.slidepassertrial.DirectoryConstants;
 import com.imperial.slidepassertrial.R;
-import com.imperial.slidepassertrial.learn.main.LearnActivityMain;
-import com.imperial.slidepassertrial.learn.main.offline.p2p.WifiDirectCourseSharingActivity;
+import com.imperial.slidepassertrial.learn.main.offline.share.ShareBluetoothActivity;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
 import com.imperial.slidepassertrial.shared.CourseItem;
 import com.imperial.slidepassertrial.shared.FileHandler;
@@ -47,7 +48,6 @@ public class LearnOfflineMainFragment extends Fragment {
     // Button View
     private ImageButton learn;
     private ImageButton share;
-    private ImageButton receive;
     private ImageButton delete;
 
     // ListView
@@ -83,6 +83,8 @@ public class LearnOfflineMainFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+        StrictMode.setVmPolicy(builder.build());
     }
 
     @Override
@@ -98,7 +100,6 @@ public class LearnOfflineMainFragment extends Fragment {
 
         configureLearnButton();
         configureShareButton();
-        configureReceiveButton();
         configureDeleteButton();
         configureListView();
 
@@ -160,33 +161,19 @@ public class LearnOfflineMainFragment extends Fragment {
                             if (learn != null) {
                                 learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                             }
-                            if (share != null) {
-                                share.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                            }
                             if (delete != null) {
                                 delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                             }
-                            if(receive != null) {
-                                receive.setColorFilter(null);
-                            }
                             courseName = null;
-
                         } else {
                             selectedCourse = true;
                             view.setBackgroundColor(Color.LTGRAY);
                             if (learn != null) {
                                 learn.setColorFilter(null);
                             }
-                            if (share != null) {
-                                share.setColorFilter(null);
-                            }
                             if (delete != null) {
                                 delete.setColorFilter(null);
                             }
-                            if(receive != null) {
-                                receive.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                            }
-
                             courseItem = (CourseItem) parent.getAdapter().getItem(position);
                             courseName = courseItem.getCourseName();
                         }
@@ -201,36 +188,18 @@ public class LearnOfflineMainFragment extends Fragment {
     private ArrayList<CourseItem> retrieveLocalCourses() {
         ArrayList<CourseItem> courseItems = new ArrayList<>();
 
-        File directory = getView().getContext().getExternalFilesDir(null);
+        File directory = new File(getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline);
 
         File[] courses = directory.listFiles();
 
         for (File f : courses) {
+
             String courseName = FileReader.readTextFromFile(f.getPath()+ "/meta/title.txt");
 
             CourseItem courseItem= new CourseItem(courseName, f.getPath());
             courseItems.add(courseItem);
         }
         return courseItems;
-    }
-
-    // Receive
-    private void configureReceiveButton() {
-        receive = getView().findViewById(R.id.receive_button);
-
-        receive.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (hasReadWriteStorageAccess) {
-                    if (!selectedCourse) {
-                        Toast.makeText(getContext(), "Receive Button", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(getView().getContext(), "Need Storage Permission For Receive Button", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
     }
 
 
@@ -243,9 +212,13 @@ public class LearnOfflineMainFragment extends Fragment {
 
                 if (hasReadWriteStorageAccess) {
                         if (selectedCourse) {
-                            Intent sharingIntent = new Intent(getView().getContext(), WifiDirectCourseSharingActivity.class);
-                            sharingIntent.putExtra("coursePath", getView().getContext().getExternalFilesDir(null) + "/" + courseName);
+                            Intent sharingIntent = new Intent(getView().getContext(), ShareBluetoothActivity.class);
+                            sharingIntent.putExtra("coursePath", getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName);
                             sharingIntent.putExtra("courseName", courseName);
+                            startActivity(sharingIntent);
+                        }
+                        else {
+                            Intent sharingIntent = new Intent(getView().getContext(), ShareBluetoothActivity.class);
                             startActivity(sharingIntent);
                         }
                 } else {
@@ -254,13 +227,7 @@ public class LearnOfflineMainFragment extends Fragment {
 
             }
         });
-
-
-        if (share != null) {
-            share.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-        }
     }
-
 
     // Learn
     private void configureLearnButton() {
@@ -273,8 +240,7 @@ public class LearnOfflineMainFragment extends Fragment {
                     if (selectedCourse) {
                         if (courseName != null) {
                             Intent learnIntent = new Intent(getView().getContext(), SlideLearningActivity.class);
-                            learnIntent.putExtra("course directory path",  getView().getContext().getExternalFilesDir(null) + "/" + courseName);
-                            startActivity(learnIntent);
+                            learnIntent.putExtra("course directory path",  getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName);
                             startActivity(learnIntent);
                         }
                     }
@@ -300,9 +266,8 @@ public class LearnOfflineMainFragment extends Fragment {
                 if (hasReadWriteStorageAccess) {
                     if (selectedCourse) {
                         if (courseName != null) {
-                            File courseFile = new File(getView().getContext().getExternalFilesDir(null) + "/" + courseName);
+                            File courseFile = new File(courseItem.getCoursePath());
                             if (courseFile.exists()) {
-                                Toast.makeText(getView().getContext(), "Deleting Course: " + courseName, Toast.LENGTH_SHORT).show();
                                 FileHandler.deleteRecursive(courseFile);
                                 adapter.remove(courseItem);
                                 adapter.notifyDataSetChanged();
@@ -312,7 +277,6 @@ public class LearnOfflineMainFragment extends Fragment {
                     }
                     selectedCourse = false;
                     learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                    share.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                     delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                 } else {
                     Toast.makeText(getView().getContext(), "Need Storage Permission For Learn Button", Toast.LENGTH_SHORT).show();

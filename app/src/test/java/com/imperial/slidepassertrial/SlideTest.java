@@ -9,7 +9,7 @@ public class SlideTest {
     public final int SLIDE_POSITION = 0;
 
 
-    Slide slide = new Slide(COURSE_NAME, SLIDE_NAME, SLIDE_POSITION);
+//    Slide slide = new Slide(COURSE_NAME, SLIDE_NAME, SLIDE_POSITION);
 
 
 

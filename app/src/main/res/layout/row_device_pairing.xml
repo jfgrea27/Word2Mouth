@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
+    android:background="@color/colorAccent"
     android:layout_height="?android:attr/listPreferredItemHeight"
     android:padding="6dip">
     <ImageView
@@ -21,6 +22,7 @@
             android:layout_width="fill_parent"
             android:layout_height="0dip"
             android:layout_weight="1"
+            android:textColor="@color/colorWhite"
             android:gravity="center_vertical" />
         <TextView
             android:layout_width="fill_parent"

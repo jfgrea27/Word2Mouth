@@ -2,6 +2,11 @@ package com.imperial.slidepassertrial;
 
 import org.junit.Test;
 
+import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import static org.junit.Assert.*;
 
 /**
@@ -12,6 +17,12 @@ import static org.junit.Assert.*;
 public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
-        assertEquals(4, 2 + 2);
+
+        Set<Integer> test = new LinkedHashSet<>();
+
+        test.add(1);
+        test.add(1);
+
+        assertEquals(test.size(), 1);
     }
 }

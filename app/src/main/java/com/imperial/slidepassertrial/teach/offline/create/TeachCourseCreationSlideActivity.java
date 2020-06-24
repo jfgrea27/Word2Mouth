@@ -294,7 +294,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
                 titleEdit.setText("");
             } else {
                 titleEdit.setText(text);
-                titleEdit.setSelection(instructionsEdit.length());
+                titleEdit.setSelection(titleEdit.length());
             }
         }
 

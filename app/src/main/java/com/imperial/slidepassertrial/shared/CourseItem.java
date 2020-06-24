@@ -8,13 +8,16 @@ public class CourseItem  {
     private String courseName = null;
     private File thumbnail = null;
     private File audio = null;
+    private String coursePath = null;
 
-    public CourseItem(String courseName, String coursePath) {
+    public CourseItem(String courseName, String path) {
         this.courseName = courseName;
 
-        thumbnail = new File(coursePath + "/meta" + "/thumbnail.jpg");
+        thumbnail = new File(path + "/meta" + "/thumbnail.jpg");
 
-        audio = new File(coursePath + "/meta" + "/audio.3gp");
+        audio = new File(path + "/meta" + "/audio.3gp");
+
+        coursePath = path;
     }
 
     public String getCourseName() {
@@ -27,5 +30,9 @@ public class CourseItem  {
 
     public File getAudio() {
         return audio;
+    }
+
+    public String getCoursePath() {
+        return coursePath;
     }
 }

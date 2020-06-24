@@ -26,34 +26,34 @@
         </ListView>
 
         <ImageButton
-            android:id="@+id/create_button"
+            android:id="@+id/upload_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/todo"
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="@+id/delete_button"
-            app:layout_constraintEnd_toStartOf="@+id/delete_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_create">
+            app:layout_constraintStart_toEndOf="@+id/create_edit_button"
+            app:srcCompat="@drawable/ic_upload">
 
         </ImageButton>
 
         <ImageButton
-            android:id="@+id/edit_button"
+            android:id="@+id/create_edit_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/todo"
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
-            app:layout_constraintBottom_toBottomOf="@+id/delete_button"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/upload_button"
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toEndOf="@+id/delete_button"
-            app:srcCompat="@drawable/ic_edit">
+            app:srcCompat="@drawable/ic_create">
 
         </ImageButton>
 
@@ -66,9 +66,9 @@
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/edit_button"
+            app:layout_constraintEnd_toStartOf="@+id/create_edit_button"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/create_button"
+            app:layout_constraintStart_toStartOf="parent"
             app:srcCompat="@drawable/ic_delete">
 
         </ImageButton>

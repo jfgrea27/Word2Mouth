@@ -25,13 +25,12 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.imperial.slidepassertrial.DirectoryConstants;
 import com.imperial.slidepassertrial.R;
-import com.imperial.slidepassertrial.learn.main.LearnActivityMain;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
 import com.imperial.slidepassertrial.shared.CourseItem;
 import com.imperial.slidepassertrial.shared.FileHandler;
 import com.imperial.slidepassertrial.shared.FileReader;
-import com.imperial.slidepassertrial.teach.TeachActivityMain;
 import com.imperial.slidepassertrial.teach.offline.create.TeachCourseCreationSummaryActivity;
 
 import java.io.File;
@@ -50,7 +49,7 @@ public class TeachOfflineMainFragment extends Fragment {
 
     // View
     private ImageButton create = null;
-    private ImageButton edit = null;
+    private ImageButton upload = null;
     private ImageButton delete = null;
     private ListView courseList;
 
@@ -105,7 +104,7 @@ public class TeachOfflineMainFragment extends Fragment {
 
         if (hasNecessaryPermissions()) {
             configureCreateButton();
-            configureEditButton();
+            configureUploadButton();
 
             configureDeleteButton();
             configureListView();
@@ -172,13 +171,8 @@ public class TeachOfflineMainFragment extends Fragment {
                         if (delete != null) {
                             delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                         }
-
-                        if (edit != null) {
-                            edit.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                        }
-
-                        if (create != null) {
-                            create.setColorFilter(null);
+                        if (upload != null) {
+                            upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                         }
                         courseName = null;
 
@@ -188,12 +182,8 @@ public class TeachOfflineMainFragment extends Fragment {
                         if (delete != null) {
                             delete.setColorFilter(null);
                         }
-                        if (edit != null) {
-                            edit.setColorFilter(null);
-                        }
-
-                        if (create != null) {
-                            create.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                        if (upload != null) {
+                            upload.setColorFilter(null);
                         }
 
                         courseItem = (CourseItem) parent.getAdapter().getItem(position);
@@ -207,7 +197,7 @@ public class TeachOfflineMainFragment extends Fragment {
     private ArrayList<CourseItem> retrieveLocalCourses() {
         ArrayList<CourseItem> courseItems = new ArrayList<>();
 
-        File directory = getView().getContext().getExternalFilesDir(null);
+        File directory = new File(getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline);
 
         File[] courses = directory.listFiles();
 
@@ -219,24 +209,20 @@ public class TeachOfflineMainFragment extends Fragment {
         }
         return courseItems;
     }
-    // Edit Button
+    // Upload Button
 
-    private void configureEditButton() {
-        edit = getView().findViewById(R.id.edit_button);
+    private void configureUploadButton() {
+        upload = getView().findViewById(R.id.upload_button);
 
-        if (edit!= null) {
-            edit.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        if (upload!= null) {
+            upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
         }
 
-        edit.setOnClickListener(new View.OnClickListener() {
+        upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedCourse) {
-                    Intent createIntent = new Intent(getView().getContext(), TeachCourseCreationSummaryActivity.class);
-                    createIntent.putExtra("course name", courseName);
-                    createIntent.putExtra("course directory path", getView().getContext().getExternalFilesDir(null) + "/" + courseName);
-                    startActivity(createIntent);
-                }
+
+                Toast.makeText(getView().getContext(), "Upload content to Online", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -251,9 +237,8 @@ public class TeachOfflineMainFragment extends Fragment {
             public void onClick(View v) {
                 if (selectedCourse) {
                     if (courseName != null) {
-                        File courseFile = new File(getView().getContext().getExternalFilesDir(null) + "/" + courseName);
+                        File courseFile = new File(courseItem.getCoursePath());
                         if (courseFile.exists()) {
-                            Toast.makeText(getView().getContext(), "Deleting Course: " + courseName, Toast.LENGTH_SHORT).show();
                             FileHandler.deleteRecursive(courseFile);
                             adapter.remove(courseItem);
                             adapter.notifyDataSetChanged();
@@ -262,7 +247,7 @@ public class TeachOfflineMainFragment extends Fragment {
                     }
                 }
                 selectedCourse = false;
-                edit.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                 create.setColorFilter(null);
                 delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
             }
@@ -277,45 +262,54 @@ public class TeachOfflineMainFragment extends Fragment {
 
     private void configureCreateButton() {
 
-        create = getView().findViewById(R.id.create_button);
+        create = getView().findViewById(R.id.create_edit_button);
 
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-                builder.setTitle("Course Name");
-                final EditText input = new EditText(getView().getContext());
-                input.setHint("Type Course Name");
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-                builder.setView(input);
 
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        courseName = input.getText().toString();
-                        if (courseName.isEmpty()) {
-                            courseName = "Untitled Course";
+                if (selectedCourse) {
+                    Intent createIntent = new Intent(getView().getContext(), TeachCourseCreationSummaryActivity.class);
+                    createIntent.putExtra("course name", courseName);
+                    createIntent.putExtra("course directory path", getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName);
+                    startActivity(createIntent);
+
+                } else {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+                    builder.setTitle("Course Name");
+                    final EditText input = new EditText(getView().getContext());
+                    input.setHint("Type Course Name");
+                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+                    builder.setView(input);
+
+                    // Set up the buttons
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            courseName = input.getText().toString();
+                            if (courseName.isEmpty()) {
+                                courseName = "Untitled Course";
+                            }
+                            courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
+                            intentToCreateCourseAndStartActivity();
                         }
-                        courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
-                        intentToCreateCourseAndStartActivity();
-                    }
 
-                    private void intentToCreateCourseAndStartActivity() {
-                        Intent createIntent = new Intent(getView().getContext(), TeachCourseCreationSummaryActivity.class);
-                        createIntent.putExtra("course name", courseDirectory.getName());
-                        createIntent.putExtra("course directory path", courseDirectory.getPath());
-                        startActivity(createIntent);
-                    }
-                 });
+                        private void intentToCreateCourseAndStartActivity() {
+                            Intent createIntent = new Intent(getView().getContext(), TeachCourseCreationSummaryActivity.class);
+                            createIntent.putExtra("course name", courseDirectory.getName());
+                            createIntent.putExtra("course directory path", courseDirectory.getPath());
+                            startActivity(createIntent);
+                        }
+                    });
 
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-                builder.show();
+                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+                    builder.show();
+                }
             }
         });
     }

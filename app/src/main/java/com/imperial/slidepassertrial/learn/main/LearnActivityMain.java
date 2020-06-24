@@ -18,9 +18,13 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.imperial.slidepassertrial.DirectoryConstants;
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.learn.main.ui.SectionsPagerAdapter;
 import com.imperial.slidepassertrial.teach.TeachActivityMain;
+
+import java.io.File;
+import java.io.FileOutputStream;
 
 public class LearnActivityMain extends AppCompatActivity {
 
@@ -36,10 +40,29 @@ public class LearnActivityMain extends AppCompatActivity {
 
         setToolBar();
 
+        fileManagement();
+
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         tabs.getTabAt(0).setIcon(R.drawable.ic_offline_online_0);
         tabs.getTabAt(1).setIcon(R.drawable.ic_offline_online_1);
+    }
+
+    private void fileManagement() {
+        File f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.zip);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+
+        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.offline);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+
+        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.online);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
     }
 
 

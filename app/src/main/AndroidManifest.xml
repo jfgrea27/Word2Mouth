@@ -1,43 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-package="com.imperial.slidepassertrial">
-
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.imperial.slidepassertrial">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
     <uses-permission android:name="android.permission.CAMERA" />
-
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.STORAGE" />
-
     <uses-permission android:name="android.permission.INTERNET" />
-
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"
-        android:required="true"/>
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"
-        android:required="true"/>
-    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"
-    android:required="true"/>
-    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"
-        android:required="true"/>
-
-
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission
+        android:name="android.permission.ACCESS_FINE_LOCATION"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_COARSE_LOCATION"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.ACCESS_WIFI_STATE"
+        android:required="true" />
+    <uses-permission
+        android:name="android.permission.CHANGE_WIFI_STATE"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
-        android:screenOrientation="portrait"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".learn.main.offline.share.ShareBluetoothActivity"></activity>
         <activity
             android:name=".teach.offline.create.TeachCourseCreationSummaryActivity"
-            android:screenOrientation="portrait">
-
-        </activity>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".learn.main.offline.SlideLearningActivity"
             android:screenOrientation="portrait" />
@@ -61,16 +59,9 @@ package="com.imperial.slidepassertrial">
             </intent-filter>
         </activity>
 
-        <activity android:name="com.imperial.slidepassertrial.learn.main.offline.p2p.WifiDirectCourseSharingActivity"
-            android:screenOrientation="portrait">
-        </activity>
-
-
         <activity
             android:name=".teach.offline.create.TeachCourseCreationSlideActivity"
             android:screenOrientation="portrait" />
-
-        <receiver android:name=".learn.main.offline.p2p.ArrayAdapterWifiP2PDevices" />
     </application>
 
 </manifest>

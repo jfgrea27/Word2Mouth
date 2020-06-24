@@ -50,23 +50,61 @@
         tools:layout_editor_absoluteX="2dp">
 
         <ImageButton
-            android:id="@+id/delete_button"
+            android:id="@+id/connect"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:layout_marginBottom="72dp"
+            android:layout_marginBottom="32dp"
             android:background="@android:color/transparent"
             android:contentDescription="@string/todo"
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.498"
+            app:layout_constraintHorizontal_bias="0.2"
             app:layout_constraintStart_toStartOf="parent"
-            app:srcCompat="@drawable/ic_delete">
+            app:srcCompat="@drawable/ic_speak">
+
+        </ImageButton>
+
+        <ImageButton
+            android:id="@+id/share"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="40dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/todo"
+            android:paddingTop="25dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.792"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_learn">
 
         </ImageButton>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <EditText
+        android:id="@+id/test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textView"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="80dp"
+        android:layout_marginLeft="80dp"
+        android:layout_marginTop="26dp"
+        android:layout_marginEnd="70dp"
+        android:layout_marginRight="70dp"
+        android:layout_marginBottom="22dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        android:text="Test" />
 
 
 </RelativeLayout>
