@@ -1,5 +1,7 @@
 package com.imperial.slidepassertrial;
 
+import android.widget.ArrayAdapter;
+
 import org.junit.Test;
 
 import java.net.InetAddress;
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.*;
 
 /**
@@ -18,11 +21,17 @@ public class ExampleUnitTest {
     @Test
     public void addition_isCorrect() {
 
-        Set<Integer> test = new LinkedHashSet<>();
+        ArrayList<Integer> array = new ArrayList<>();
 
-        test.add(1);
-        test.add(1);
+        array.add(0);
+        array.add(1);
+        array.add(2);
 
-        assertEquals(test.size(), 1);
+        array.remove(1);
+
+        assertThat(array.get(0), is(0));
+        assertThat(array.get(1), is(2));
+
+
     }
 }

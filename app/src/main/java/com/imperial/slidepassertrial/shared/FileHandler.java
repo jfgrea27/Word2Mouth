@@ -33,7 +33,9 @@ public class FileHandler {
     public static final int VIDEO = 101;
     public static final int INSTRUCTIONS = 102;
     public static final int AUDIO = 103;
-    private static final int IMAGE = 104;
+    public static final int IMAGE = 104;
+    public static final int META = 105;
+    public static final int SLIDES = 106;
 
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
@@ -51,19 +53,29 @@ public class FileHandler {
     }
 
     public static File createDirectoryForSlideAndReturnIt(String coursePath, int slideNumber) {
-        File file = new File(coursePath, "/" + slideNumber);
+        File file = new File(coursePath, DirectoryConstants.slides+ slideNumber);
         file.mkdirs();
         return file;
     }
 
-    public static File createDirectoryForMetaData(String coursePath) {
-        File file = new File(coursePath, "/" + "meta");
+    public static File createDirectoryAndReturnIt(String coursePath, int type) {
+        File file = null;
+        switch (type) {
+            case META:
+                file = new File(coursePath, DirectoryConstants.meta);
+                break;
+            case SLIDES:
+                file = new File(coursePath, DirectoryConstants.slides);
+                break;
+            default:
+                throw new IllegalStateException("Unexpected value: " + type);
+        }
         file.mkdirs();
         return file;
     }
 
     public static File retrieveSlideDirectoryByNumber(String coursePath, int slideNumber) {
-        File slideDirectory = new File(coursePath, "/" + slideNumber);
+        File slideDirectory = new File(coursePath, DirectoryConstants.slides + slideNumber);
         if (slideDirectory.exists()) {
             return slideDirectory;
         } else {
@@ -200,6 +212,11 @@ public class FileHandler {
         }
 
     }
+
+    public static void shuffleUpFiles(File second, File First) {
+        
+    }
+
 
     public static void addTree(File file, Collection<File> all) {
         File[] children = file.listFiles();

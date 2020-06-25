@@ -56,7 +56,7 @@ public class ArrayAdapterSlideName extends ArrayAdapter<String> {
             holder = (ArrayAdapterSlideName.ViewHolder) convertView.getTag();
         }
 
-        holder.slideName.setText(position + ". " + slideNames.get(position));
+        holder.slideName.setText(position + 1 + ". " + slideNames.get(position));
 
         return convertView;
     }

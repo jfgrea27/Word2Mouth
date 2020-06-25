@@ -22,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.imperial.slidepassertrial.IntentNames;
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.FileReader;
 import com.imperial.slidepassertrial.shared.FileHandler;
@@ -93,7 +94,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         setContentView(R.layout.activity_teach_course_slide_creation);
 
         // get Intents
-        coursePath = (String) getIntent().getExtras().get("course directory path");
+        coursePath = (String) getIntent().getExtras().get(IntentNames.COURSE_PATH);
         totalNumberSlides = (int) getIntent().getExtras().get("number of slides");
         try {
             slideCounter = (int) getIntent().getExtras().get("slide number");

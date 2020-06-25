@@ -12,6 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.imperial.slidepassertrial.DirectoryConstants;
+import com.imperial.slidepassertrial.IntentNames;
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.FileReader;
 import com.imperial.slidepassertrial.shared.FileHandler;
@@ -52,7 +54,7 @@ public class SlideLearningActivity extends AppCompatActivity {
 
 
     // File Management
-    private File courseFolder = null;
+    private File slidesFolder = null;
     private File currentSlideDirectory = null;
     private File titleFile = null;
     private File videoFile = null;
@@ -64,11 +66,12 @@ public class SlideLearningActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_slide);
 
-        coursePath = (String) getIntent().getExtras().get("course directory path");
+        coursePath = (String) getIntent().getExtras().get(IntentNames.COURSE_PATH);
 
-        courseFolder = new File(coursePath);
+        slidesFolder = new File(coursePath + DirectoryConstants.slides);
+
         // meta
-        totalNumberSlides = courseFolder.listFiles().length - 1;
+        totalNumberSlides = slidesFolder.listFiles().length;
 
 
         // Forward and Backward Buttons

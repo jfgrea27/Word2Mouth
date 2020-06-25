@@ -23,6 +23,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.imperial.slidepassertrial.DirectoryConstants;
+import com.imperial.slidepassertrial.IntentNames;
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.learn.main.offline.share.ShareBluetoothActivity;
 import com.imperial.slidepassertrial.shared.ArrayAdapterCourseItems;
@@ -240,7 +241,7 @@ public class LearnOfflineMainFragment extends Fragment {
                     if (selectedCourse) {
                         if (courseName != null) {
                             Intent learnIntent = new Intent(getView().getContext(), SlideLearningActivity.class);
-                            learnIntent.putExtra("course directory path",  getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName);
+                            learnIntent.putExtra(IntentNames.COURSE_PATH, getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName);
                             startActivity(learnIntent);
                         }
                     }

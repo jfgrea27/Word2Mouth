@@ -25,16 +25,22 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.imperial.slidepassertrial.DirectoryConstants;
+import com.imperial.slidepassertrial.IntentNames;
 import com.imperial.slidepassertrial.R;
 import com.imperial.slidepassertrial.shared.FileReader;
 import com.imperial.slidepassertrial.shared.FileHandler;
 import com.imperial.slidepassertrial.teach.offline.create.audio.AudioRecorder;
 import com.imperial.slidepassertrial.teach.offline.create.video.ImageDialog;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class TeachCourseCreationSummaryActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
@@ -78,6 +84,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     // File
     private static final int TITLE = 100;
     private File metaDirectory = null;
+    private File slideDirectory = null;
     private File audioFile = null;
     private String courseDirectoryPath = null;
     private int numberOfSlides = 0;
@@ -89,7 +96,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
     private static final int IMAGE = 104;
 
-    private int slideNumber = 0;
+    private int slideNumber = -1;
 
     // Bottom View Button
     private ImageButton delete = null;
@@ -110,7 +117,8 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
         if (hasReadWriteStorageAccess) {
             // File
-            metaDirectory = FileHandler.createDirectoryForMetaData(courseDirectoryPath);
+            metaDirectory = FileHandler.createDirectoryAndReturnIt(courseDirectoryPath, FileHandler.META);
+            slideDirectory = FileHandler.createDirectoryAndReturnIt(courseDirectoryPath, FileHandler.SLIDES);
             // Creating audioFile
             audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, AUDIO );
             FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseName, TITLE);
@@ -209,8 +217,11 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
         localSlides = retrieveLocalSlides();
 
-        adapter = new ArrayAdapterSlideName(TeachCourseCreationSummaryActivity.this, R.layout.list_slide, localSlides);
-        slides.setAdapter(adapter);
+        if (localSlides.size() > 0) {
+            adapter = new ArrayAdapterSlideName(TeachCourseCreationSummaryActivity.this, R.layout.list_slide, localSlides);
+            slides.setAdapter(adapter);
+        }
+
         slides.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -234,27 +245,23 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                     if (create != null) {
                         create.setColorFilter(null);
                     }
-                    slideNumber = 0 ;
+                    slideNumber = -1;
 
                 } else {
                     selectedSlide = true;
 
                     slideNumber = position;
                     view.setBackgroundColor(Color.LTGRAY);
-
-                    if (slideNumber > 0) {
-                        if (delete != null) {
-                            delete.setColorFilter(null);
-                        }
-                        if (edit != null) {
-                            edit.setColorFilter(null);
-                        }
-
-                        if (create != null) {
-                            create.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                        }
+                    if (delete != null) {
+                        delete.setColorFilter(null);
+                    }
+                    if (edit != null) {
+                        edit.setColorFilter(null);
                     }
 
+                    if (create != null) {
+                        create.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    }
                  }
             }
         });
@@ -265,18 +272,13 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
         ArrayList<String> slideNames = new ArrayList<>();
 
-        File directory = new File(courseDirectoryPath);
-
-        File[] slidesFiles = directory.listFiles();
-        numberOfSlides = slidesFiles.length - 1;
+        File[] slidesFiles = slideDirectory.listFiles();
+        numberOfSlides = slidesFiles.length;
 
         for (File f : slidesFiles) {
+
             String slideName;
-            if (f.getName().equals("meta")) {
-                slideName = "Meta Files";
-            } else {
-                slideName = FileReader.readTextFromFile(f.getPath()+ "/title.txt");
-            }
+            slideName = FileReader.readTextFromFile(f.getPath()+ "/title.txt");
 
             slideNames.add(slideName);
         }
@@ -415,7 +417,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
             public void onClick(View v) {
                 saveMetaData();
                 Intent createFirstSlideIntent = new Intent(TeachCourseCreationSummaryActivity.this, TeachCourseCreationSlideActivity.class);
-                createFirstSlideIntent.putExtra("course directory path", courseDirectoryPath);
+                createFirstSlideIntent.putExtra(IntentNames.COURSE_PATH, courseDirectoryPath);
                 // take into account the meta file
                 createFirstSlideIntent.putExtra("number of slides", numberOfSlides);
                 startActivity(createFirstSlideIntent);
@@ -430,12 +432,17 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedSlide && slideNumber > 0) {
+                if (selectedSlide) {
                     Intent editIntent = new Intent(TeachCourseCreationSummaryActivity.this, TeachCourseCreationSlideActivity.class);
                     // starts at 0
-                    editIntent.putExtra("slide number", slideNumber - 1);
+                    if (slideNumber > -1) {
+                        editIntent.putExtra("slide number", slideNumber);
+                    } else {
+                        editIntent.putExtra("slide number", 0);
+
+                    }
                     // meta not included
-                    editIntent.putExtra("course directory path", courseDirectoryPath);
+                    editIntent.putExtra(IntentNames.COURSE_PATH, courseDirectoryPath);
                     editIntent.putExtra("number of slides", numberOfSlides);
                     startActivity(editIntent);
                 }
@@ -455,36 +462,49 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
             @Override
             public void onClick(View v) {
 
-                if (slideNumber - 1 > -1) {
-                    int currentItem = slideNumber - 1;
-                    int nextItem = currentItem + 1;
+                if (selectedSlide) {
+                    if (slideNumber > -1) {
+                        int currentItem = slideNumber;
+                        int nextItem = currentItem + 1;
 
-                    File currentItemFile = null;
-                    File nextItemFile = null;
 
-                    while (nextItem < numberOfSlides) {
-                        currentItemFile = new File(courseDirectoryPath + "/" + currentItem);
-                        nextItemFile = new File(courseDirectoryPath + "/" + nextItem);
-
-                        try {
-                            FileHandler.copyDirectoryOneLocationToAnotherLocation(nextItemFile, currentItemFile);
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                        localSlides.set(currentItem, localSlides.get(nextItem));
-
-                        currentItem++;
-                        nextItem++;
-                    }
-
-                    currentItemFile = new File(courseDirectoryPath + "/" + currentItem);
-
-                    if (currentItemFile.exists()) {
-                        FileHandler.deleteRecursive(currentItemFile);
                         adapter.remove(adapter.getItem(currentItem));
                         adapter.notifyDataSetChanged();
-                        adapter.notifyDataSetInvalidated();
+
+                        // remove from File System
+                        File currentItemFile = null;
+                        File nextItemFile = null;
+
+                        while (nextItem < numberOfSlides) {
+
+                            currentItemFile = new File(slideDirectory.getPath() + "/" + currentItem);
+                            nextItemFile = new File(slideDirectory.getPath() + "/" + nextItem);
+
+
+
+                            try {
+                                FileUtils.copyDirectory(nextItemFile, currentItemFile);
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+
+//                        localSlides.set(currentItem, localSlides.get(nextItem));
+
+                            currentItem++;
+                            nextItem++;
+                        }
+
+                        currentItemFile = new File(slideDirectory.getPath() + "/" + currentItem);
+
+                        if (currentItemFile.exists()) {
+                            FileHandler.deleteRecursive(currentItemFile);
+
+                        }
                     }
+
+                    selectedSlide = false;
+                    slideNumber = -1;
+                    delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                 }
 
             }
