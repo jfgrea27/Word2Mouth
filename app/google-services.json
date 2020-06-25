@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "53389300561",
+    "firebase_url": "https://word2mouth-46979.firebaseio.com",
+    "project_id": "word2mouth-46979",
+    "storage_bucket": "word2mouth-46979.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:53389300561:android:ca15b3988719c2ee1b3970",
+        "android_client_info": {
+          "package_name": "com.imperial.word2mouth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "53389300561-flako8qi81h7g0h4ic9umq1efg5e9jtv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtG81R0crO9FD9c0yxiVBK_N6Lno_j5RE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "53389300561-flako8qi81h7g0h4ic9umq1efg5e9jtv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

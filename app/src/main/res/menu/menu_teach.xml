@@ -6,6 +6,9 @@
         android:id="@+id/login"
         android:title="@string/login" />
     <item
+        android:id="@+id/sign_up"
+        android:title="Sign Up" />
+    <item
         android:id="@+id/learn_menu"
         android:title="@string/teaching"
         android:icon="@drawable/ic_learn_white"
