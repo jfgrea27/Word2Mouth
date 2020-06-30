@@ -32,8 +32,8 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".teach.online.TeachSignUpActivity"></activity>
-        <activity android:name=".teach.online.TeachLoginActivity" />
+        <activity android:name=".teach.online.account.TeachSignUpActivity"></activity>
+        <activity android:name=".teach.online.account.TeachLoginActivity" />
         <activity
             android:name=".ui.login.TeacherLoginActiity"
             android:label="@string/title_activity_teacher_login_actiity" />

@@ -1,8 +1,9 @@
-package com.imperial.word2mouth.teach.offline;
+package com.imperial.word2mouth.teach.offline.upload.storage;
 
 import android.content.Context;
 
 import com.imperial.word2mouth.learn.main.offline.share.bluetooth.FileZip;
+import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 
 import net.lingala.zip4j.ZipFile;
@@ -11,15 +12,17 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
-public class UploadPreparation {
+public class StorageUploadPreparation {
 
 
     private final String coursePath;
     private final String zipCoursePath;
     private final Context context;
 
-    public UploadPreparation(String coursePath, Context context) {
+
+    public StorageUploadPreparation(String coursePath, Context context) {
         this.coursePath = coursePath;
         this.context = context;
         zipCoursePath = context.getExternalFilesDir(null).getPath() + DirectoryConstants.zip + "zipCourse.zip";
@@ -36,7 +39,7 @@ public class UploadPreparation {
     }
 
 
-    public byte[] getZippedCourseCompressed() {
+    public byte[] getZippedCourse() {
 
         if (FileZip.zipFileAtPath(coursePath, zipCoursePath)) {
             byte[] zipArray = FileZip.convertFileToByteArray(zipCoursePath);

@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.teach.online;
+package com.imperial.word2mouth.teach.online.account;
 
 import android.util.Patterns;
 

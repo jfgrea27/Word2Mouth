@@ -9,7 +9,9 @@ public class CourseItem  {
     private File thumbnail = null;
     private File audio = null;
     private String coursePath = null;
+    private String courseOnlineIdentification = null;
 
+    // For offline purposes
     public CourseItem(String courseName, String path) {
         this.courseName = courseName;
 
@@ -18,6 +20,12 @@ public class CourseItem  {
         audio = new File(path + "/meta" + "/audio.3gp");
 
         coursePath = path;
+    }
+
+    // For online purposes
+    public CourseItem(String courseName, String id, boolean online) {
+        this.courseName = courseName;
+        this.courseOnlineIdentification = id;
     }
 
     public String getCourseName() {
@@ -34,5 +42,13 @@ public class CourseItem  {
 
     public String getCoursePath() {
         return coursePath;
+    }
+
+    public String getCourseOnlineIdentification() {
+        return courseOnlineIdentification;
+    }
+
+    public void setCourseOnlineIdentification(String courseOnlineIdentification) {
+        this.courseOnlineIdentification = courseOnlineIdentification;
     }
 }

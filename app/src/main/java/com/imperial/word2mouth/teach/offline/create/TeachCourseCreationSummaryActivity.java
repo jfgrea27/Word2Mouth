@@ -276,17 +276,20 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         audioButton = findViewById(R.id.list_audio_button);
 
         audioButton.setOnTouchListener(new View.OnTouchListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean onTouch(View v, MotionEvent event) {
                 if (hasAudioRecordingPermission) {
                     switch (event.getAction()){
                         case MotionEvent.ACTION_DOWN:
                             Toast.makeText(TeachCourseCreationSummaryActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                            audioButton.setColorFilter(Color.RED);
                             recorder.startRecording(audioFile.getPath());
                             return true;
                         case MotionEvent.ACTION_UP:
                             Toast.makeText(TeachCourseCreationSummaryActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
                             recorder.stopRecording();
+                            audioButton.setColorFilter(null);
                             audioUri = Uri.fromFile(audioFile);
                             audioPreview.setVisibility(View.VISIBLE);
                             break;

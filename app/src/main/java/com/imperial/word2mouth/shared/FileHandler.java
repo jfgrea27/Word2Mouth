@@ -26,6 +26,7 @@ public class FileHandler {
     public static final int IMAGE = 104;
     public static final int META = 105;
     public static final int SLIDES = 106;
+    public static final int ONLINE_IDENTIFICATION = 107;
 
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
@@ -91,6 +92,9 @@ public class FileHandler {
             case IMAGE:
                 outputAddress += "/thumbnail.jpg";
                 return copyVideoToFile(outputAddress, originalUriPath, content);
+            case ONLINE_IDENTIFICATION:
+                outputAddress += DirectoryConstants.identification;
+                return copyTextToFile(outputAddress, script);
             default:
                 return null;
         }

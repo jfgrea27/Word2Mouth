@@ -15,8 +15,8 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.teach.online.TeachLoginActivity;
-import com.imperial.word2mouth.teach.online.TeachSignUpActivity;
+import com.imperial.word2mouth.teach.online.account.TeachLoginActivity;
+import com.imperial.word2mouth.teach.online.account.TeachSignUpActivity;
 import com.imperial.word2mouth.teach.ui.main.SectionsPagerAdapter;
 
 public class TeachActivityMain extends AppCompatActivity {

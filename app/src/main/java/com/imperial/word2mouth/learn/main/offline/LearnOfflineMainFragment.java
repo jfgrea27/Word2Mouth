@@ -26,7 +26,7 @@ import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.offline.share.bluetooth.ShareBluetoothActivity;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseItems;
+import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReader;
@@ -53,7 +53,7 @@ public class LearnOfflineMainFragment extends Fragment {
 
     // ListView
     private ListView courseList;
-    private ArrayAdapterCourseItems adapter;
+    private ArrayAdapterCourseItemsOffline adapter;
 
     // Model
     private ArrayList<CourseItem> localCourses = null;
@@ -142,7 +142,7 @@ public class LearnOfflineMainFragment extends Fragment {
             localCourses = retrieveLocalCourses();
 
             if (localCourses.size() > 0) {
-                adapter = new ArrayAdapterCourseItems(getContext(), R.layout.list_item, localCourses);
+                adapter = new ArrayAdapterCourseItemsOffline(getContext(), R.layout.list_item, localCourses);
 
                 courseList.setAdapter(adapter);
                 courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {

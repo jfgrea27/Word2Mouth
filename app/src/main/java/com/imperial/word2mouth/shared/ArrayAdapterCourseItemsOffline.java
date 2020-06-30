@@ -22,7 +22,7 @@ import com.imperial.word2mouth.R;
 import java.io.File;
 import java.util.ArrayList;
 
-public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
+public class ArrayAdapterCourseItemsOffline extends ArrayAdapter<CourseItem> {
     private static ArrayList<CourseItem> courseItems;
 
     private int layout;
@@ -30,7 +30,7 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
 
     private ViewHolder holder = new ViewHolder();
 
-    public ArrayAdapterCourseItems(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
+    public ArrayAdapterCourseItemsOffline(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
@@ -107,9 +107,7 @@ public class ArrayAdapterCourseItems extends ArrayAdapter<CourseItem> {
                     Toast.makeText(getContext(), "No audio File", Toast.LENGTH_SHORT).show();
                 }
 
-
             }
-
 
         });
 

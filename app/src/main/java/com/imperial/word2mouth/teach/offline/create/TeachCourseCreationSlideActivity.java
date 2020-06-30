@@ -365,12 +365,15 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
                     audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
                     switch (event.getAction()){
                         case MotionEvent.ACTION_DOWN:
+                            recordAudioButton.setColorFilter(Color.RED);
                             Toast.makeText(TeachCourseCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
                             recorder.startRecording(audioFile.getPath());
                             return true;
                         case MotionEvent.ACTION_UP:
                             Toast.makeText(TeachCourseCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
                             recorder.stopRecording();
+                            recordAudioButton.setColorFilter(null);
+
                             audio = Uri.fromFile(audioFile);
                             playAudioButton.setVisibility(View.VISIBLE);
                             break;

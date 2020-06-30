@@ -2,23 +2,46 @@ package com.imperial.word2mouth.teach.online;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
 
+import com.google.android.gms.auth.api.signin.internal.Storage;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOnline;
+import com.imperial.word2mouth.shared.CourseItem;
+import com.imperial.word2mouth.teach.TeachActivityMain;
+import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -34,10 +57,29 @@ public class TeachOnlineMainFragment extends Fragment {
     private boolean hasInternetAccess = false;
     private boolean hasReadWriteStorageAccess = false;
 
-    // Internet Permisison
+    // Internet Permissison
 
-    private ImageButton upload;
-    private WebView onlineCoursesView;
+    private ListView onlineListCourses;
+    private ImageButton delete;
+
+    // Courses
+    private ArrayList<CourseItem> onlineCourses = null;
+
+
+    // Adapter
+    private ArrayList<CourseItem> localCourses = null;
+    private ArrayAdapterCourseItemsOnline adapter = null;
+
+
+    // Online
+    private FirebaseUser user;
+    private FirebaseDatabase database;
+    private boolean selectedCourse = false;
+
+    // Course data
+    private String courseName = null;
+    private CourseItem courseItem = null;
+    private String courseIdentification = null;
 
     public TeachOnlineMainFragment() {
         // Required empty public constructor
@@ -66,6 +108,10 @@ public class TeachOnlineMainFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
+        if (onlineListCourses != null) {
+            retrieveOnlineCourses();
+        }
         return inflater.inflate(R.layout.fragment_teach_online_main, container, false);
     }
 
@@ -77,22 +123,13 @@ public class TeachOnlineMainFragment extends Fragment {
         getPermissions();
 
         if (hasNecessaryPermissions()) {
-            configureUploadButton();
-            configureWebView();
+            configureDeleteButton();
+            configureListCourses();
         }
 
     }
 
-    private void configureWebView() {
-        onlineCoursesView = (WebView) getView().findViewById(R.id.online_courses_web);
 
-        onlineCoursesView.getSettings().setLoadsImagesAutomatically(true);
-        onlineCoursesView.setWebViewClient(new WebViewClient());
-        onlineCoursesView.getSettings().setJavaScriptEnabled(true);
-        onlineCoursesView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        onlineCoursesView.loadUrl("https://www.google.com/");
-
-    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Permissions
@@ -105,7 +142,7 @@ public class TeachOnlineMainFragment extends Fragment {
         }
 
         if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
+        ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
             Toast.makeText(getView().getContext(), "Please allow access to Storage", Toast.LENGTH_SHORT).show();
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
         } else {
@@ -132,20 +169,177 @@ public class TeachOnlineMainFragment extends Fragment {
         }
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////
+    // Retrieving courses from Database
 
-    // Upload Button
-    private void configureUploadButton() {
-        upload = getView().findViewById(R.id.upload_button);
-        upload.setOnClickListener(new View.OnClickListener() {
+    private void configureListCourses() {
+        onlineListCourses = getView().findViewById(R.id.list_courses_online);
+
+        retrieveOnlineCourses();
+
+        onlineListCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onClick(View v) {
-//                FirebaseDatabase database = FirebaseDatabase.getInstance();
-//                DatabaseReference myRef = database.getReference("message");
-//
-//                myRef.setValue("Hello World!");
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (selectedCourse) {
+                    selectedCourse = false;
+
+                    if (delete != null) {
+                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    }
+
+                    courseName = null;
+
+                } else {
+                    selectedCourse = true;
+                    if (delete != null) {
+                        delete.setColorFilter(null);
+                    }
+
+                    courseItem = (CourseItem) parent.getAdapter().getItem(position);
+                    courseName = courseItem.getCourseName();
+                    courseIdentification = courseItem.getCourseOnlineIdentification();
+                }
+
+
             }
         });
     }
+
+
+    private void retrieveOnlineCourses() {
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        database = FirebaseDatabase.getInstance();
+
+        if (user != null) {
+            DatabaseReference teacherRef = database.getReference().child(DataTransferObject.userNameRetrieving(user.getEmail()));
+            teacherRef.addValueEventListener(new ValueEventListener() {
+                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                    if (snapshot.getValue() != null) {
+                        onlineCourses = getCourses((Map<String, Map<String, String>>) snapshot.getValue());
+
+                        updateListView();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Toast.makeText(getView().getContext(), "Could Not retrieve courses", Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        } else {
+            Toast.makeText(getView().getContext(), "Teacher must sign-in to retrieve their courses", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void updateListView() {
+        if (onlineCourses.size() > 0) {
+            if (getView() != null) {
+                adapter = new ArrayAdapterCourseItemsOnline(getView().getContext(), R.layout.list_item, onlineCourses);
+                adapter.loadThumbnails();
+                onlineListCourses.setAdapter(adapter);
+            }
+        }
+    }
+
+    private ArrayList<CourseItem> getCourses( Map<String, Map<String, String>> courses) {
+
+        ArrayList<CourseItem> courseItems = new ArrayList<>();
+
+        for (Map.Entry<String, Map<String, String>> entry : courses.entrySet()) {
+
+            courseItems.add(new CourseItem((String) entry.getValue().get("courseName"), (String) entry.getValue().get("key"), true));
+        }
+        return courseItems;
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void configureDeleteButton() {
+        delete = getView().findViewById(R.id.delete_button);
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View v) {
+                if (selectedCourse) {
+
+                    if (courseName != null) {
+
+
+                        // Delete from Firebase
+
+                        DatabaseReference courseDatabaseRef = FirebaseDatabase.getInstance().getReference(DataTransferObject.userNameRetrieving(user.getEmail())).child(courseIdentification);
+                        courseDatabaseRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getView().getContext(), "Successfully deleted from the Database", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
+                        StorageReference courseDirectoryRef = FirebaseStorage.getInstance()
+                                .getReference(DataTransferObject.userNameRetrieving(user.getEmail()) + "/" + courseName + courseIdentification);
+                        StorageReference courseStorageRef = courseDirectoryRef.child(courseName + ".zip");
+                        courseStorageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getView().getContext(), "Course zip has been deleted", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+
+                        StorageReference coursePhotoThumbnailRef = courseDirectoryRef.child("Photo Thumbnail");
+                        coursePhotoThumbnailRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getView().getContext(), "Course Photo Thumbnail has been deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+                        StorageReference courseAudioThumbnail = courseDirectoryRef.child("Sound Thumbnail");
+                        courseAudioThumbnail.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getView().getContext(), "Course Audio Thumbnail has been deleted", Toast.LENGTH_SHORT).show();
+
+                            }
+                        });
+
+                        courseDirectoryRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Toast.makeText(getView().getContext(), "Course Directory has been successfully deleted", Toast.LENGTH_SHORT).show();
+                            }
+                        });
+
+
+                        // delete from the list adapter
+                        adapter.remove(courseItem);
+                        adapter.notifyDataSetChanged();
+                        adapter.notifyDataSetInvalidated();
+
+                        selectedCourse = false;
+
+                        courseName = null;
+                        courseIdentification = null;
+                        courseItem = null;
+
+                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+
+                    }
+
+                }
+            }
+        });
+
+        if (delete != null) {
+            delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        }
+    }
+
 
 }

@@ -8,5 +8,12 @@ public class DirectoryConstants {
 
     public static final String slides = "/slides/";
 
+
+    // Meta Directory and Files
     public static final String meta = "/meta/";
+
+    // Fles
+    public static final String identification = "identification.txt";
+    public static final String photoThumbnail = "thumbnail.jpg";
+    public static final String soundThumbnail = "audio.3gp";
 }

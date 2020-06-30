@@ -26,25 +26,18 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageMetadata;
-import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseItems;
+import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReader;
 import com.imperial.word2mouth.teach.offline.create.TeachCourseCreationSummaryActivity;
+import com.imperial.word2mouth.teach.offline.upload.UploadProcedure;
+import com.imperial.word2mouth.teach.online.TeachOnlineMainFragment;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,18 +63,17 @@ public class TeachOfflineMainFragment extends Fragment {
     private boolean selectedCourse = false;
     private CourseItem courseItem = null;
     private String courseName = null;
+    private String courseIdentification = null;
     private File courseDirectory;
     private String coursePath = null;
 
     // Adapter for the ListView
     private ArrayList<CourseItem> localCourses = null;
-    private ArrayAdapterCourseItems adapter = null;
+    private ArrayAdapterCourseItemsOffline adapter = null;
 
-    // Database
-    private FirebaseStorage storage = FirebaseStorage.getInstance();
-    private FirebaseAuth mAuth = FirebaseAuth.getInstance();
-    private StorageReference storageRef = storage.getReference();
-    private FirebaseUser user = null;
+    // Upload Listener
+    private UploadProcedure uploadProcedure;
+
 
     public TeachOfflineMainFragment() {
         // Required empty public constructor
@@ -125,12 +117,7 @@ public class TeachOfflineMainFragment extends Fragment {
             configureUploadButton();
             configureDeleteButton();
             configureListView();
-            configureLoggedIn();
         }
-    }
-
-    private void configureLoggedIn() {
-        user = FirebaseAuth.getInstance().getCurrentUser();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,7 +161,7 @@ public class TeachOfflineMainFragment extends Fragment {
         localCourses = retrieveLocalCourses();
 
         if (localCourses.size() > 0) {
-            adapter = new ArrayAdapterCourseItems(getContext(), R.layout.list_item, localCourses);
+            adapter = new ArrayAdapterCourseItemsOffline(getContext(), R.layout.list_item, localCourses);
             courseList.setAdapter(adapter);
             courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @SuppressLint("ResourceAsColor")
@@ -211,6 +198,7 @@ public class TeachOfflineMainFragment extends Fragment {
                         courseItem = (CourseItem) parent.getAdapter().getItem(position);
                         courseName = courseItem.getCourseName();
                         coursePath = courseItem.getCoursePath();
+                        courseIdentification = courseItem.getCourseOnlineIdentification();
                     }
                 }
             });
@@ -226,8 +214,10 @@ public class TeachOfflineMainFragment extends Fragment {
 
         for (File f : courses) {
             String courseName = FileReader.readTextFromFile(f.getPath()+ "/meta/title.txt");
+            String courseIdentification = FileReader.readTextFromFile(f.getPath() + "/meta/identification.txt");
 
             CourseItem courseItem= new CourseItem(courseName, f.getPath());
+            courseItem.setCourseOnlineIdentification(courseIdentification);
             courseItems.add(courseItem);
         }
         return courseItems;
@@ -333,47 +323,67 @@ public class TeachOfflineMainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (selectedCourse) {
-                    if (user != null) {
-                        UploadPreparation prep = new UploadPreparation(coursePath, getContext());
-                        byte[] data = prep.getZippedCourseCompressed();
+                    uploadProcedure = new UploadProcedure(courseName, coursePath, courseIdentification, getActivity());
 
-                        String path = courseName + UUID.randomUUID() + ".zip";
+                    uploadProgress.setVisibility(View.VISIBLE);
+                    upload.setEnabled(false);
 
-                        StorageReference teacherRef = storage.getReference(user.getEmail());
 
-                        if (teacherRef == null) {
-                            teacherRef = storageRef.child(user.getEmail());
+                    uploadProcedure.setListener(new UploadProcedure.UploadListener() {
+                        @Override
+                        public void onDataLoadedInDatabase() {
+                            uploadDataBaseSuccessful();
                         }
 
-
-                        StorageReference courseRef = teacherRef.child(path);
-
-                        UploadTask uploadTask = courseRef.putBytes(data);
-                        uploadProgress.setVisibility(View.VISIBLE);
-                        upload.setEnabled(false);
-
-                        uploadTask.addOnCompleteListener(getActivity(), new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                                Toast.makeText(getView().getContext(), "Upload Completed", Toast.LENGTH_SHORT).show();
-
-                                uploadProgress.setVisibility(View.GONE);
-                                upload.setEnabled(true);
+                        @Override
+                        public void onDataLoadedInStorage(String courseIdentification) {
+                            setCourseIdentification(courseIdentification);
+                           uploadStorageSuccessful();
+                        }
+                    });
 
 
-                            }
-                        });
+                    completedDatabase = false;
+                    completedStorage = false;
 
-                    } else {
-                        Toast.makeText(getView().getContext(), "Must create an Account", Toast.LENGTH_SHORT).show();
-
-                    }
+                    uploadProcedure.uploadCourse();
 
                 }
             }
         });
     }
 
+    private void setCourseIdentification(String identification) {
+        if (courseIdentification == "") {
+            courseIdentification = identification;
+           courseItem.setCourseOnlineIdentification(identification);
+           updateCourseIdentificationFile();
+        }
+    }
+
+    private void updateCourseIdentificationFile() {
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_IDENTIFICATION);
+    }
+
+    private boolean completedDatabase = false;
+    private boolean completedStorage = false;
+
+    private void uploadDataBaseSuccessful() {
+        completedDatabase = true;
+        uploadSuccessful();
+    }
 
 
+    private void uploadStorageSuccessful() {
+        completedStorage = true;
+        uploadSuccessful();
+    }
+
+    private void uploadSuccessful() {
+        if (completedDatabase && completedStorage) {
+            uploadProgress.setVisibility(View.GONE);
+//            Toast.makeText(getView().getContext(), "Upload Successful", Toast.LENGTH_SHORT).show();
+            upload.setEnabled(true);
+        }
+    }
 }
