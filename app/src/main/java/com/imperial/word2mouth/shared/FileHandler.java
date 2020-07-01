@@ -6,6 +6,8 @@ import android.net.Uri;
 
 import androidx.annotation.Nullable;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -235,5 +237,34 @@ public class FileHandler {
             return false;
         }
         return true;
+    }
+
+
+    public static void saveUriFileToDestination(Uri sourceuri, String destinationPath)
+    {
+        String sourceFilename= sourceuri.getPath();
+        String destinationFilename = destinationPath;
+
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+
+        try {
+            bis = new BufferedInputStream(new FileInputStream(sourceFilename));
+            bos = new BufferedOutputStream(new FileOutputStream(destinationFilename, false));
+            byte[] buf = new byte[1024];
+            bis.read(buf);
+            do {
+                bos.write(buf);
+            } while(bis.read(buf) != -1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (bis != null) bis.close();
+                if (bos != null) bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

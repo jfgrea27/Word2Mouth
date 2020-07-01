@@ -98,6 +98,44 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
         }
     }
 
+    public void loadThumbnails(String teacherName) {
+        StorageReference teacherRef = FirebaseStorage.getInstance().getReference(teacherName);
+
+        soundThumbnails.clear();
+        photoThumbnails.clear();
+
+        for (CourseItem course : courseItems) {
+            String courseName = course.getCourseName();
+            String courseIdentification = course.getCourseOnlineIdentification();
+
+            String courseAddress = courseName + courseIdentification;
+
+            StorageReference imageRef = teacherRef.child(courseAddress + "/Photo Thumbnail");
+            StorageReference soundRef = teacherRef.child(courseAddress + "/Sound Thumbnail");
+
+            soundRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    soundThumbnails.put(courseIdentification, uri);
+                    notifyDataSetInvalidated();
+                    notifyDataSetChanged();
+                }
+            });
+
+            imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    photoThumbnails.put(courseIdentification, uri);
+                    notifyDataSetInvalidated();
+                    notifyDataSetChanged();
+                }
+            });
+
+        }
+
+    }
+
+
 
     @NonNull
     @Override

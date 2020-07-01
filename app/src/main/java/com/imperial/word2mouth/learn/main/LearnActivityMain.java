@@ -6,6 +6,9 @@ import android.os.Bundle;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -42,6 +45,7 @@ public class LearnActivityMain extends AppCompatActivity {
         tabs.getTabAt(0).setIcon(R.drawable.ic_offline_online_0);
         tabs.getTabAt(1).setIcon(R.drawable.ic_offline_online_1);
     }
+
 
     private void fileManagement() {
         File f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.zip);

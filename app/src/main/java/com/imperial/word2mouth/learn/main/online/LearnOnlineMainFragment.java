@@ -13,7 +13,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,8 +48,6 @@ public class LearnOnlineMainFragment extends Fragment {
     private boolean hasReadWriteStorageAccess = false;
 
 
-    private ImageButton download;
-
     private ListView listTeachers = null;
     private FirebaseDatabase database = null;
     private ArrayList<Teacher> teachers = new ArrayList<>();
@@ -73,6 +72,7 @@ public class LearnOnlineMainFragment extends Fragment {
         return fragment;
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
 
@@ -83,6 +83,7 @@ public class LearnOnlineMainFragment extends Fragment {
         return inflater.inflate(R.layout.fragment_learn_online_main, container, false);
     }
 
+    @SuppressLint("ResourceType")
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -90,7 +91,6 @@ public class LearnOnlineMainFragment extends Fragment {
         getPermissions();
 
         if (hasNecessaryPermissions()) {
-            configureDownloadButton();
             configureTeacherListView();
         }
     }
@@ -169,15 +169,11 @@ public class LearnOnlineMainFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-                Fragment fragment = CourseOnlineSelection.newInstance(teachers.get(position).getTeacherName());
-                FragmentTransaction fragmentTransaction
-                retrieveCoursesForThatTeacher(teachers.get(position));
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                CourseOnlineSelection frag = CourseOnlineSelection.newInstance(teachers.get(position).getTeacherName());
+                manager.beginTransaction().replace(R.id.frag_courses_per_teacher, frag).addToBackStack("Course per Teacher").commit();
             }
         });
-    }
-
-    private void retrieveCoursesForThatTeacher(Teacher teacher) {
-
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -203,16 +199,6 @@ public class LearnOnlineMainFragment extends Fragment {
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Download Button
-    private void configureDownloadButton() {
-        download = getView().findViewById(R.id.download_button);
-
-        download.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-
-
-    }
-
 
 
 }

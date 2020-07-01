@@ -6,6 +6,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".learn.main.offline.LearnOfflineMainFragment">
 
+
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -13,49 +16,24 @@
 
         <ListView
             android:id="@+id/list_teachers"
-            android:layout_width="360dp"
-            android:layout_height="382dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-            </FrameLayout>
         </ListView>
 
-
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/relativeLayout"
+        <FrameLayout
+            android:id="@+id/frag_courses_per_teacher"
             android:layout_width="match_parent"
-            android:layout_height="209dp"
-            android:background="@color/design_default_color_on_primary"
+            android:layout_height="match_parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            tools:layout_editor_absoluteX="2dp">
-
-            <ImageButton
-                android:id="@+id/download_button"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginBottom="80dp"
-                android:background="@android:color/transparent"
-                android:contentDescription="@string/todo"
-                android:paddingTop="25dp"
-                android:scaleType="fitCenter"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:srcCompat="@drawable/ic_download">
-
-            </ImageButton>
-        </androidx.constraintlayout.widget.ConstraintLayout>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -410,13 +410,6 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
     }
 
-    private void unzippingInFolder(String zipFilePath) {
-        if (zipFilePath != null) {
-
-
-        }
-    }
-
 
     private void configureDeviceSelection() {
         listDiscoverableDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
