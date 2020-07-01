@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".learn.main.offline.LearnOfflineMainFragment">
+    tools:context=".learn.main.online.CourseOnlineSelection">
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -12,7 +13,7 @@
 
 
         <ListView
-            android:id="@+id/list_teachers"
+            android:id="@+id/list_courses_per_teacher"
             android:layout_width="360dp"
             android:layout_height="382dp"
             app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
@@ -21,15 +22,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
 
-            <FrameLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent">
-
-            </FrameLayout>
         </ListView>
-
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -59,5 +52,4 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 </FrameLayout>

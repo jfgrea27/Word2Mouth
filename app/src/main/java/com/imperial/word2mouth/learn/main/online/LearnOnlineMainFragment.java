@@ -1,23 +1,36 @@
 package com.imperial.word2mouth.learn.main.online;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.imperial.word2mouth.R;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -35,7 +48,12 @@ public class LearnOnlineMainFragment extends Fragment {
 
 
     private ImageButton download;
-    private WebView onlineCoursesView;
+
+    private ListView listTeachers = null;
+    private FirebaseDatabase database = null;
+    private ArrayList<Teacher> teachers = new ArrayList<>();
+
+    private ArrayAdapterTeacher adapter;
 
     public LearnOnlineMainFragment() {
         // Required empty public constructor
@@ -73,9 +91,10 @@ public class LearnOnlineMainFragment extends Fragment {
 
         if (hasNecessaryPermissions()) {
             configureDownloadButton();
-            configureWebView();
+            configureTeacherListView();
         }
     }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -121,29 +140,77 @@ public class LearnOnlineMainFragment extends Fragment {
 
     // UI
 
-    // WebView
-    private void configureWebView() {
-        onlineCoursesView = (WebView) getView().findViewById(R.id.online_courses_web);
+    // ListView Teachers
+    private void configureTeacherListView() {
+        listTeachers = getView().findViewById(R.id.list_teachers);
 
-        onlineCoursesView.getSettings().setLoadsImagesAutomatically(true);
-        onlineCoursesView.setWebViewClient(new WebViewClient());
-        onlineCoursesView.getSettings().setJavaScriptEnabled(true);
-        onlineCoursesView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
-        onlineCoursesView.loadUrl("https://www.google.com/");
+        database = FirebaseDatabase.getInstance();
+
+        database.getReference().addValueEventListener(new ValueEventListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.getValue() != null) {
+                    teachers = getTeachers((Map<String, String>) snapshot.getValue());
+
+                    updateListView();
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getView().getContext(), "Could Not retrieve teachers", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+
+        listTeachers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @SuppressLint("ResourceType")
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Fragment fragment = CourseOnlineSelection.newInstance(teachers.get(position).getTeacherName());
+                FragmentTransaction fragmentTransaction
+                retrieveCoursesForThatTeacher(teachers.get(position));
+            }
+        });
+    }
+
+    private void retrieveCoursesForThatTeacher(Teacher teacher) {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void updateListView() {
+        if (teachers.size() > 0) {
+            if (getView() != null) {
+                adapter = new ArrayAdapterTeacher(getView().getContext(), R.layout.list_teacher, teachers);
+                adapter.loadThumbnails();
+                listTeachers.setAdapter(adapter);
+            }
+        }
+    }
 
+    private ArrayList<Teacher> getTeachers(Map<String, String> teachers) {
+        ArrayList<Teacher> teacherArrayList = new ArrayList<>();
+
+
+        for (Map.Entry<String, String> entry : teachers.entrySet()) {
+            teacherArrayList.add(new Teacher(entry.getKey()));
+        }
+
+        return teacherArrayList;
+    }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     // Download Button
     private void configureDownloadButton() {
         download = getView().findViewById(R.id.download_button);
-        download.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(getContext(), "Download Button", Toast.LENGTH_SHORT).show();
-            }
-        });
+
+        download.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+
+
     }
 
 

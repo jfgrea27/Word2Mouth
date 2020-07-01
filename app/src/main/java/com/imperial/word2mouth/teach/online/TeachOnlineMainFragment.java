@@ -169,7 +169,7 @@ public class TeachOnlineMainFragment extends Fragment {
         }
     }
 
-///////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     // Retrieving courses from Database
 
     private void configureListCourses() {
@@ -211,7 +211,23 @@ public class TeachOnlineMainFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
 
         if (user != null) {
-            DatabaseReference teacherRef = database.getReference().child(DataTransferObject.userNameRetrieving(user.getEmail()));
+                DatabaseReference teacherRef = database.getReference().child(DataTransferObject.userNameRetrieving(user.getEmail()));
+
+            // check if there is such a
+            teacherRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.getValue() == null) {
+                        return;
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+
+                }
+            });
+
             teacherRef.addValueEventListener(new ValueEventListener() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override

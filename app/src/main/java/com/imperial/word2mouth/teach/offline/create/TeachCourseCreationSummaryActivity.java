@@ -289,7 +289,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                         case MotionEvent.ACTION_UP:
                             Toast.makeText(TeachCourseCreationSummaryActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
                             recorder.stopRecording();
-                            audioButton.setColorFilter(null);
+                            audioButton.setColorFilter(Color.RED);
                             audioUri = Uri.fromFile(audioFile);
                             audioPreview.setVisibility(View.VISIBLE);
                             break;

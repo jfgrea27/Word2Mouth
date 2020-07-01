@@ -3,18 +3,28 @@ package com.imperial.word2mouth.teach.online.account;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
+
+import java.io.IOException;
 
 public class TeachLoginActivity extends AppCompatActivity {
 
@@ -25,6 +35,7 @@ public class TeachLoginActivity extends AppCompatActivity {
     private EditText password;
     private ImageButton login;
     private ImageButton logout;
+    private ImageButton thumbnail;
 
     private String emailText;
     private String passwordText;
@@ -60,6 +71,7 @@ public class TeachLoginActivity extends AppCompatActivity {
         password = findViewById(R.id.password);
         login = findViewById(R.id.login_button);
         logout = findViewById(R.id.logout_button);
+        thumbnail = findViewById(R.id.thumbnail);
 
     }
 
@@ -70,16 +82,30 @@ public class TeachLoginActivity extends AppCompatActivity {
             email.setText(user.getEmail());
             email.setEnabled(false);
             password.setVisibility(View.INVISIBLE);
+            setProfilePicture();
         } else {
             login.setVisibility(View.VISIBLE);
             logout.setVisibility(View.INVISIBLE);
             email.clearComposingText();
             email.setEnabled(true);
             password.setVisibility(View.VISIBLE);
+            thumbnail.setImageResource(R.drawable.ic_account);
         }
 
     }
 
+
+    private void setProfilePicture() {
+        if (user != null) {
+            StorageReference ref = FirebaseStorage.getInstance().getReference(DataTransferObject.userNameRetrieving(user.getEmail()) + "/profilePicture/" + "pp.jpg");
+            ref.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    Glide.with(getApplicationContext()).load(uri).into(thumbnail);
+                }
+            });
+        }
+    }
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
