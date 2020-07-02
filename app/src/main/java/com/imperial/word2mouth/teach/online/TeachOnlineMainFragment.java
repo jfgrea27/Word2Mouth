@@ -180,7 +180,17 @@ public class TeachOnlineMainFragment extends Fragment {
         onlineListCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                for (int i = 0; i < adapter.getCount(); i++) {
+                    View item = onlineListCourses.getChildAt(i);
+                    if (item != null) {
+                        item.setBackgroundColor(Color.WHITE);
+                    }
+                }
+
                 if (selectedCourse) {
+                    view.setBackgroundColor(Color.WHITE);
+
                     selectedCourse = false;
 
                     if (delete != null) {
@@ -190,6 +200,8 @@ public class TeachOnlineMainFragment extends Fragment {
                     courseName = null;
 
                 } else {
+                    view.setBackgroundColor(Color.LTGRAY);
+
                     selectedCourse = true;
                     if (delete != null) {
                         delete.setColorFilter(null);

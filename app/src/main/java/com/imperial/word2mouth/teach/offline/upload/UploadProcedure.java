@@ -143,23 +143,37 @@ public class UploadProcedure {
 
     private void uploadToDataBase() {
         if (user != null) {
+            dto = new DataTransferObject(user.getEmail(), courseName);
+            teacherDatabaseRef = database.getReference(dto.getUserName());
+            dto.setCourseURL(" ");
+
+            DatabaseReference courseRef = null;
 
             // New Course to upload
             if (courseIdentification == "") {
-                dto = new DataTransferObject(user.getEmail(), courseName);
+                courseRef = teacherDatabaseRef.push();
 
-
-                teacherDatabaseRef = database.getReference(dto.getUserName());
-                DatabaseReference courseRef = teacherDatabaseRef.push();
+                // get new Key
                 courseIdentification = courseRef.getKey();
+
+            } else {
+
+                // retrieve key
                 dto.setFileKey(courseIdentification);
-                dto.setCourseURL(" ");
+                courseRef = teacherDatabaseRef.child(courseIdentification);
+            }
+
+            dto.setFileKey(courseIdentification);
+
+
+            if (courseRef != null) {
                 courseRef.setValue(dto);
 
                 courseRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         listener.onDataLoadedInDatabase();
+
                     }
 
                     @Override
@@ -167,17 +181,9 @@ public class UploadProcedure {
 
                     }
                 });
-            } else {
-                dto = new DataTransferObject(user.getEmail(), courseName);
-                dto.setFileKey(courseIdentification);
-
-                teacherDatabaseRef = database.getReference(dto.getUserName());
-                listener.onDataLoadedInDatabase();
-
             }
 
         }
-
     }
 
     public void setListener(UploadListener listener) {

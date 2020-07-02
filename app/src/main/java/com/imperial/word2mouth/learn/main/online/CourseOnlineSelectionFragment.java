@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -20,12 +19,10 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,9 +35,7 @@ import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOnline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
-import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.UnzipFile;
-import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -49,10 +44,10 @@ import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link CourseOnlineSelection#newInstance} factory method to
+ * Use the {@link CourseOnlineSelectionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class CourseOnlineSelection extends Fragment {
+public class CourseOnlineSelectionFragment extends Fragment {
 
 
     // Permissions
@@ -65,6 +60,7 @@ public class CourseOnlineSelection extends Fragment {
 
     private ImageButton download = null;
     private ListView listCourses = null;
+    private ProgressBar progress = null;
 
     // List of Courses
 
@@ -84,7 +80,7 @@ public class CourseOnlineSelection extends Fragment {
     private CourseItem courseItem = null;
     private String courseIdentification = null;
 
-    public CourseOnlineSelection() {
+    public CourseOnlineSelectionFragment() {
         // Required empty public constructor
     }
 
@@ -96,8 +92,8 @@ public class CourseOnlineSelection extends Fragment {
      * @return A new instance of fragment CourseOnlineSelection.
      */
     // TODO: Rename and change types and number of parameters
-    public static CourseOnlineSelection newInstance(String param1) {
-        CourseOnlineSelection fragment = new CourseOnlineSelection();
+    public static CourseOnlineSelectionFragment newInstance(String param1) {
+        CourseOnlineSelectionFragment fragment = new CourseOnlineSelectionFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         fragment.setArguments(args);
@@ -128,9 +124,17 @@ public class CourseOnlineSelection extends Fragment {
 
         if (hasNecessaryPermissions()) {
             configureUI();
+            configureProgressBar();
             configureDownloadButton();
             configureListCourses();
         }
+    }
+
+    private void configureProgressBar() {
+        progress = getView().findViewById(R.id.progress_download);
+        progress.bringToFront();
+
+        progress.setVisibility(View.INVISIBLE);
     }
 
     private void configureUI() {
@@ -191,7 +195,15 @@ public class CourseOnlineSelection extends Fragment {
             listCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        View item = listCourses.getChildAt(i);
+                        if (item != null) {
+                            item.setBackgroundColor(Color.WHITE);
+                        }
+                    }
+
                     if (selectedCourse) {
+                        view.setBackgroundColor(Color.WHITE);
                         selectedCourse = false;
 
                         if (download != null) {
@@ -201,6 +213,8 @@ public class CourseOnlineSelection extends Fragment {
                         courseName = null;
 
                     } else {
+                        view.setBackgroundColor(Color.LTGRAY);
+
                         selectedCourse = true;
                         if (download != null) {
                             download.setColorFilter(null);
@@ -278,7 +292,7 @@ public class CourseOnlineSelection extends Fragment {
                 public void onClick(View v) {
                     if (selectedCourse) {
                         StorageReference courseRef = FirebaseStorage.getInstance().getReference(teacherName + "/" + courseName + courseIdentification + "/" + courseName +".zip");
-
+                        progress.setVisibility(View.VISIBLE);
                         File f = new File(getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.zip + courseName + ".zip");
                         if (!f.exists()) {
                             try {
@@ -312,6 +326,8 @@ public class CourseOnlineSelection extends Fragment {
 
     private void signalCompleteDownload() {
         Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
+
+        progress.setVisibility(View.INVISIBLE);
 
         courseItem = null;
         courseName = null;

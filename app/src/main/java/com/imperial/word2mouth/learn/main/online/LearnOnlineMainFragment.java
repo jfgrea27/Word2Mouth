@@ -2,9 +2,8 @@ package com.imperial.word2mouth.learn.main.online;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.SearchManager;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -13,15 +12,14 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -51,6 +49,8 @@ public class LearnOnlineMainFragment extends Fragment {
     private ListView listTeachers = null;
     private FirebaseDatabase database = null;
     private ArrayList<Teacher> teachers = new ArrayList<>();
+
+    private SearchView searchView = null;
 
     private ArrayAdapterTeacher adapter;
 
@@ -91,9 +91,30 @@ public class LearnOnlineMainFragment extends Fragment {
         getPermissions();
 
         if (hasNecessaryPermissions()) {
+//            configureSearchView();
             configureTeacherListView();
         }
     }
+
+//    private void configureSearchView() {
+//        searchView = getView().findViewById(R.id.searchView);
+//
+//
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                return false;
+//            }
+//
+//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                String text = newText;
+//                adapter.filter(text);
+//                return false;
+//            }
+//        });
+//    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +191,7 @@ public class LearnOnlineMainFragment extends Fragment {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
                 FragmentManager manager = getActivity().getSupportFragmentManager();
-                CourseOnlineSelection frag = CourseOnlineSelection.newInstance(teachers.get(position).getTeacherName());
+                CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance(teachers.get(position).getTeacherName());
                 manager.beginTransaction().replace(R.id.frag_courses_per_teacher, frag).addToBackStack("Course per Teacher").commit();
             }
         });

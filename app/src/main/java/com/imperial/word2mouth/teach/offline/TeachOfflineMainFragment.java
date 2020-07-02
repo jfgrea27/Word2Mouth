@@ -314,6 +314,7 @@ public class TeachOfflineMainFragment extends Fragment {
     private void configureUploadButton() {
         upload = getView().findViewById(R.id.upload_button);
         uploadProgress = getView().findViewById(R.id.progress_upload);
+        uploadProgress.bringToFront();
 
         if (upload!= null) {
             upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);

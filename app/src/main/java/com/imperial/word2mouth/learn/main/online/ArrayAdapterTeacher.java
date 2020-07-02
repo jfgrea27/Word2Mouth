@@ -40,6 +40,7 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
     private int layout;
     private ArrayList<Teacher> teachers;
     private Context context;
+    private ArrayList<Teacher> queryTeacher = new ArrayList<>();
 
     private ArrayMap<String, Uri> profilePictures = new ArrayMap<>();
 
@@ -127,6 +128,22 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
 
         return position;
     }
+
+//    public void filter(String text) {
+//        queryTeacher.clear();
+//
+//        if (text.length() == 0) {
+//            teachers.addAll(teachers);
+//
+//        } else {
+//            for (Teacher t : teachers) {
+//                if (t.getTeacherName().toLowerCase().contains(text)) {
+//                    queryTeacher.add(t);
+//                }
+//            }
+//        }
+//        notifyDataSetChanged();
+//    }
 
     public class ViewHolder {
         ImageView thumbnail;
