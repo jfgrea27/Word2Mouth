@@ -30,7 +30,9 @@ import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -56,19 +58,19 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
     }
 
 
-    public void loadThumbnails() {
+    public void loadThumbnails(HashMap<String, Teacher> teachersHashMap) {
 
-        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference("/users");
         profilePictures.clear();
 
-        for (Teacher teacher : teachers) {
+        for (Map.Entry<String, Teacher> teacher : teachersHashMap.entrySet()) {
 
-            StorageReference imageRef = storageRef.child("/" + teacher.getTeacherName() + "/profilePicture/pp.jpg");
+            StorageReference imageRef = storageRef.child(teacher.getKey() + "/profilePicture/pp.jpg");
 
             imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    profilePictures.put(teacher.getTeacherName(), uri);
+                    profilePictures.put(teacher.getValue().getTeacherName(), uri);
                     notifyDataSetInvalidated();
                     notifyDataSetChanged();
                 }
@@ -97,7 +99,7 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
 
 
         // Title Course
-        holder.title.setText(teachers.get(position).getTeacherName());
+        holder.title.setText(setUserNameOnly(teachers.get(position).getTeacherName()));
 
         Uri image = profilePictures.get(teachers.get(position).getTeacherName());
 
@@ -110,6 +112,16 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
 
 
         return convertView;
+    }
+
+
+    private String setUserNameOnly(String email) {
+        String temp = email;
+        int iend = temp.indexOf("@");
+        if (iend != -1) {
+            temp = temp.substring(0, iend);
+        }
+        return temp;
     }
 
     @Override
@@ -127,6 +139,10 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
     public int getItemViewType(int position) {
 
         return position;
+    }
+
+    public void filter(String text) {
+
     }
 
 //    public void filter(String text) {

@@ -24,11 +24,13 @@ import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.imperial.word2mouth.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -53,6 +55,7 @@ public class LearnOnlineMainFragment extends Fragment {
     private SearchView searchView = null;
 
     private ArrayAdapterTeacher adapter;
+    private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
 
     public LearnOnlineMainFragment() {
         // Required empty public constructor
@@ -91,30 +94,31 @@ public class LearnOnlineMainFragment extends Fragment {
         getPermissions();
 
         if (hasNecessaryPermissions()) {
-//            configureSearchView();
             configureTeacherListView();
+//            configureSearchView();
+
         }
     }
 
-//    private void configureSearchView() {
-//        searchView = getView().findViewById(R.id.searchView);
-//
-//
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                return false;
-//            }
-//
-//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                String text = newText;
-//                adapter.filter(text);
-//                return false;
-//            }
-//        });
-//    }
+    private void configureSearchView() {
+        searchView = getView().findViewById(R.id.searchView);
+
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String text = newText;
+                adapter.filter(text);
+                return false;
+            }
+        });
+    }
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,7 +171,8 @@ public class LearnOnlineMainFragment extends Fragment {
 
         database = FirebaseDatabase.getInstance();
 
-        database.getReference().addValueEventListener(new ValueEventListener() {
+        DatabaseReference teachersRef = database.getReference("users");
+        teachersRef.addValueEventListener(new ValueEventListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -202,7 +207,7 @@ public class LearnOnlineMainFragment extends Fragment {
         if (teachers.size() > 0) {
             if (getView() != null) {
                 adapter = new ArrayAdapterTeacher(getView().getContext(), R.layout.list_teacher, teachers);
-                adapter.loadThumbnails();
+                adapter.loadThumbnails(teachersHashMap);
                 listTeachers.setAdapter(adapter);
             }
         }
@@ -213,9 +218,9 @@ public class LearnOnlineMainFragment extends Fragment {
 
 
         for (Map.Entry<String, String> entry : teachers.entrySet()) {
-            teacherArrayList.add(new Teacher(entry.getKey()));
+            teachersHashMap.put(entry.getKey(), new Teacher(entry.getValue()));
+            teacherArrayList.add(new Teacher(entry.getValue()));
         }
-
         return teacherArrayList;
     }
 

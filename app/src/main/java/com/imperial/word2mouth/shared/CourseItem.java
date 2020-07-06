@@ -9,6 +9,10 @@ public class CourseItem  {
     private File thumbnail = null;
     private File audio = null;
     private String coursePath = null;
+
+    private String language = null;
+    private String category = null;
+
     private String courseOnlineIdentification = null;
 
     // For offline purposes
@@ -18,6 +22,9 @@ public class CourseItem  {
         thumbnail = new File(path + "/meta" + "/thumbnail.jpg");
 
         audio = new File(path + "/meta" + "/audio.3gp");
+
+        language = FileReader.readTextFromFile(path + DirectoryConstants.meta + DirectoryConstants.language);
+        category = FileReader.readTextFromFile(path + DirectoryConstants.meta + DirectoryConstants.category);
 
         coursePath = path;
     }
@@ -51,4 +58,13 @@ public class CourseItem  {
     public void setCourseOnlineIdentification(String courseOnlineIdentification) {
         this.courseOnlineIdentification = courseOnlineIdentification;
     }
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
 }

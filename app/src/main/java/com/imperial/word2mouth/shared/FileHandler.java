@@ -29,6 +29,8 @@ public class FileHandler {
     public static final int META = 105;
     public static final int SLIDES = 106;
     public static final int ONLINE_IDENTIFICATION = 107;
+    public static final int LANGUAGE_SELECTION = 108;
+    public static final int CATEGORY_SELECTION = 109;
 
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
@@ -97,6 +99,13 @@ public class FileHandler {
             case ONLINE_IDENTIFICATION:
                 outputAddress += DirectoryConstants.identification;
                 return copyTextToFile(outputAddress, script);
+            case LANGUAGE_SELECTION:
+                outputAddress += DirectoryConstants.language;
+                return copyTextToFile(outputAddress, script);
+            case CATEGORY_SELECTION:
+                outputAddress += DirectoryConstants.category;
+                return copyTextToFile(outputAddress, script);
+
             default:
                 return null;
         }

@@ -16,4 +16,6 @@ public class DirectoryConstants {
     public static final String identification = "identification.txt";
     public static final String photoThumbnail = "thumbnail.jpg";
     public static final String soundThumbnail = "audio.3gp";
+    public static String language = "language.txt";
+    public static String category = "category.txt";
 }

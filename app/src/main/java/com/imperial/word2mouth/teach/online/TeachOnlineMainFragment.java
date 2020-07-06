@@ -31,6 +31,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -223,10 +224,10 @@ public class TeachOnlineMainFragment extends Fragment {
         database = FirebaseDatabase.getInstance();
 
         if (user != null) {
-                DatabaseReference teacherRef = database.getReference().child(DataTransferObject.userNameRetrieving(user.getEmail()));
+            Query query = FirebaseDatabase.getInstance().getReference("/content/").orderByChild("userUID").equalTo(user.getUid());
 
             // check if there is such a
-            teacherRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            query.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.getValue() == null) {
@@ -240,7 +241,7 @@ public class TeachOnlineMainFragment extends Fragment {
                 }
             });
 
-            teacherRef.addValueEventListener(new ValueEventListener() {
+            query.addValueEventListener(new ValueEventListener() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -300,7 +301,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
                         // Delete from Firebase
 
-                        DatabaseReference courseDatabaseRef = FirebaseDatabase.getInstance().getReference(DataTransferObject.userNameRetrieving(user.getEmail())).child(courseIdentification);
+                        DatabaseReference courseDatabaseRef = FirebaseDatabase.getInstance().getReference("/content/" + courseIdentification);
                         courseDatabaseRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
@@ -309,8 +310,7 @@ public class TeachOnlineMainFragment extends Fragment {
                         });
 
 
-                        StorageReference courseDirectoryRef = FirebaseStorage.getInstance()
-                                .getReference(DataTransferObject.userNameRetrieving(user.getEmail()) + "/" + courseName + courseIdentification);
+                        StorageReference courseDirectoryRef = FirebaseStorage.getInstance().getReference("/content/" + courseName + courseIdentification);
                         StorageReference courseStorageRef = courseDirectoryRef.child(courseName + ".zip");
                         courseStorageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override

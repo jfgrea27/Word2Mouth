@@ -33,8 +33,8 @@ import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReader;
 import com.imperial.word2mouth.teach.offline.create.TeachCourseCreationSummaryActivity;
+import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
 import com.imperial.word2mouth.teach.offline.upload.UploadProcedure;
-import com.imperial.word2mouth.teach.online.TeachOnlineMainFragment;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -73,6 +73,15 @@ public class TeachOfflineMainFragment extends Fragment {
 
     // Upload Listener
     private UploadProcedure uploadProcedure;
+
+    private String selectedLanguage;
+    private String selectedCategory;
+    private String courseLanguage;
+    private String courseCategory;
+
+    private boolean completedDatabase = false;
+    private boolean completedStorage = false;
+
 
 
     public TeachOfflineMainFragment() {
@@ -199,6 +208,8 @@ public class TeachOfflineMainFragment extends Fragment {
                         courseName = courseItem.getCourseName();
                         coursePath = courseItem.getCoursePath();
                         courseIdentification = courseItem.getCourseOnlineIdentification();
+                        courseLanguage = courseItem.getLanguage();
+                        courseCategory = courseItem.getCategory();
                     }
                 }
             });
@@ -267,39 +278,136 @@ public class TeachOfflineMainFragment extends Fragment {
                 if (selectedCourse) {
                     intentToCreateCourseAndStartActivity();
                 } else {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-                    builder.setTitle("Course Name");
-                    final EditText input = new EditText(getView().getContext());
-                    input.setHint("Type Course Name");
-                    input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
-                    builder.setView(input);
-
-                    // Set up the buttons
-                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            courseName = input.getText().toString();
-                            if (courseName.isEmpty()) {
-                                courseName = "Untitled Course";
-                            }
-                            courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
-                            coursePath = courseDirectory.getPath();
-                            intentToCreateCourseAndStartActivity();
-                        }
-
-
-                    });
-
-                    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            dialog.cancel();
-                        }
-                    });
-                    builder.show();
+                    dialogNameCourse();
                 }
             }
         });
+    }
+
+    private void dialogNameCourse() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle("Course Name");
+        final EditText input = new EditText(getView().getContext());
+        input.setHint("Type Course Name");
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                courseName = input.getText().toString();
+                if (courseName.isEmpty()) {
+                    courseName = "Untitled Course";
+                }
+                dialogLanguageSelection();
+
+            }
+
+
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void dialogLanguageSelection() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle("Language Selection");
+
+        final ListView listLanguages = new ListView(getView().getContext());
+        ArrayList<String> languages = new ArrayList<>();
+
+        languages.add("English");
+        languages.add("Francais");
+        languages.add("Deutsch");
+        languages.add("Swahili");
+
+        listLanguages.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, languages));
+
+        builder.setView(listLanguages);
+
+        listLanguages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedLanguage = languages.get(position);
+            }
+        });
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (selectedLanguage != null) {
+                    dialogCategorySelection();
+                }
+
+
+            }
+
+
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void dialogCategorySelection() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+        builder.setTitle("Category Selection");
+
+        final ListView categoryListView = new ListView(getView().getContext());
+        ArrayList<String> categories = new ArrayList<>();
+
+        categories.add("Health");
+        categories.add("Mechanical");
+        categories.add("Academic");
+
+        categoryListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_categories, categories));
+
+        builder.setView(categoryListView);
+
+        categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectedCategory = categories.get(position);
+            }
+        });
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (selectedCategory != null) {
+                    courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
+                    coursePath = courseDirectory.getPath();
+                    FileHandler.createDirectoryAndReturnIt(courseDirectory.getPath(), FileHandler.META);
+                    FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, selectedLanguage, FileHandler.LANGUAGE_SELECTION);
+                    FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null,selectedCategory, FileHandler.CATEGORY_SELECTION);
+                    intentToCreateCourseAndStartActivity();
+                }
+
+            }
+        });
+
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
     }
 
     private void intentToCreateCourseAndStartActivity() {
@@ -324,7 +432,7 @@ public class TeachOfflineMainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (selectedCourse) {
-                    uploadProcedure = new UploadProcedure(courseName, coursePath, courseIdentification, getActivity());
+                    uploadProcedure = new UploadProcedure(courseName, coursePath, courseLanguage, courseCategory, courseIdentification, getActivity());
 
                     uploadProgress.setVisibility(View.VISIBLE);
                     upload.setEnabled(false);
@@ -366,8 +474,7 @@ public class TeachOfflineMainFragment extends Fragment {
         FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_IDENTIFICATION);
     }
 
-    private boolean completedDatabase = false;
-    private boolean completedStorage = false;
+
 
     private void uploadDataBaseSuccessful() {
         completedDatabase = true;

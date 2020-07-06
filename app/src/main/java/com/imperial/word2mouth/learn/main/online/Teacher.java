@@ -10,18 +10,15 @@ public class Teacher {
 
 
 
-    private final String teacherName;
+    private final String teacherEmail;
 
-    public Teacher(String n) {
-        teacherName = n;
+    public Teacher(String email) {
+        teacherEmail = email;
 
     }
 
     public String getTeacherName() {
-        return teacherName;
+        return teacherEmail;
     }
 
-    private void addCourse(CourseItem i) {
-        courses.add(i);
-    }
 }

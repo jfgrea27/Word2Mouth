@@ -2,28 +2,28 @@ package com.imperial.word2mouth.teach.offline.upload.database;
 
 public class DataTransferObject {
 
-    private final String userEmail;
+
+
+    private final String userUID;
+    private final String language;
+    private final String category;
     private String fileKey;
-
-    private final String userName;
-
 
 
     private final String courseName;
 
     private String courseURL;
 
-    public DataTransferObject(String email, String name) {
-        userEmail = email;
+    public DataTransferObject(String userUID, String name, String language, String category) {
+        this.userUID = userUID;
         courseName = name;
-        userName = userNameRetrieving(email);
+        this.language = language;
+        this.category = category;
     }
 
-
-    public String getUserName() {
-        return userName;
+    public String getUserUID() {
+        return userUID;
     }
-
 
     public static String userNameRetrieving(String email) {
         String username = null;
@@ -53,6 +53,15 @@ public class DataTransferObject {
 
     public void setCourseURL(String courseURL) {
         this.courseURL = courseURL;
+    }
+
+
+    public String getLanguage() {
+        return language;
+    }
+
+    public String getCategory() {
+        return category;
     }
 
 

@@ -26,6 +26,8 @@ import java.io.File;
 
 public class UploadProcedure {
 
+    private final String language;
+    private final String category;
     private String courseIdentification;
     private FirebaseDatabase database;
     private FirebaseStorage storage;
@@ -39,11 +41,13 @@ public class UploadProcedure {
     private DatabaseReference teacherDatabaseRef;
     private DataTransferObject dto;
 
-    public UploadProcedure(String courseName, String coursePath, String courseIdentification, Activity activity) {
+    public UploadProcedure(String courseName, String coursePath, String courseLanguage, String courseCategory, String courseIdentification, Activity activity) {
 
         this.courseName = courseName;
         this.coursePath = coursePath;
         this.activity = activity;
+        this.language = courseLanguage;
+        this.category = courseCategory;
         this.courseIdentification = courseIdentification;
 
     }
@@ -67,11 +71,11 @@ public class UploadProcedure {
 
             String courseZip = courseName + ".zip";
 
-            StorageReference teacherRef = storage.getReference(dto.getUserName());
+            StorageReference teacherRef = storage.getReference("/content/");
 
             // if there is no reference for that teacher yet.
             if (teacherRef == null) {
-                teacherRef = storage.getReference().child(dto.getUserName());
+                teacherRef = storage.getReference().child("/content/");
             }
 
 
@@ -143,8 +147,8 @@ public class UploadProcedure {
 
     private void uploadToDataBase() {
         if (user != null) {
-            dto = new DataTransferObject(user.getEmail(), courseName);
-            teacherDatabaseRef = database.getReference(dto.getUserName());
+            dto = new DataTransferObject(user.getUid(), courseName, language, category);
+            teacherDatabaseRef = database.getReference("/content/");
             dto.setCourseURL(" ");
 
             DatabaseReference courseRef = null;

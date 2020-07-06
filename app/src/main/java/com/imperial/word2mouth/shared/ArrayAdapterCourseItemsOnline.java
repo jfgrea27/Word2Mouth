@@ -63,7 +63,7 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
 
     public void loadThumbnails() {
 
-        StorageReference teacherRef = FirebaseStorage.getInstance().getReference(DataTransferObject.userNameRetrieving(user.getEmail()));
+        StorageReference teacherRef = FirebaseStorage.getInstance().getReference("/content/");
 
         soundThumbnails.clear();
         photoThumbnails.clear();
@@ -99,7 +99,7 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
     }
 
     public void loadThumbnails(String teacherName) {
-        StorageReference teacherRef = FirebaseStorage.getInstance().getReference(teacherName);
+        StorageReference teacherRef = FirebaseStorage.getInstance().getReference("/content/");
 
         soundThumbnails.clear();
         photoThumbnails.clear();
