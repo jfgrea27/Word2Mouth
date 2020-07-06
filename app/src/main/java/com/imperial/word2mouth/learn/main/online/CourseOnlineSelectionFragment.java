@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -17,19 +16,22 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -39,12 +41,11 @@ import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.UnzipFile;
 
-import org.json.JSONArray;
-
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,6 +54,9 @@ import java.util.Map;
  * create an instance of this fragment.
  */
 public class CourseOnlineSelectionFragment extends Fragment {
+
+
+
 
 
     // Permissions
@@ -77,7 +81,12 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
     // Parameter (Teacher Name)
     private static final String ARG_PARAM1 = "param1";
-    private String teacherName;
+    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
+
+    private String language;
+    private String teacherUID;
+    private String category;
     private ArrayList<CourseItem> onlineCourses;
 
     // Model
@@ -88,10 +97,11 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
 
     // Firebase
-    private FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
     private ArrayList<Teacher> teachers = new ArrayList<>();
-    private String teacherUID = null;
+;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     public CourseOnlineSelectionFragment() {
@@ -102,14 +112,17 @@ public class CourseOnlineSelectionFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
      * @return A new instance of fragment CourseOnlineSelection.
      */
     // TODO: Rename and change types and number of parameters
-    public static CourseOnlineSelectionFragment newInstance(String param1) {
+    public static CourseOnlineSelectionFragment newInstance(String teacher, String language, String category) {
         CourseOnlineSelectionFragment fragment = new CourseOnlineSelectionFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM1, teacher);
+        args.putString(ARG_PARAM2, language);
+        args.putString(ARG_PARAM3, category);
+
+
         fragment.setArguments(args);
         return fragment;
     }
@@ -118,7 +131,9 @@ public class CourseOnlineSelectionFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            teacherName = getArguments().getString(ARG_PARAM1);
+            teacherUID = getArguments().getString(ARG_PARAM1);
+            language = getArguments().getString(ARG_PARAM2);
+            category = getArguments().getString(ARG_PARAM3);
         }
     }
 
@@ -142,7 +157,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
             configureUI();
             configureProgressBar();
             configureDownloadButton();
-            configureListCourses();
+            configureQuerySearch();
         }
     }
 
@@ -204,120 +219,54 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
 
 
-    private void configureListCourses() {
-        if (listCourses != null) {
-            retrieveAccounts();
-
-            listCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    for (int i = 0; i < adapter.getCount(); i++) {
-                        View item = listCourses.getChildAt(i);
-                        if (item != null) {
-                            item.setBackgroundColor(Color.WHITE);
-                        }
-                    }
-
-                    if (selectedCourse) {
-                        view.setBackgroundColor(Color.WHITE);
-                        selectedCourse = false;
-
-                        if (download != null) {
-                            download.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                        }
-
-                        courseName = null;
-
-                    } else {
-                        view.setBackgroundColor(Color.LTGRAY);
-
-                        selectedCourse = true;
-                        if (download != null) {
-                            download.setColorFilter(null);
-                        }
-
-                        courseItem = (CourseItem) parent.getAdapter().getItem(position);
-                        courseName = courseItem.getCourseName();
-                        courseIdentification = courseItem.getCourseOnlineIdentification();
-                    }
+    private void configureQuerySearch() {
 
 
-                }
-            });
-        }
+        Query query = prepareQuery();
+
+        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+           @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+           @Override
+           public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                onlineCourses = getCourses(queryDocumentSnapshots.getDocuments());
+               updateListView();
+           }
+       }).addOnFailureListener(new OnFailureListener() {
+           @Override
+           public void onFailure(@NonNull Exception e) {
+               Toast.makeText(getView().getContext(), "Could not retrieve the query", Toast.LENGTH_SHORT).show();
+
+           }
+       });
 
     }
 
+    private Query prepareQuery() {
+        Query query = null;
 
-    private void retrieveOnlineCourses() {
-
-        Query query = FirebaseDatabase.getInstance().getReference("/content/").orderByChild("userUID").equalTo(teacherUID);
-
-        if (query != null) {
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-
-                    if (snapshot.getValue() != null) {
-                        onlineCourses = getCourses((Map<String, Map<String, String>>) snapshot.getValue());
-                        updateListView();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(getView().getContext(), "Could Not retrieve courses", Toast.LENGTH_SHORT).show();
-
-                }
-            });
+        if (language != "") {
+            query = db.collection("content").whereEqualTo("language", language);
         }
-    }
 
-    private String getUIDTeacher(String teacherName) {
-        for (Map.Entry<String, Teacher> teacher : teachersHashMap.entrySet()) {
-            if (teacher.getValue().getTeacherName().equals(teacherName)) {
-                return teacher.getKey();
+        if (category != "") {
+            if (language != "") {
+                query =  query.whereEqualTo("category", category);
+            } else {
+                query = db.collection("content").whereEqualTo("language", language);
             }
         }
-        return  null;
-    }
 
-
-    private void retrieveAccounts() {
-        DatabaseReference users = database.getReference("/users/");
-        users.addValueEventListener(new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() != null) {
-                    teachers = getTeachers((Map<String, String>) snapshot.getValue());
-                    teacherUID = getUIDTeacher(teacherName);
-
-                    if (teacherUID != null) {
-                        retrieveOnlineCourses();
-                    }
-                }
+        if (teacherUID != "") {
+            if (category != "" || language != "") {
+                query = query.whereEqualTo("userUID", teacherUID);
+            } else {
+                query = db.collection("content").whereEqualTo("userUID", teacherUID);
             }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getView().getContext(), "Could Not retrieve teachers", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-
-    private ArrayList<Teacher> getTeachers(Map<String, String> teachers) {
-        ArrayList<Teacher> teacherArrayList = new ArrayList<>();
-
-
-        for (Map.Entry<String, String> entry : teachers.entrySet()) {
-            teachersHashMap.put(entry.getKey(), new Teacher(entry.getValue()));
-            teacherArrayList.add(new Teacher(entry.getValue()));
         }
-        return teacherArrayList;
+
+        return query;
     }
+
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void updateListView() {
@@ -330,13 +279,15 @@ public class CourseOnlineSelectionFragment extends Fragment {
         }
     }
 
-    private ArrayList<CourseItem> getCourses(Map<String, Map<String, String>> courses) {
-
+    private ArrayList<CourseItem> getCourses(List<DocumentSnapshot> courses) {
         ArrayList<CourseItem> courseItems = new ArrayList<>();
 
-        for (Map.Entry<String, Map<String, String>> entry : courses.entrySet()) {
+        for (DocumentSnapshot course: courses) {
+            CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("key"), true);
+            courseItem.setLanguage((String) course.get("language"));
+            courseItem.setCategory((String) course.get("category"));
 
-            courseItems.add(new CourseItem((String) entry.getValue().get("courseName"), (String) entry.getValue().get("key"), true));
+            courseItems.add(courseItem);
         }
         return courseItems;
     }

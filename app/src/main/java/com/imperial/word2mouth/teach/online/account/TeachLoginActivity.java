@@ -21,6 +21,7 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -39,7 +41,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TeachLoginActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
 
@@ -73,7 +77,7 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
     private boolean signedIn = false;
     private Bitmap imageBitmap = null;
     private Uri imageUri = null;
-
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -207,11 +211,21 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
 
     private void storeEmail() {
         if (user != null) {
-            DatabaseReference teacherRef = FirebaseDatabase.getInstance().getReference("users").child(user.getUid());
-            teacherRef.setValue(user.getEmail()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            Map<String, String> teacher = new HashMap<>();
+            teacher.put("UID", user.getUid());
+            teacher.put("email", user.getEmail());
+            teacher.put("name", user.getDisplayName());
+
+            db.collection("users").document(user.getUid()).set(teacher).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    Toast.makeText(TeachLoginActivity.this, "Details saved in Database", Toast.LENGTH_SHORT).show();
+                public void onSuccess(Void aVoid) {
+                    Toast.makeText(TeachLoginActivity.this, "Details saved", Toast.LENGTH_SHORT).show();
+
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(TeachLoginActivity.this, "Details not saved", Toast.LENGTH_SHORT).show();
 
                 }
             });

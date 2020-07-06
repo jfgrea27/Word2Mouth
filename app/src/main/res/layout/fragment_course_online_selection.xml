@@ -26,7 +26,7 @@
         <ListView
             android:id="@+id/list_courses_per_teacher"
             android:layout_width="match_parent"
-            android:layout_height="382dp"
+            android:layout_height="481dp"
             android:background="@color/colorWhite"
             app:layout_constraintBottom_toTopOf="@+id/relativeLayout"
             app:layout_constraintEnd_toEndOf="parent"

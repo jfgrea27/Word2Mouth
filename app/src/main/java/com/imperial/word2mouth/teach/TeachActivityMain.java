@@ -16,7 +16,6 @@ import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.teach.online.account.TeachLoginActivity;
-import com.imperial.word2mouth.teach.online.account.TeachSignUpActivity;
 import com.imperial.word2mouth.teach.ui.main.SectionsPagerAdapter;
 
 public class TeachActivityMain extends AppCompatActivity {
@@ -73,10 +72,6 @@ public class TeachActivityMain extends AppCompatActivity {
             case R.id.login:
                 Intent loginIntent = new Intent(getApplicationContext(), TeachLoginActivity.class);
                 startActivity(loginIntent);
-                return true;
-            case R.id.sign_up:
-                Intent signUpIntent = new Intent(getApplicationContext(), TeachSignUpActivity.class);
-                startActivity(signUpIntent);
                 return true;
             case R.id.setting:
                 Toast.makeText(this, "Setting - TO DO", Toast.LENGTH_SHORT).show();

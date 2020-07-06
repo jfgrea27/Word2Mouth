@@ -33,6 +33,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
@@ -42,6 +45,7 @@ import com.imperial.word2mouth.teach.TeachActivityMain;
 import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -74,7 +78,8 @@ public class TeachOnlineMainFragment extends Fragment {
 
     // Online
     private FirebaseUser user;
-    private FirebaseDatabase database;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
     private boolean selectedCourse = false;
 
     // Course data
@@ -221,44 +226,25 @@ public class TeachOnlineMainFragment extends Fragment {
 
     private void retrieveOnlineCourses() {
         user = FirebaseAuth.getInstance().getCurrentUser();
-        database = FirebaseDatabase.getInstance();
 
         if (user != null) {
-            Query query = FirebaseDatabase.getInstance().getReference("/content/").orderByChild("userUID").equalTo(user.getUid());
 
-            // check if there is such a
-            query.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.getValue() == null) {
-                        return;
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-
-                }
-            });
-
-            query.addValueEventListener(new ValueEventListener() {
+            db.collection("content").whereEqualTo("userUID", user.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    onlineCourses = getCourses(queryDocumentSnapshots.getDocuments());
 
-                    if (snapshot.getValue() != null) {
-                        onlineCourses = getCourses((Map<String, Map<String, String>>) snapshot.getValue());
+                    updateListView();
 
-                        updateListView();
-                    }
                 }
-
+            }).addOnFailureListener(new OnFailureListener() {
                 @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Toast.makeText(getView().getContext(), "Could Not retrieve courses", Toast.LENGTH_SHORT).show();
-
+                public void onFailure(@NonNull Exception e) {
+                    Toast.makeText(getView().getContext(), "Could not retrieve courses for " +  user.getEmail(), Toast.LENGTH_LONG).show();
                 }
             });
+
         } else {
             Toast.makeText(getView().getContext(), "Teacher must sign-in to retrieve their courses", Toast.LENGTH_SHORT).show();
         }
@@ -275,13 +261,16 @@ public class TeachOnlineMainFragment extends Fragment {
         }
     }
 
-    private ArrayList<CourseItem> getCourses( Map<String, Map<String, String>> courses) {
+    private ArrayList<CourseItem> getCourses(List<DocumentSnapshot> courses) {
 
         ArrayList<CourseItem> courseItems = new ArrayList<>();
 
-        for (Map.Entry<String, Map<String, String>> entry : courses.entrySet()) {
+        for (DocumentSnapshot course: courses) {
+            CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("key"), true);
+            courseItem.setLanguage((String) course.get("language"));
+            courseItem.setCategory((String) course.get("category"));
 
-            courseItems.add(new CourseItem((String) entry.getValue().get("courseName"), (String) entry.getValue().get("key"), true));
+            courseItems.add(courseItem);
         }
         return courseItems;
     }
@@ -300,14 +289,19 @@ public class TeachOnlineMainFragment extends Fragment {
 
 
                         // Delete from Firebase
-
-                        DatabaseReference courseDatabaseRef = FirebaseDatabase.getInstance().getReference("/content/" + courseIdentification);
-                        courseDatabaseRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        db.collection("content").document(courseIdentification).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Toast.makeText(getView().getContext(), "Successfully deleted from the Database", Toast.LENGTH_SHORT).show();
+
                             }
                         });
+//                        DatabaseReference courseDatabaseRef = FirebaseDatabase.getInstance().getReference("/content/" + courseIdentification);
+//                        courseDatabaseRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
+//                            @Override
+//                            public void onSuccess(Void aVoid) {
+//                            }
+//                        });
 
 
                         StorageReference courseDirectoryRef = FirebaseStorage.getInstance().getReference("/content/" + courseName + courseIdentification);

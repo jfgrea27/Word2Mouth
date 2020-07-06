@@ -67,4 +67,14 @@ public class CourseItem  {
         return category;
     }
 
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+
 }

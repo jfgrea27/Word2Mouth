@@ -12,8 +12,6 @@ public class DataTransferObject {
 
     private final String courseName;
 
-    private String courseURL;
-
     public DataTransferObject(String userUID, String name, String language, String category) {
         this.userUID = userUID;
         courseName = name;
@@ -46,15 +44,6 @@ public class DataTransferObject {
     public void setFileKey(String fileKey) {
         this.fileKey = fileKey;
     }
-
-    public String getCourseURL() {
-        return courseURL;
-    }
-
-    public void setCourseURL(String courseURL) {
-        this.courseURL = courseURL;
-    }
-
 
     public String getLanguage() {
         return language;

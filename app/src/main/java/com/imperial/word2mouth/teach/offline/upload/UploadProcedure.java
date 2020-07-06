@@ -14,6 +14,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
@@ -23,6 +25,8 @@ import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
 import com.imperial.word2mouth.teach.offline.upload.storage.StorageUploadPreparation;
 
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 
 public class UploadProcedure {
 
@@ -40,6 +44,7 @@ public class UploadProcedure {
     private UploadListener listener;
     private DatabaseReference teacherDatabaseRef;
     private DataTransferObject dto;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public UploadProcedure(String courseName, String coursePath, String courseLanguage, String courseCategory, String courseIdentification, Activity activity) {
 
@@ -61,7 +66,6 @@ public class UploadProcedure {
 
         uploadToDataBase();
 
-        uploadToStorage();
     }
     private void uploadToStorage() {
         if (user != null) {
@@ -130,8 +134,6 @@ public class UploadProcedure {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                     if (listener != null) {
-                        dto.setCourseURL(courseRef.getDownloadUrl().toString());
-                        finalTeacherDatabaseRef.child(dto.getKey()).child("courseURL").setValue(courseRef.getDownloadUrl().toString());
                         listener.onDataLoadedInStorage(dto.getKey());
                     }
                 }
@@ -149,40 +151,40 @@ public class UploadProcedure {
         if (user != null) {
             dto = new DataTransferObject(user.getUid(), courseName, language, category);
             teacherDatabaseRef = database.getReference("/content/");
-            dto.setCourseURL(" ");
 
-            DatabaseReference courseRef = null;
+
+
 
             // New Course to upload
             if (courseIdentification == "") {
-                courseRef = teacherDatabaseRef.push();
 
-                // get new Key
-                courseIdentification = courseRef.getKey();
 
+                db.collection("content").add(dto).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        courseIdentification = documentReference.getId();
+                        dto.setFileKey(courseIdentification);
+                        db.collection("content").document(courseIdentification).update("key", courseIdentification).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                listener.onDataLoadedInDatabase();
+                                uploadToStorage();
+
+                            }
+                        });
+
+                    }
+                });
             } else {
 
                 // retrieve key
                 dto.setFileKey(courseIdentification);
-                courseRef = teacherDatabaseRef.child(courseIdentification);
-            }
 
-            dto.setFileKey(courseIdentification);
-
-
-            if (courseRef != null) {
-                courseRef.setValue(dto);
-
-                courseRef.addValueEventListener(new ValueEventListener() {
+                db.collection("content").document(courseIdentification).set(dto).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    public void onSuccess(Void aVoid) {
                         listener.onDataLoadedInDatabase();
-
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
+                        uploadToStorage();
                     }
                 });
             }

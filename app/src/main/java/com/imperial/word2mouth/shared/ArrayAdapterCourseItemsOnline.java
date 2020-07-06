@@ -157,7 +157,13 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
 
         // Retrieve image
 
-        Glide.with(getContext()).load(photoThumbnails.get(courseItems.get(position).getCourseOnlineIdentification())).into(holder.thumbnail);
+        if (photoThumbnails.get(courseItems.get(position).getCourseOnlineIdentification()) == null){
+            Glide.with(getContext()).load(R.drawable.ic_picture).into(holder.thumbnail);
+
+        } else {
+            Glide.with(getContext()).load(photoThumbnails.get(courseItems.get(position).getCourseOnlineIdentification())).into(holder.thumbnail);
+
+        }
 
 
 

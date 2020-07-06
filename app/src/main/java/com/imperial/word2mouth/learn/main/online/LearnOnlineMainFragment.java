@@ -69,12 +69,11 @@ public class LearnOnlineMainFragment extends Fragment {
 
     private ImageButton searchButton;
 
-    private ListView listTeachers = null;
-    private FirebaseDatabase database = null;
-    private ArrayList<Teacher> teachers = new ArrayList<>();
-
-    private ArrayAdapterTeacher adapter;
-    private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
+//    private FirebaseDatabase database = null;
+//    private ArrayList<Teacher> teachers = new ArrayList<>();
+//
+//    private ArrayAdapterTeacher adapter;
+//    private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
 
     // Model
     private String selectedCategory;
@@ -214,9 +213,15 @@ public class LearnOnlineMainFragment extends Fragment {
         });
 
         searchButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ResourceType")
             @Override
             public void onClick(View v) {
                 if (!languageText.getText().toString().equals("") || !categoryText.getText().toString().equals("") || !teacherText.getText().toString().equals("")) {
+                    FragmentManager manager = getActivity().getSupportFragmentManager();
+
+                    // TODO OOOOo
+                    CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance("",  languageText.getText().toString(), categoryText.getText().toString());
+                    manager.beginTransaction().replace(R.id.fragment_online_test, frag).addToBackStack(null).commit();
 
                 }
             }
@@ -224,8 +229,6 @@ public class LearnOnlineMainFragment extends Fragment {
     }
 
     private void setUpUI() {
-        listTeachers = getView().findViewById(R.id.list_teachers);
-
         personButton = getView().findViewById(R.id.account_button);
         categoryButton = getView().findViewById(R.id.category_button);
         languageButton = getView().findViewById(R.id.language_button);
@@ -284,60 +287,60 @@ public class LearnOnlineMainFragment extends Fragment {
 
     // ListView Teachers
     private void configureTeacherListView() {
-        database = FirebaseDatabase.getInstance();
-
-        DatabaseReference teachersRef = database.getReference("users");
-        teachersRef.addValueEventListener(new ValueEventListener() {
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.getValue() != null) {
-                    teachers = getTeachers((Map<String, String>) snapshot.getValue());
-
-                    updateListView();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getView().getContext(), "Could Not retrieve teachers", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-
-        listTeachers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @SuppressLint("ResourceType")
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                FragmentManager manager = getActivity().getSupportFragmentManager();
-                CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance(teachers.get(position).getTeacherName());
-                manager.beginTransaction().replace(R.id.frag_courses_per_teacher, frag).addToBackStack("Course per Teacher").commit();
-            }
-        });
+//        database = FirebaseDatabase.getInstance();
+//
+//        DatabaseReference teachersRef = database.getReference("users");
+//        teachersRef.addValueEventListener(new ValueEventListener() {
+//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot snapshot) {
+//                if (snapshot.getValue() != null) {
+//                    teachers = getTeachers((Map<String, String>) snapshot.getValue());
+//
+//                    updateListView();
+//                }
+//            }
+//
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError error) {
+//                Toast.makeText(getView().getContext(), "Could Not retrieve teachers", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//
+//
+//        listTeachers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @SuppressLint("ResourceType")
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                FragmentManager manager = getActivity().getSupportFragmentManager();
+//                CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance(teachers.get(position).getTeacherName());
+//                manager.beginTransaction().replace(R.id.frag_courses_per_teacher, frag).addToBackStack("Course per Teacher").commit();
+//            }
+//        });
     }
-
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    private void updateListView() {
-        if (teachers.size() > 0) {
-            if (getView() != null) {
-                adapter = new ArrayAdapterTeacher(getView().getContext(), R.layout.list_teacher, teachers);
-                adapter.loadThumbnails(teachersHashMap);
-                listTeachers.setAdapter(adapter);
-            }
-        }
-    }
-
-    private ArrayList<Teacher> getTeachers(Map<String, String> teachers) {
-        ArrayList<Teacher> teacherArrayList = new ArrayList<>();
-
-
-        for (Map.Entry<String, String> entry : teachers.entrySet()) {
-            teachersHashMap.put(entry.getKey(), new Teacher(entry.getValue()));
-            teacherArrayList.add(new Teacher(entry.getValue()));
-        }
-        return teacherArrayList;
-    }
+//
+//    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+//    private void updateListView() {
+//        if (teachers.size() > 0) {
+//            if (getView() != null) {
+//                adapter = new ArrayAdapterTeacher(getView().getContext(), R.layout.list_teacher, teachers);
+//                adapter.loadThumbnails(teachersHashMap);
+//                listTeachers.setAdapter(adapter);
+//            }
+//        }
+//    }
+//
+//    private ArrayList<Teacher> getTeachers(Map<String, String> teachers) {
+//        ArrayList<Teacher> teacherArrayList = new ArrayList<>();
+//
+//
+//        for (Map.Entry<String, String> entry : teachers.entrySet()) {
+//            teachersHashMap.put(entry.getKey(), new Teacher(entry.getValue()));
+//            teacherArrayList.add(new Teacher(entry.getValue()));
+//        }
+//        return teacherArrayList;
+//    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
