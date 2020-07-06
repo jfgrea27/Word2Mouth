@@ -2,7 +2,9 @@ package com.imperial.word2mouth.learn.main.online;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.app.SearchManager;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,8 +20,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +33,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.offline.LearnOfflineMainFragment;
+import com.imperial.word2mouth.shared.Categories;
+import com.imperial.word2mouth.shared.DirectoryConstants;
+import com.imperial.word2mouth.shared.FileHandler;
+import com.imperial.word2mouth.shared.Languages;
+import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,14 +59,25 @@ public class LearnOnlineMainFragment extends Fragment {
     private boolean hasReadWriteStorageAccess = false;
 
 
+    // UI
+    private ImageButton personButton;
+    private ImageButton languageButton;
+    private ImageButton categoryButton;
+    private TextView teacherText;
+    private TextView languageText;
+    private TextView categoryText;
+
+    private ImageButton searchButton;
+
     private ListView listTeachers = null;
     private FirebaseDatabase database = null;
     private ArrayList<Teacher> teachers = new ArrayList<>();
 
-    private SearchView searchView = null;
-
     private ArrayAdapterTeacher adapter;
     private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
+
+    // Model
+    private String selectedCategory;
 
     public LearnOnlineMainFragment() {
         // Required empty public constructor
@@ -94,32 +116,127 @@ public class LearnOnlineMainFragment extends Fragment {
         getPermissions();
 
         if (hasNecessaryPermissions()) {
-            configureTeacherListView();
-//            configureSearchView();
+            setUpUI();
+            configureOnClicks();
 
         }
     }
 
-    private void configureSearchView() {
-        searchView = getView().findViewById(R.id.searchView);
-
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+    private void configureOnClicks() {
+        personButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
+            public void onClick(View v) {
+                Toast.makeText(getView().getContext(), "TODO", Toast.LENGTH_SHORT).show();
             }
+        });
 
-            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+        categoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onQueryTextChange(String newText) {
-                String text = newText;
-                adapter.filter(text);
-                return false;
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+                builder.setTitle("Category Selection");
+
+                final ListView categoryListView = new ListView(getView().getContext());
+
+                categoryListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_categories, Categories.categories));
+
+                builder.setView(categoryListView);
+
+                categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        categoryText.setText(Categories.get(position));
+                    }
+                });
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        categoryText.setText("");
+                        dialog.cancel();
+                    }
+                });
+                builder.show();
+            }
+        });
+
+
+        languageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+                builder.setTitle("Language Selection");
+
+                final ListView languageListView = new ListView(getView().getContext());
+
+                languageListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, Languages.languages));
+
+                builder.setView(languageListView);
+
+
+                languageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        languageText.setText(Languages.get(position));
+                    }
+                });
+
+
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        languageText.setText("");
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!languageText.getText().toString().equals("") || !categoryText.getText().toString().equals("") || !teacherText.getText().toString().equals("")) {
+
+                }
             }
         });
     }
 
+    private void setUpUI() {
+        listTeachers = getView().findViewById(R.id.list_teachers);
+
+        personButton = getView().findViewById(R.id.account_button);
+        categoryButton = getView().findViewById(R.id.category_button);
+        languageButton = getView().findViewById(R.id.language_button);
+
+        languageText = getView().findViewById(R.id.label_language);
+        categoryText = getView().findViewById(R.id.label_category);
+        teacherText = getView().findViewById(R.id.label_teacher);
+
+        searchButton = getView().findViewById(R.id.search_button);
+
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -167,8 +284,6 @@ public class LearnOnlineMainFragment extends Fragment {
 
     // ListView Teachers
     private void configureTeacherListView() {
-        listTeachers = getView().findViewById(R.id.list_teachers);
-
         database = FirebaseDatabase.getInstance();
 
         DatabaseReference teachersRef = database.getReference("users");

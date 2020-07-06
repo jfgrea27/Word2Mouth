@@ -26,12 +26,14 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.imperial.word2mouth.shared.Categories;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReader;
+import com.imperial.word2mouth.shared.Languages;
 import com.imperial.word2mouth.teach.offline.create.TeachCourseCreationSummaryActivity;
 import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
 import com.imperial.word2mouth.teach.offline.upload.UploadProcedure;
@@ -322,21 +324,15 @@ public class TeachOfflineMainFragment extends Fragment {
         builder.setTitle("Language Selection");
 
         final ListView listLanguages = new ListView(getView().getContext());
-        ArrayList<String> languages = new ArrayList<>();
 
-        languages.add("English");
-        languages.add("Francais");
-        languages.add("Deutsch");
-        languages.add("Swahili");
-
-        listLanguages.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, languages));
+        listLanguages.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, Languages.languages));
 
         builder.setView(listLanguages);
 
         listLanguages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedLanguage = languages.get(position);
+                selectedLanguage = Languages.get(position);
             }
         });
 
@@ -347,11 +343,7 @@ public class TeachOfflineMainFragment extends Fragment {
                 if (selectedLanguage != null) {
                     dialogCategorySelection();
                 }
-
-
             }
-
-
         });
 
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -368,20 +360,15 @@ public class TeachOfflineMainFragment extends Fragment {
         builder.setTitle("Category Selection");
 
         final ListView categoryListView = new ListView(getView().getContext());
-        ArrayList<String> categories = new ArrayList<>();
 
-        categories.add("Health");
-        categories.add("Mechanical");
-        categories.add("Academic");
-
-        categoryListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_categories, categories));
+        categoryListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_categories, Categories.categories));
 
         builder.setView(categoryListView);
 
         categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedCategory = categories.get(position);
+                selectedCategory = Categories.get(position);
             }
         });
 
