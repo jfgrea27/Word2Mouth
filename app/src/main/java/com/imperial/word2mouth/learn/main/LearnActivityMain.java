@@ -62,6 +62,12 @@ public class LearnActivityMain extends AppCompatActivity {
         if (!f.exists()) {
             f.mkdirs();
         }
+
+        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.cache);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+
     }
 
 

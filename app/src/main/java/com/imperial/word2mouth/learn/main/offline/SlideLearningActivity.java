@@ -74,6 +74,8 @@ public class SlideLearningActivity extends AppCompatActivity {
         totalNumberSlides = slidesFolder.listFiles().length;
 
 
+        emptyCourseCheck();
+
         // Forward and Backward Buttons
         configurePreviousButton();
         configureNextButton();
@@ -93,6 +95,12 @@ public class SlideLearningActivity extends AppCompatActivity {
 
         retrieveSlide();
         updateCurrentView();
+    }
+
+    private void emptyCourseCheck() {
+        if (totalNumberSlides < 1) {
+            finish();
+        }
     }
 
     private void configureSideTitleEdit() {

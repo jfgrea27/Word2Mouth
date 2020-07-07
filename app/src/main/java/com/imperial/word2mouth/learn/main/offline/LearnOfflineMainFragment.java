@@ -72,7 +72,6 @@ public class LearnOfflineMainFragment extends Fragment {
      *
      * @return A new instance of fragment LearnOfflineMainFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static LearnOfflineMainFragment newInstance() {
         LearnOfflineMainFragment fragment = new LearnOfflineMainFragment();
         Bundle args = new Bundle();

@@ -39,6 +39,7 @@ import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.Languages;
 import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
+import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,7 +50,7 @@ import java.util.Map;
  * Use the {@link LearnOnlineMainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LearnOnlineMainFragment extends Fragment {
+public class LearnOnlineMainFragment extends Fragment implements TeacherDialog.OnInputListener{
 
     // Permissions
     private final int INTERNET_PERMISSION = 1;
@@ -88,7 +89,6 @@ public class LearnOnlineMainFragment extends Fragment {
      *
      * @return A new instance of fragment LearnOnlineMainFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static LearnOnlineMainFragment newInstance() {
         LearnOnlineMainFragment fragment = new LearnOnlineMainFragment();
         Bundle args = new Bundle();
@@ -125,7 +125,9 @@ public class LearnOnlineMainFragment extends Fragment {
         personButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getView().getContext(), "TODO", Toast.LENGTH_SHORT).show();
+
+                TeacherDialog teacherDialog = new TeacherDialog();
+                teacherDialog.show( getActivity().getSupportFragmentManager(), "Video Dialog");
             }
         });
 
@@ -212,6 +214,49 @@ public class LearnOnlineMainFragment extends Fragment {
             }
         });
 
+        languageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+                builder.setTitle("Teacher Selection");
+
+                final ListView languageListView = new ListView(getView().getContext());
+
+                languageListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, Languages.languages));
+
+                builder.setView(languageListView);
+
+
+                languageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        languageText.setText(Languages.get(position));
+                    }
+                });
+
+
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        languageText.setText("");
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
         searchButton.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ResourceType")
             @Override
@@ -219,9 +264,9 @@ public class LearnOnlineMainFragment extends Fragment {
                 if (!languageText.getText().toString().equals("") || !categoryText.getText().toString().equals("") || !teacherText.getText().toString().equals("")) {
                     FragmentManager manager = getActivity().getSupportFragmentManager();
 
-                    // TODO OOOOo
+                    // TODO add Teacher part
                     CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance("",  languageText.getText().toString(), categoryText.getText().toString());
-                    manager.beginTransaction().replace(R.id.fragment_online_test, frag).addToBackStack(null).commit();
+                    manager.beginTransaction().replace(R.id.fragment_learn_online_main, frag).addToBackStack(null).commit();
 
                 }
             }
@@ -282,7 +327,6 @@ public class LearnOnlineMainFragment extends Fragment {
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
     // UI
 
     // ListView Teachers
@@ -319,29 +363,27 @@ public class LearnOnlineMainFragment extends Fragment {
 //            }
 //        });
     }
-//
-//    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//    private void updateListView() {
-//        if (teachers.size() > 0) {
-//            if (getView() != null) {
-//                adapter = new ArrayAdapterTeacher(getView().getContext(), R.layout.list_teacher, teachers);
-//                adapter.loadThumbnails(teachersHashMap);
-//                listTeachers.setAdapter(adapter);
-//            }
-//        }
-//    }
-//
-//    private ArrayList<Teacher> getTeachers(Map<String, String> teachers) {
-//        ArrayList<Teacher> teacherArrayList = new ArrayList<>();
-//
-//
-//        for (Map.Entry<String, String> entry : teachers.entrySet()) {
-//            teachersHashMap.put(entry.getKey(), new Teacher(entry.getValue()));
-//            teacherArrayList.add(new Teacher(entry.getValue()));
-//        }
-//        return teacherArrayList;
-//    }
 
+    @Override
+    public void sendInput(int choice) {
+        FragmentManager manager = getActivity().getSupportFragmentManager();
+        Fragment frag;
+
+        if (manager != null) {
+            switch (choice) {
+                case TeacherDialog.FOLLOWING:
+                    // TODO add Teacher part
+                    frag = FragmentListFollowers.newInstance();
+                    manager.beginTransaction().replace(R.id.fragment_learn_online_main, frag).addToBackStack(null).commit();
+                    break;
+                case TeacherDialog.TEACHER_SEARCH:
+                    // TODO add Teacher part
+                    frag = FragmentSearchTeacher.newInstance();
+                    manager.beginTransaction().replace( getView().getId(), frag).addToBackStack(null).commit();
+                    break;
+            }
+        }
+    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
 

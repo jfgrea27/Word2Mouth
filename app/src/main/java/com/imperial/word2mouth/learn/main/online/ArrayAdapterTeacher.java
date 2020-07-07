@@ -36,6 +36,7 @@ import java.util.Map;
 
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+
 public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
 
 
@@ -55,27 +56,31 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
         layout = resource;
         teachers = objects;
         this.context = context;
+        queryTeacher = teachers;
     }
 
 
-    public void loadThumbnails(HashMap<String, Teacher> teachersHashMap) {
+    public void loadThumbnails() {
 
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("/users");
         profilePictures.clear();
 
-        for (Map.Entry<String, Teacher> teacher : teachersHashMap.entrySet()) {
+        for (Teacher teacher : teachers) {
 
-            StorageReference imageRef = storageRef.child(teacher.getKey() + "/profilePicture/pp.jpg");
+
+            StorageReference imageRef = storageRef.child(teacher.getUID() + "/profilePicture/pp.jpg");
 
             imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    profilePictures.put(teacher.getValue().getTeacherName(), uri);
+                    profilePictures.put(teacher.getTeacherName(), uri);
                     notifyDataSetInvalidated();
                     notifyDataSetChanged();
                 }
             });
         }
+        queryTeacher = teachers;
+
     }
 
 
@@ -90,7 +95,7 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
             holder = new ViewHolder();
 
             holder.thumbnail = convertView.findViewById(R.id.list_item_thumbnail);
-            holder.title = convertView.findViewById(R.id.list_item_text);
+            holder.title = convertView.findViewById(R.id.name_Teacher);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
@@ -99,9 +104,9 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
 
 
         // Title Course
-        holder.title.setText(setUserNameOnly(teachers.get(position).getTeacherName()));
+        holder.title.setText(setUserNameOnly(queryTeacher.get(position).getTeacherName()));
 
-        Uri image = profilePictures.get(teachers.get(position).getTeacherName());
+        Uri image = profilePictures.get(queryTeacher.get(position).getTeacherName());
 
         if (image == null) {
             holder.thumbnail.setImageResource(R.drawable.ic_account);
@@ -141,25 +146,22 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
         return position;
     }
 
+
     public void filter(String text) {
+        queryTeacher.clear();
 
+        if (text.length() == 0) {
+            queryTeacher.addAll(teachers);
+
+        } else {
+            for (Teacher t : teachers) {
+                if (t.getUserName().toLowerCase().contains(text)) {
+                    queryTeacher.add(t);
+                }
+            }
+        }
+        notifyDataSetChanged();
     }
-
-//    public void filter(String text) {
-//        queryTeacher.clear();
-//
-//        if (text.length() == 0) {
-//            teachers.addAll(teachers);
-//
-//        } else {
-//            for (Teacher t : teachers) {
-//                if (t.getTeacherName().toLowerCase().contains(text)) {
-//                    queryTeacher.add(t);
-//                }
-//            }
-//        }
-//        notifyDataSetChanged();
-//    }
 
     public class ViewHolder {
         ImageView thumbnail;

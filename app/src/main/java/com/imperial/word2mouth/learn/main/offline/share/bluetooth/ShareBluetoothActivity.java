@@ -134,7 +134,6 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
     @Override
     public void onDestroy() {
-        // TODO Auto-generated method stub
         try{
             if(discoverReceiver !=null)
                 unregisterReceiver(discoverReceiver);

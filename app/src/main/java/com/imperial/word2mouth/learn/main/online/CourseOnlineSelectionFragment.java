@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -101,7 +102,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
     private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
     private ArrayList<Teacher> teachers = new ArrayList<>();
-;
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     public CourseOnlineSelectionFragment() {
@@ -114,7 +115,6 @@ public class CourseOnlineSelectionFragment extends Fragment {
      *
      * @return A new instance of fragment CourseOnlineSelection.
      */
-    // TODO: Rename and change types and number of parameters
     public static CourseOnlineSelectionFragment newInstance(String teacher, String language, String category) {
         CourseOnlineSelectionFragment fragment = new CourseOnlineSelectionFragment();
         Bundle args = new Bundle();
@@ -158,6 +158,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
             configureProgressBar();
             configureDownloadButton();
             configureQuerySearch();
+            configureListCourses();
         }
     }
 
@@ -292,6 +293,21 @@ public class CourseOnlineSelectionFragment extends Fragment {
         return courseItems;
     }
 
+
+
+    private void configureListCourses() {
+        if (listCourses != null) {
+            listCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    selectedCourse = true;
+                    courseItem = onlineCourses.get(position);
+                    download.setColorFilter(null);
+                }
+            });
+        }
+    }
+
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Download Button
 
@@ -303,9 +319,9 @@ public class CourseOnlineSelectionFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     if (selectedCourse) {
-                        StorageReference courseRef = FirebaseStorage.getInstance().getReference("/content/" + courseName + courseIdentification + "/" + courseName +".zip");
+                        StorageReference courseRef = FirebaseStorage.getInstance().getReference("/content/" + courseItem.getCourseName() +  courseItem.getCourseOnlineIdentification() + "/" + courseItem.getCourseName() +".zip");
                         progress.setVisibility(View.VISIBLE);
-                        File f = new File(getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.zip + courseName + ".zip");
+                        File f = new File(getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.zip + courseItem.getCourseName() + ".zip");
                         if (!f.exists()) {
                             try {
                                 f.createNewFile();
@@ -340,11 +356,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
         Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
 
         progress.setVisibility(View.INVISIBLE);
-
         courseItem = null;
-        courseName = null;
-        courseIdentification = null;
-
     }
 
 }
