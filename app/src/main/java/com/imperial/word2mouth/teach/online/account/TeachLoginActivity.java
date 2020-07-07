@@ -13,22 +13,17 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -67,7 +62,8 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
     private ImageButton login;
     private ImageButton logout;
     private ImageButton thumbnail;
-
+    private TextView welcome;
+    private TextView userName;
 
     // Firebase
     private FirebaseUser user;
@@ -132,6 +128,9 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
         logout = findViewById(R.id.logout_button);
         thumbnail = findViewById(R.id.thumbnail);
 
+        welcome = findViewById(R.id.welcomeMessage);
+        userName = findViewById(R.id.userName);
+
     }
 
     private void updateUI() {
@@ -139,12 +138,31 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
             login.setVisibility(View.INVISIBLE);
             logout.setVisibility(View.VISIBLE);
             setProfilePicture();
+            setWelcome(true);
         } else {
             login.setVisibility(View.VISIBLE);
             logout.setVisibility(View.INVISIBLE);
             thumbnail.setImageResource(R.drawable.ic_account);
+            setWelcome(false);
         }
 
+    }
+
+    private void setWelcome(boolean b) {
+        if (b) {
+            String temp = user.getDisplayName();
+            if (temp.equals("")) {
+                temp = user.getEmail();
+            }
+
+            userName.setText(temp);
+            userName.setVisibility(View.VISIBLE);
+            welcome.setVisibility(View.VISIBLE);
+        } else {
+            userName.setText("");
+            userName.setVisibility(View.INVISIBLE);
+            welcome.setVisibility(View.INVISIBLE);
+        }
     }
 
 

@@ -19,4 +19,6 @@ public class DirectoryConstants {
     public static String language = "language.txt";
     public static String category = "category.txt";
     public static String cache = "/cache/";
+    public static String following = "following.txt";
+    public static String author = "author.txt";
 }

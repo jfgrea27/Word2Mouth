@@ -24,7 +24,7 @@ import android.widget.VideoView;
 
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.FileReader;
+import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.teach.offline.create.audio.AudioRecorder;
 import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
@@ -290,7 +290,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         // title
         titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
         if(titleFile.exists()) {
-            String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/title.txt");
+            String text = FileReaderHelper.readTextFromFile(currentSlideDirectory.getPath() + "/title.txt");
             if (text.isEmpty()) {
                 titleEdit.setText("");
             } else {
@@ -302,7 +302,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
         // instructions
         instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
         if (instructionsFile.exists()) {
-            String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/instructions.txt");
+            String text = FileReaderHelper.readTextFromFile(currentSlideDirectory.getPath() + "/instructions.txt");
             if (text.isEmpty()) {
                 instructionsEdit.setText("");
             } else {

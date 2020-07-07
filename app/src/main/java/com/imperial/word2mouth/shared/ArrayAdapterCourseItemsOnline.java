@@ -29,19 +29,21 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.online.Teacher;
 import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
 
-    private static ArrayList<CourseItem> courseItems;
+    private static ArrayList<CourseItem> courseItems = new ArrayList<>();
+    private final Context context;
 
     private int layout;
-    private Context context;
 
     private ViewHolder holder = new ViewHolder();
 
@@ -52,12 +54,20 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
     private ArrayMap<String, Uri> soundThumbnails = new ArrayMap<>();
     private ArrayMap<String, Uri> photoThumbnails = new ArrayMap<>();
 
+
+    private ArrayList<CourseItem> queryCourses;
+
+
+
+
     public ArrayAdapterCourseItemsOnline(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
-        courseItems = objects;
         this.context = context;
+        queryCourses = objects;
+
+        courseItems.addAll(queryCourses);
     }
 
 
@@ -98,52 +108,13 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
         }
     }
 
-    public void loadThumbnails(String teacherName) {
-        StorageReference teacherRef = FirebaseStorage.getInstance().getReference("/content/");
-
-        soundThumbnails.clear();
-        photoThumbnails.clear();
-
-        for (CourseItem course : courseItems) {
-            String courseName = course.getCourseName();
-            String courseIdentification = course.getCourseOnlineIdentification();
-
-            String courseAddress = courseName + courseIdentification;
-
-            StorageReference imageRef = teacherRef.child(courseAddress + "/Photo Thumbnail");
-            StorageReference soundRef = teacherRef.child(courseAddress + "/Sound Thumbnail");
-
-            soundRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    soundThumbnails.put(courseIdentification, uri);
-                    notifyDataSetInvalidated();
-                    notifyDataSetChanged();
-                }
-            });
-
-            imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
-                    photoThumbnails.put(courseIdentification, uri);
-                    notifyDataSetInvalidated();
-                    notifyDataSetChanged();
-                }
-            });
-
-        }
-
-    }
-
-
 
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         if(convertView == null) {
-            LayoutInflater inflater = LayoutInflater.from(getContext());
+            LayoutInflater inflater = LayoutInflater.from(context);
             convertView = inflater.inflate(layout, parent, false);
-
             holder = new ViewHolder();
 
             holder.audio = convertView.findViewById(R.id.list_audio_button);
@@ -157,11 +128,11 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
 
         // Retrieve image
 
-        if (photoThumbnails.get(courseItems.get(position).getCourseOnlineIdentification()) == null){
+        if (photoThumbnails.get(queryCourses.get(position).getCourseOnlineIdentification()) == null){
             Glide.with(getContext()).load(R.drawable.ic_picture).into(holder.thumbnail);
 
         } else {
-            Glide.with(getContext()).load(photoThumbnails.get(courseItems.get(position).getCourseOnlineIdentification())).into(holder.thumbnail);
+            Glide.with(getContext()).load(photoThumbnails.get(queryCourses.get(position).getCourseOnlineIdentification())).into(holder.thumbnail);
 
         }
 
@@ -171,7 +142,7 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
             @Override
             public void onClick(View v) {
                 MediaPlayer player;
-                Uri audioUri = soundThumbnails.get(courseItems.get(position).getCourseOnlineIdentification());
+                Uri audioUri = soundThumbnails.get(queryCourses.get(position).getCourseOnlineIdentification());
                 if (audioUri != null) {
                     holder.audio.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                     player = MediaPlayer.create(getContext(), audioUri);
@@ -194,7 +165,7 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
         });
 
         // Title Course
-        holder.title.setText(courseItems.get(position).getCourseName());
+        holder.title.setText(queryCourses.get(position).getCourseName());
 
 
         return convertView;
@@ -216,6 +187,23 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
 
         return position;
     }
+
+    public void filter(String query) {
+        query = query.toLowerCase(Locale.getDefault());
+        queryCourses.clear();
+        if (query.length() == 0) {
+            queryCourses.addAll(courseItems);
+        } else {
+            for (CourseItem wp : courseItems) {
+                if (wp.getCourseName().toLowerCase(Locale.getDefault()).contains(query)) {
+                    queryCourses.add(wp);
+                }
+            }
+        }
+        notifyDataSetChanged();
+
+    }
+
 
     public class ViewHolder {
         ImageView thumbnail;

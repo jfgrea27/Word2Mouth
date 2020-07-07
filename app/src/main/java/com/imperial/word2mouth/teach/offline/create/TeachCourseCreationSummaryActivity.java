@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.FileReader;
+import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.teach.offline.create.audio.AudioRecorder;
 import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
@@ -260,7 +260,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
         for (File f : slidesFiles) {
 
             String slideName;
-            slideName = FileReader.readTextFromFile(f.getPath()+ "/title.txt");
+            slideName = FileReaderHelper.readTextFromFile(f.getPath()+ "/title.txt");
 
             slideNames.add(slideName);
         }

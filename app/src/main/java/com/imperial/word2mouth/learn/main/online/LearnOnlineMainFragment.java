@@ -3,15 +3,12 @@ package com.imperial.word2mouth.learn.main.online;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.SearchManager;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -20,37 +17,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.offline.LearnOfflineMainFragment;
 import com.imperial.word2mouth.shared.Categories;
-import com.imperial.word2mouth.shared.DirectoryConstants;
-import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.Languages;
 import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
-import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LearnOnlineMainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LearnOnlineMainFragment extends Fragment implements TeacherDialog.OnInputListener{
+public class LearnOnlineMainFragment extends Fragment{
 
     // Permissions
     private final int INTERNET_PERMISSION = 1;
@@ -68,16 +51,14 @@ public class LearnOnlineMainFragment extends Fragment implements TeacherDialog.O
     private TextView languageText;
     private TextView categoryText;
 
-    private ImageButton searchButton;
+    private ImageButton teacherDelete;
+    private ImageButton languageDelete;
+    private ImageButton categoryDelete;
 
-//    private FirebaseDatabase database = null;
-//    private ArrayList<Teacher> teachers = new ArrayList<>();
-//
-//    private ArrayAdapterTeacher adapter;
-//    private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
+    private ImageButton searchButton;
+    private String selectedUserUID;
 
     // Model
-    private String selectedCategory;
 
     public LearnOnlineMainFragment() {
         // Required empty public constructor
@@ -117,174 +98,10 @@ public class LearnOnlineMainFragment extends Fragment implements TeacherDialog.O
         if (hasNecessaryPermissions()) {
             setUpUI();
             configureOnClicks();
-
         }
     }
 
-    private void configureOnClicks() {
-        personButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                TeacherDialog teacherDialog = new TeacherDialog();
-                teacherDialog.show( getActivity().getSupportFragmentManager(), "Video Dialog");
-            }
-        });
-
-        categoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-                builder.setTitle("Category Selection");
-
-                final ListView categoryListView = new ListView(getView().getContext());
-
-                categoryListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_categories, Categories.categories));
-
-                builder.setView(categoryListView);
-
-                categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        categoryText.setText(Categories.get(position));
-                    }
-                });
-
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        categoryText.setText("");
-                        dialog.cancel();
-                    }
-                });
-                builder.show();
-            }
-        });
-
-
-        languageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-                builder.setTitle("Language Selection");
-
-                final ListView languageListView = new ListView(getView().getContext());
-
-                languageListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, Languages.languages));
-
-                builder.setView(languageListView);
-
-
-                languageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        languageText.setText(Languages.get(position));
-                    }
-                });
-
-
-
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        languageText.setText("");
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-            }
-        });
-
-        languageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-                builder.setTitle("Teacher Selection");
-
-                final ListView languageListView = new ListView(getView().getContext());
-
-                languageListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, Languages.languages));
-
-                builder.setView(languageListView);
-
-
-                languageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        languageText.setText(Languages.get(position));
-                    }
-                });
-
-
-
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        languageText.setText("");
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-            }
-        });
-
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @SuppressLint("ResourceType")
-            @Override
-            public void onClick(View v) {
-                if (!languageText.getText().toString().equals("") || !categoryText.getText().toString().equals("") || !teacherText.getText().toString().equals("")) {
-                    FragmentManager manager = getActivity().getSupportFragmentManager();
-
-                    // TODO add Teacher part
-                    CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance("",  languageText.getText().toString(), categoryText.getText().toString());
-                    manager.beginTransaction().replace(R.id.fragment_learn_online_main, frag).addToBackStack(null).commit();
-
-                }
-            }
-        });
-    }
-
-    private void setUpUI() {
-        personButton = getView().findViewById(R.id.account_button);
-        categoryButton = getView().findViewById(R.id.category_button);
-        languageButton = getView().findViewById(R.id.language_button);
-
-        languageText = getView().findViewById(R.id.label_language);
-        categoryText = getView().findViewById(R.id.label_category);
-        teacherText = getView().findViewById(R.id.label_teacher);
-
-        searchButton = getView().findViewById(R.id.search_button);
-
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -326,65 +143,153 @@ public class LearnOnlineMainFragment extends Fragment implements TeacherDialog.O
     }
 
 
-    ////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
     // UI
 
-    // ListView Teachers
-    private void configureTeacherListView() {
-//        database = FirebaseDatabase.getInstance();
-//
-//        DatabaseReference teachersRef = database.getReference("users");
-//        teachersRef.addValueEventListener(new ValueEventListener() {
-//            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot snapshot) {
-//                if (snapshot.getValue() != null) {
-//                    teachers = getTeachers((Map<String, String>) snapshot.getValue());
-//
-//                    updateListView();
-//                }
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError error) {
-//                Toast.makeText(getView().getContext(), "Could Not retrieve teachers", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//
-//        listTeachers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @SuppressLint("ResourceType")
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                FragmentManager manager = getActivity().getSupportFragmentManager();
-//                CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance(teachers.get(position).getTeacherName());
-//                manager.beginTransaction().replace(R.id.frag_courses_per_teacher, frag).addToBackStack("Course per Teacher").commit();
-//            }
-//        });
+
+    private void setUpUI() {
+        personButton = getView().findViewById(R.id.account_button);
+        categoryButton = getView().findViewById(R.id.category_button);
+        languageButton = getView().findViewById(R.id.language_button);
+
+        languageText = getView().findViewById(R.id.label_language);
+        categoryText = getView().findViewById(R.id.label_category);
+        teacherText = getView().findViewById(R.id.label_teacher);
+
+
+        teacherDelete = getView().findViewById(R.id.delete_teacher_query);
+        languageDelete = getView().findViewById(R.id.delete_language_query);
+        categoryDelete = getView().findViewById(R.id.delete_category_query);
+
+        searchButton = getView().findViewById(R.id.search_button);
     }
 
-    @Override
-    public void sendInput(int choice) {
-        FragmentManager manager = getActivity().getSupportFragmentManager();
-        Fragment frag;
 
-        if (manager != null) {
-            switch (choice) {
-                case TeacherDialog.FOLLOWING:
-                    // TODO add Teacher part
-                    frag = FragmentListFollowers.newInstance();
-                    manager.beginTransaction().replace(R.id.fragment_learn_online_main, frag).addToBackStack(null).commit();
-                    break;
-                case TeacherDialog.TEACHER_SEARCH:
-                    // TODO add Teacher part
-                    frag = FragmentSearchTeacher.newInstance();
-                    manager.beginTransaction().replace( getView().getId(), frag).addToBackStack(null).commit();
-                    break;
+
+    private void configureOnClicks() {
+        categoryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+                builder.setTitle("Category Selection");
+
+                final ListView categoryListView = new ListView(getView().getContext());
+
+                categoryListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_categories, Categories.categories));
+
+                builder.setView(categoryListView);
+
+                categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        categoryText.setText(Categories.get(position));
+                    }
+                });
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
             }
-        }
+        });
+
+
+        languageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
+                builder.setTitle("Language Selection");
+
+                final ListView languageListView = new ListView(getView().getContext());
+
+                languageListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, Languages.languages));
+
+                builder.setView(languageListView);
+
+
+                languageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        languageText.setText(Languages.get(position));
+                    }
+                });
+
+
+
+                // Set up the buttons
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+            }
+        });
+
+        personButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                FragmentSearchTeacher frag;
+                frag = FragmentSearchTeacher.newInstance();
+                frag.setFragment(LearnOnlineMainFragment.this);
+                manager.beginTransaction().replace( getView().getId(), frag).addToBackStack(null).commit();
+            }
+        });
+
+        searchButton.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ResourceType")
+            @Override
+            public void onClick(View v) {
+                if (!languageText.getText().toString().equals("") || !categoryText.getText().toString().equals("") || !teacherText.getText().toString().equals("")) {
+                    FragmentManager manager = getActivity().getSupportFragmentManager();
+                    CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance(selectedUserUID, languageText.getText().toString(), categoryText.getText().toString());
+                    manager.beginTransaction().replace(R.id.fragment_learn_online_main, frag).addToBackStack(null).commit();
+
+                }
+            }
+        });
+
+        categoryDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                categoryText.setText("");
+            }
+        });
+
+        teacherDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                teacherText.setText("");
+                selectedUserUID = "";
+            }
+        });
+
+        languageDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                languageText.setText("");
+            }
+        });
+
     }
-    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
+    public void setTeacherName(String userName, String userUid) {
+        teacherText.setText(userName);
+        this.selectedUserUID = userUid;
+
+    }
 }

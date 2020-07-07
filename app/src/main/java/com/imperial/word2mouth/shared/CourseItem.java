@@ -13,6 +13,9 @@ public class CourseItem  {
     private String language = null;
     private String category = null;
 
+
+    private String authorID = "";
+
     private String courseOnlineIdentification = null;
 
     // For offline purposes
@@ -23,8 +26,8 @@ public class CourseItem  {
 
         audio = new File(path + "/meta" + "/audio.3gp");
 
-        language = FileReader.readTextFromFile(path + DirectoryConstants.meta + DirectoryConstants.language);
-        category = FileReader.readTextFromFile(path + DirectoryConstants.meta + DirectoryConstants.category);
+        language = FileReaderHelper.readTextFromFile(path + DirectoryConstants.meta + DirectoryConstants.language);
+        category = FileReaderHelper.readTextFromFile(path + DirectoryConstants.meta + DirectoryConstants.category);
 
         coursePath = path;
     }
@@ -49,6 +52,7 @@ public class CourseItem  {
 
     public String getCoursePath() {
         return coursePath;
+
     }
 
     public String getCourseOnlineIdentification() {
@@ -74,6 +78,14 @@ public class CourseItem  {
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getAuthorID() {
+        return authorID;
+    }
+
+    public void setAuthorID(String authorID) {
+        this.authorID = authorID;
     }
 
 

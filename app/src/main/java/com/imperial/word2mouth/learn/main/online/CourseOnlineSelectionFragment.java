@@ -253,7 +253,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
             if (language != "") {
                 query =  query.whereEqualTo("category", category);
             } else {
-                query = db.collection("content").whereEqualTo("language", language);
+                query = db.collection("content").whereEqualTo("category", category);
             }
         }
 

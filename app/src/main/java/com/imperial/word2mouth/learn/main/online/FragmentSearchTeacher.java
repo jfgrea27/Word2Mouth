@@ -22,9 +22,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOnline;
+import com.imperial.word2mouth.shared.DirectoryConstants;
 
-import java.util.AbstractQueue;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,16 +36,18 @@ import java.util.List;
  * Use the {@link FragmentSearchTeacher#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentSearchTeacher extends Fragment {
+public class FragmentSearchTeacher extends Fragment  {
 
 
     private ListView listTeachers;
     private SearchView searchTeacher;
 
+    private LearnOnlineMainFragment frag;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ArrayList<Teacher> registeredTeachers = new ArrayList<>();
     private ArrayAdapterTeacher adapter;
+    private ArrayList<String> followingEmailTeachers = new ArrayList<>();
 
     public FragmentSearchTeacher() {
         // Required empty public constructor
@@ -86,6 +91,12 @@ public class FragmentSearchTeacher extends Fragment {
 
         setUpTeacherList();
 
+        try {
+            retrieveFollowingTeachers();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         retrieveAllTeachers();
     }
 
@@ -94,8 +105,35 @@ public class FragmentSearchTeacher extends Fragment {
         searchTeacher = getView().findViewById(R.id.search_teacher);
     }
 
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+    private void retrieveFollowingTeachers() throws IOException {
+        File followingFile = new File(getView().getContext().getExternalFilesDir(null) + DirectoryConstants.cache + DirectoryConstants.following);
+
+        if (!followingFile.exists()) {
+            try {
+                followingFile.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        BufferedReader reader = null;
+        String line = null;
+        try {
+            reader = new BufferedReader(new FileReader(followingFile));
+            line = reader.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        while (line != null) {
+            followingEmailTeachers.add(line);
+            line = reader.readLine();
+        }
+    }
+
 
 
     private void retrieveAllTeachers() {
@@ -129,6 +167,7 @@ public class FragmentSearchTeacher extends Fragment {
         if (registeredTeachers.size() > 0) {
             if (getView() != null) {
                 adapter = new ArrayAdapterTeacher(getView().getContext(), R.layout.list_teacher, registeredTeachers);
+                adapter.setFollowingTeachersArray(followingEmailTeachers);
                 adapter.loadThumbnails();
                 listTeachers.setAdapter(adapter);
             }
@@ -140,13 +179,24 @@ public class FragmentSearchTeacher extends Fragment {
         listTeachers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                if (frag != null) {
+                    frag.setTeacherName(registeredTeachers.get(position).getUserName(), registeredTeachers.get(position).getUID());
+                    getActivity().getSupportFragmentManager().popBackStack();
+                }
             }
         });
     }
 
     private void setUpSearchView() {
-        searchTeacher.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+        searchTeacher.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchTeacher.setIconified(false);
+            }
+        });
+
+        searchTeacher .setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -156,9 +206,15 @@ public class FragmentSearchTeacher extends Fragment {
             @Override
             public boolean onQueryTextChange(String newText) {
                 String text = newText;
-                adapter.filter(text);
+                if (adapter != null) {
+                    adapter.filter(text);
+                }
                 return false;
             }
         });
+    }
+
+    public void setFragment(LearnOnlineMainFragment learnOnlineMainFragment) {
+        this.frag = learnOnlineMainFragment;
     }
 }

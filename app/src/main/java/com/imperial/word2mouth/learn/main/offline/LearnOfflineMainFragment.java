@@ -29,7 +29,7 @@ import com.imperial.word2mouth.learn.main.offline.share.bluetooth.ShareBluetooth
 import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
-import com.imperial.word2mouth.shared.FileReader;
+import com.imperial.word2mouth.shared.FileReaderHelper;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -214,7 +214,7 @@ public class LearnOfflineMainFragment extends Fragment {
 
         for (File f : courses) {
 
-            String courseName = FileReader.readTextFromFile(f.getPath()+ "/meta/title.txt");
+            String courseName = FileReaderHelper.readTextFromFile(f.getPath()+ "/meta/title.txt");
 
             CourseItem courseItem= new CourseItem(courseName, f.getPath());
             courseItems.add(courseItem);

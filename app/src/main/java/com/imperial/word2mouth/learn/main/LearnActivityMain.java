@@ -7,8 +7,6 @@ import com.google.android.material.tabs.TabLayout;
 
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -23,6 +21,7 @@ import com.imperial.word2mouth.learn.main.ui.SectionsPagerAdapter;
 import com.imperial.word2mouth.teach.TeachActivityMain;
 
 import java.io.File;
+import java.io.IOException;
 
 public class LearnActivityMain extends AppCompatActivity {
 
@@ -68,6 +67,15 @@ public class LearnActivityMain extends AppCompatActivity {
             f.mkdirs();
         }
 
+
+        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.cache + DirectoryConstants.following);
+        if (!f.exists()) {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 

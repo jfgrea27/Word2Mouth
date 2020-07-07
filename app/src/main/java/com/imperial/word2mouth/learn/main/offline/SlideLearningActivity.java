@@ -15,7 +15,7 @@ import android.widget.VideoView;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.FileReader;
+import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.FileHandler;
 
 import java.io.File;
@@ -183,7 +183,7 @@ public class SlideLearningActivity extends AppCompatActivity {
             // title
             titleFile = new File(currentSlideDirectory.getPath() + "/title.txt");
             if(titleFile.exists()) {
-                String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/title.txt");
+                String text = FileReaderHelper.readTextFromFile(currentSlideDirectory.getPath() + "/title.txt");
                 if (text.isEmpty()) {
                     titleView.setText("");
                 } else {
@@ -194,7 +194,7 @@ public class SlideLearningActivity extends AppCompatActivity {
             // instructions
             instructionsFile = new File(currentSlideDirectory.getPath() + "/instructions.txt");
             if (instructionsFile.exists()) {
-                String text = FileReader.readTextFromFile(currentSlideDirectory.getPath() + "/instructions.txt");
+                String text = FileReaderHelper.readTextFromFile(currentSlideDirectory.getPath() + "/instructions.txt");
                 if (text.isEmpty()) {
                     instructionsView.setText("");
                 } else {

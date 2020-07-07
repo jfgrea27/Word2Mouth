@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 
@@ -62,7 +63,7 @@ public class TeachOnlineMainFragment extends Fragment {
     private boolean hasInternetAccess = false;
     private boolean hasReadWriteStorageAccess = false;
 
-    // Internet Permissison
+    // Internet Permission
 
     private ListView onlineListCourses;
     private ImageButton delete;
@@ -72,9 +73,9 @@ public class TeachOnlineMainFragment extends Fragment {
 
 
     // Adapter
-    private ArrayList<CourseItem> localCourses = null;
     private ArrayAdapterCourseItemsOnline adapter = null;
 
+    private SearchView searchView;
 
     // Online
     private FirebaseUser user;
@@ -129,9 +130,38 @@ public class TeachOnlineMainFragment extends Fragment {
 
         if (hasNecessaryPermissions()) {
             configureDeleteButton();
+            configureSearchView();
             configureListCourses();
         }
 
+    }
+
+    private void configureSearchView() {
+        searchView = getView().findViewById(R.id.searchView);
+
+        searchView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                searchView.setIconified(false);
+            }
+        });
+
+        searchView .setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                String text = newText;
+                if (adapter != null) {
+                    adapter.filter(text);
+                }
+                return false;
+            }
+        });
     }
 
 
@@ -264,6 +294,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
         ArrayList<CourseItem> courseItems = new ArrayList<>();
 
+
         for (DocumentSnapshot course: courses) {
             CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("key"), true);
             courseItem.setLanguage((String) course.get("language"));
@@ -272,6 +303,16 @@ public class TeachOnlineMainFragment extends Fragment {
             courseItems.add(courseItem);
         }
         return courseItems;
+    }
+
+    private boolean checkDuplicatesSameCourse(ArrayList<CourseItem> courseItems, DocumentSnapshot course) {
+        CourseItem crs = new CourseItem((String) course.get("courseName"), (String) course.get("key"), true);
+        for (CourseItem c : courseItems) {
+            if (c.getCourseOnlineIdentification().equals(crs.getCourseOnlineIdentification())) {
+                return false;
+            }
+        }
+        return true;
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -295,12 +336,6 @@ public class TeachOnlineMainFragment extends Fragment {
 
                             }
                         });
-//                        DatabaseReference courseDatabaseRef = FirebaseDatabase.getInstance().getReference("/content/" + courseIdentification);
-//                        courseDatabaseRef.removeValue().addOnSuccessListener(new OnSuccessListener<Void>() {
-//                            @Override
-//                            public void onSuccess(Void aVoid) {
-//                            }
-//                        });
 
 
                         StorageReference courseDirectoryRef = FirebaseStorage.getInstance().getReference("/content/" + courseName + courseIdentification);

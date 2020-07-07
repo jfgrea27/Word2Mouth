@@ -23,7 +23,7 @@ public class Teacher {
         
     }
 
-    public String getTeacherName() {
+    public String getTeacherEmail() {
         return teacherEmail;
     }
 

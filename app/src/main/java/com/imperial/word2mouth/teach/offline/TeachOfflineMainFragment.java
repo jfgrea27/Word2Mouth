@@ -26,20 +26,24 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.imperial.word2mouth.shared.Categories;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
-import com.imperial.word2mouth.shared.FileReader;
+import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.Languages;
 import com.imperial.word2mouth.teach.offline.create.TeachCourseCreationSummaryActivity;
 import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
 import com.imperial.word2mouth.teach.offline.upload.UploadProcedure;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -80,10 +84,12 @@ public class TeachOfflineMainFragment extends Fragment {
     private String selectedCategory;
     private String courseLanguage;
     private String courseCategory;
+    private String courseAuthorID;
 
     private boolean completedDatabase = false;
     private boolean completedStorage = false;
 
+    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
 
     public TeachOfflineMainFragment() {
@@ -209,6 +215,7 @@ public class TeachOfflineMainFragment extends Fragment {
                         courseName = courseItem.getCourseName();
                         coursePath = courseItem.getCoursePath();
                         courseIdentification = courseItem.getCourseOnlineIdentification();
+                        courseAuthorID = courseItem.getAuthorID();
                         courseLanguage = courseItem.getLanguage();
                         courseCategory = courseItem.getCategory();
                     }
@@ -225,8 +232,8 @@ public class TeachOfflineMainFragment extends Fragment {
         File[] courses = directory.listFiles();
 
         for (File f : courses) {
-            String courseName = FileReader.readTextFromFile(f.getPath()+ "/meta/title.txt");
-            String courseIdentification = FileReader.readTextFromFile(f.getPath() + "/meta/identification.txt");
+            String courseName = FileReaderHelper.readTextFromFile(f.getPath()+ "/meta/title.txt");
+            String courseIdentification = FileReaderHelper.readTextFromFile(f.getPath() + "/meta/identification.txt");
 
             CourseItem courseItem= new CourseItem(courseName, f.getPath());
             courseItem.setCourseOnlineIdentification(courseIdentification);
@@ -404,6 +411,29 @@ public class TeachOfflineMainFragment extends Fragment {
     }
 
 
+    private boolean checkNewAuthor() {
+        File f = new File(coursePath + DirectoryConstants.meta + DirectoryConstants.author);
+
+        if (f.length() == 0) {
+            return true;
+        }
+
+        Scanner fileReader = null;
+        try {
+            fileReader = new Scanner(f);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        String s = fileReader.nextLine();
+
+        if (user.getUid().equals(s)) {
+            return true;
+        }
+
+        return false;
+    }
+
+
     // Upload Button
     private void configureUploadButton() {
         upload = getView().findViewById(R.id.upload_button);
@@ -418,34 +448,54 @@ public class TeachOfflineMainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (selectedCourse) {
-                    uploadProcedure = new UploadProcedure(courseName, coursePath, courseLanguage, courseCategory, courseIdentification, getActivity());
+                    if (user != null) {
+                        if (checkNewAuthor()) {
+                            setCourseAuthorIdentification();
+                            uploadProcedure = new UploadProcedure(courseName, coursePath, courseLanguage, courseCategory, courseIdentification, getActivity());
 
-                    uploadProgress.setVisibility(View.VISIBLE);
-                    upload.setEnabled(false);
+                            uploadProgress.setVisibility(View.VISIBLE);
+                            upload.setEnabled(false);
 
 
-                    uploadProcedure.setListener(new UploadProcedure.UploadListener() {
-                        @Override
-                        public void onDataLoadedInDatabase() {
-                            uploadDataBaseSuccessful();
+                            uploadProcedure.setListener(new UploadProcedure.UploadListener() {
+                                @Override
+                                public void onDataLoadedInDatabase() {
+                                    uploadDataBaseSuccessful();
+                                }
+
+                                @Override
+                                public void onDataLoadedInStorage(String courseIdentification) {
+                                    setCourseIdentification(courseIdentification);
+                                    uploadStorageSuccessful();
+                                }
+                            });
+
+                            completedDatabase = false;
+                            completedStorage = false;
+                            uploadProcedure.uploadCourse();
+                        } else {
+                            Toast.makeText(getView().getContext(), "Cannot upload another teacher's work to your account", Toast.LENGTH_SHORT).show();
                         }
 
-                        @Override
-                        public void onDataLoadedInStorage(String courseIdentification) {
-                            setCourseIdentification(courseIdentification);
-                           uploadStorageSuccessful();
-                        }
-                    });
+                    }
 
-
-                    completedDatabase = false;
-                    completedStorage = false;
-
-                    uploadProcedure.uploadCourse();
 
                 }
             }
         });
+    }
+
+    private void setCourseAuthorIdentification() {
+        if (courseAuthorID == "") {
+            courseAuthorID = user.getUid();
+            courseItem.setAuthorID(user.getUid());
+            updateCourseAuthorFile(user.getUid());
+        }
+    }
+
+    private void updateCourseAuthorFile(String uid) {
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, uid, FileHandler.AUTHOR);
+
     }
 
     private void setCourseIdentification(String identification) {

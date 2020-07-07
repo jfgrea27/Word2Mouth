@@ -63,10 +63,11 @@ public class UploadProcedure {
         storage = FirebaseStorage.getInstance();
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-
         uploadToDataBase();
 
     }
+
+
     private void uploadToStorage() {
         if (user != null) {
 
