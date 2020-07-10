@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.learn.main.online;
+package com.imperial.word2mouth.learn.main.online.teacher;
 
 import android.content.Context;
 import android.net.Uri;
@@ -8,7 +8,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Filter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,21 +15,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.online.teacher.Teacher;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileReaderHelper;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -227,6 +223,10 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
 
     public void setFollowingTeachersArray(ArrayList<String> followingEmailTeachers) {
         this.followingEmailTeachers = followingEmailTeachers;
+    }
+
+    public Uri getThumbnail(String name) {
+        return profilePictures.get(name);
     }
 
 

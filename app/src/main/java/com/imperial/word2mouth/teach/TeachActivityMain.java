@@ -33,8 +33,8 @@ public class TeachActivityMain extends AppCompatActivity {
 
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        tabs.getTabAt(0).setIcon(R.drawable.ic_offline_online_0);
-        tabs.getTabAt(1).setIcon(R.drawable.ic_offline_online_1);
+        tabs.getTabAt(0).setIcon(R.drawable.ic_teach_offline_online_0);
+        tabs.getTabAt(1).setIcon(R.drawable.ic_teach_offline_online_1);
     }
 
 

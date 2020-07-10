@@ -44,6 +44,8 @@
             android:focusable="false"
             android:focusableInTouchMode="false" />
 
+
+
         <ImageButton
             android:id="@+id/preview_video"
             android:src="@drawable/ic_play_button"

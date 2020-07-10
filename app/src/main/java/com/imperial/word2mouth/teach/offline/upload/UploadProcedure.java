@@ -153,9 +153,7 @@ public class UploadProcedure {
             dto = new DataTransferObject(user.getUid(), courseName, language, category);
             teacherDatabaseRef = database.getReference("/content/");
 
-
-
-
+            dto.setLowerCapital();
             // New Course to upload
             if (courseIdentification == "") {
 

@@ -5,16 +5,18 @@ import android.os.Bundle;
 
 import com.google.android.material.tabs.TabLayout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import android.speech.tts.TextToSpeech.OnInitListener;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.ui.SectionsPagerAdapter;
@@ -22,6 +24,7 @@ import com.imperial.word2mouth.teach.TeachActivityMain;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 public class LearnActivityMain extends AppCompatActivity {
 
@@ -39,10 +42,11 @@ public class LearnActivityMain extends AppCompatActivity {
 
         fileManagement();
 
+
         TabLayout tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-        tabs.getTabAt(0).setIcon(R.drawable.ic_offline_online_0);
-        tabs.getTabAt(1).setIcon(R.drawable.ic_offline_online_1);
+        tabs.getTabAt(0).setIcon(R.drawable.ic_learn_offline_online_0);
+        tabs.getTabAt(1).setIcon(R.drawable.ic_learn_offline_online_1);
     }
 
 
@@ -115,5 +119,6 @@ public class LearnActivityMain extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
 
 }

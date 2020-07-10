@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.shared.Languages;
 import com.imperial.word2mouth.teach.offline.create.ArrayAdapterSlideName;
 
 import java.io.File;
@@ -21,6 +22,7 @@ import java.util.List;
 
 public class ArrayAdapterLanguage extends ArrayAdapter<String> {
 
+    private Languages languagesData = new Languages();
     private static ArrayList<String> languages;
     private ViewHolder holder = null;
     private int layout;
@@ -47,7 +49,7 @@ public class ArrayAdapterLanguage extends ArrayAdapter<String> {
             holder = new ViewHolder();
 
             holder.language = convertView.findViewById(R.id.list_item_text);
-
+            holder.languageThumbnail = convertView.findViewById(R.id.list_item_thumbnail);
 
 
             convertView.setTag(holder);
@@ -57,6 +59,7 @@ public class ArrayAdapterLanguage extends ArrayAdapter<String> {
 
         holder.language.setText(languages.get(position));
 
+        holder.languageThumbnail.setImageResource(languagesData.languageIconMap.get(languages.get(position)));
         return convertView;
     }
 
@@ -77,7 +80,5 @@ public class ArrayAdapterLanguage extends ArrayAdapter<String> {
         TextView language;
         ImageButton languageThumbnail;
     }
-
-
 
 }

@@ -7,7 +7,7 @@
         android:layout_centerInParent="true"
         android:layout_width="match_parent"
         android:layout_height="259dp"
-        android:background="@color/colorPrimary">
+        android:background="@color/colorWhite">
         <RelativeLayout
             android:id="@+id/video_selector"
             android:layout_width="match_parent"
@@ -19,7 +19,7 @@
                 android:textSize="30sp"
                 android:textAlignment="center"
                 android:text="@string/video_selector"
-                android:textColor="@color/colorAccent"
+                android:textColor="@color/colorPrimary"
                 android:gravity="center_horizontal">
             </TextView>
 
@@ -35,16 +35,16 @@
                 android:id="@+id/finger_chooser"
                 android:layout_width="104dp"
                 android:layout_height="92dp"
-                android:layout_alignTop="@+id/d_gallery"
-                android:layout_alignRight="@id/d_gallery"
+                android:layout_alignTop="@+id/speak_chooser"
+                android:layout_alignRight="@id/speak_chooser"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginTop="4dp"
                 android:layout_marginRight="25dp"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorWhite"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_add_photo_roll"
-                android:layout_alignEnd="@id/d_gallery"
+                app:srcCompat="@drawable/finger_search"
+                android:layout_alignEnd="@id/speak_chooser"
                 android:contentDescription="@string/todo"
                 android:layout_marginEnd="25dp"
                 android:layout_alignParentEnd="true">
@@ -52,14 +52,14 @@
             </ImageButton>
 
             <ImageButton
-                android:id="@+id/d_gallery"
+                android:id="@+id/speak_chooser"
                 android:layout_width="104dp"
                 android:layout_height="92dp"
                 android:layout_alignParentLeft="true"
                 android:layout_marginLeft="25dp"
-                android:background="@color/colorPrimary"
+                android:background="@color/colorWhite"
                 android:scaleType="fitCenter"
-                app:srcCompat="@drawable/ic_add_photo_gallery"
+                app:srcCompat="@drawable/ic_speak"
                 android:text="@string/gallery"
                 android:textSize="30sp"
                 android:contentDescription="@string/todo"

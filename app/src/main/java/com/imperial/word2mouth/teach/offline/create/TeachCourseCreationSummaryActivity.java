@@ -289,7 +289,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                         case MotionEvent.ACTION_UP:
                             Toast.makeText(TeachCourseCreationSummaryActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
                             recorder.stopRecording();
-                            audioButton.setColorFilter(Color.RED);
+                            audioButton.setColorFilter(Color.BLACK);
                             audioUri = Uri.fromFile(audioFile);
                             audioPreview.setVisibility(View.VISIBLE);
                             break;
@@ -322,7 +322,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
             @Override
             public void onClick(View v) {
                 if (hasCameraPermission) {
-                    ImageDialog imageDialog = new ImageDialog();
+                    ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL);
                     imageDialog.show(getSupportFragmentManager(), "Video Dialog");
                 } else {
                     Toast.makeText(TeachCourseCreationSummaryActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
@@ -343,6 +343,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                     imageUri= data.getData();
                     if (imageUri != null) {
                         FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
+                        thumbnail.setImageURI(imageUri);
                     }
                     break;
 

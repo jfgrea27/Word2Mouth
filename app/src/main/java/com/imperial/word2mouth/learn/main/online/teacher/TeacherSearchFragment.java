@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.learn.main.online;
+package com.imperial.word2mouth.learn.main.online.teacher;
 
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +22,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.online.SearchMainPageCourseFragment;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 
 import java.io.BufferedReader;
@@ -33,23 +34,23 @@ import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link FragmentSearchTeacher#newInstance} factory method to
+ * Use the {@link TeacherSearchFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class FragmentSearchTeacher extends Fragment  {
+public class TeacherSearchFragment extends Fragment  {
 
 
     private ListView listTeachers;
     private SearchView searchTeacher;
 
-    private LearnOnlineMainFragment frag;
+    private SearchMainPageCourseFragment frag;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ArrayList<Teacher> registeredTeachers = new ArrayList<>();
     private ArrayAdapterTeacher adapter;
     private ArrayList<String> followingEmailTeachers = new ArrayList<>();
 
-    public FragmentSearchTeacher() {
+    public TeacherSearchFragment() {
         // Required empty public constructor
     }
 
@@ -59,8 +60,8 @@ public class FragmentSearchTeacher extends Fragment  {
      *
      * @return A new instance of fragment FragmentSearchTeacher.
      */
-    public static FragmentSearchTeacher newInstance() {
-        FragmentSearchTeacher fragment = new FragmentSearchTeacher();
+    public static TeacherSearchFragment newInstance() {
+        TeacherSearchFragment fragment = new TeacherSearchFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -177,10 +178,12 @@ public class FragmentSearchTeacher extends Fragment  {
 
     private void setUpTeacherList() {
         listTeachers.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 if (frag != null) {
                     frag.setTeacherName(registeredTeachers.get(position).getUserName(), registeredTeachers.get(position).getUID());
+                    frag.setTeacherUri(adapter.getThumbnail(registeredTeachers.get(position).getTeacherEmail()));
                     getActivity().getSupportFragmentManager().popBackStack();
                 }
             }
@@ -214,7 +217,7 @@ public class FragmentSearchTeacher extends Fragment  {
         });
     }
 
-    public void setFragment(LearnOnlineMainFragment learnOnlineMainFragment) {
-        this.frag = learnOnlineMainFragment;
+    public void setFragment(SearchMainPageCourseFragment searchMainPageCourseFragment) {
+        this.frag = searchMainPageCourseFragment;
     }
 }

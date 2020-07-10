@@ -28,16 +28,15 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.imperial.word2mouth.shared.Categories;
+import com.imperial.word2mouth.learn.main.online.dialog.DialogCategory;
+import com.imperial.word2mouth.learn.main.online.dialog.DialogLanguage;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
-import com.imperial.word2mouth.shared.Languages;
 import com.imperial.word2mouth.teach.offline.create.TeachCourseCreationSummaryActivity;
-import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
 import com.imperial.word2mouth.teach.offline.upload.UploadProcedure;
 
 import java.io.File;
@@ -324,83 +323,17 @@ public class TeachOfflineMainFragment extends Fragment {
         builder.show();
     }
 
-    private void dialogLanguageSelection() {
+    public void dialogLanguageSelection() {
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-        builder.setTitle("Language Selection");
+        DialogLanguage dialogLanguage = new DialogLanguage(getView(), this);
+        dialogLanguage.buildDialog(DialogLanguage.CREATE);
 
-        final ListView listLanguages = new ListView(getView().getContext());
-
-        listLanguages.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, Languages.languages));
-
-        builder.setView(listLanguages);
-
-        listLanguages.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedLanguage = Languages.get(position);
-            }
-        });
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (selectedLanguage != null) {
-                    dialogCategorySelection();
-                }
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
     }
 
-    private void dialogCategorySelection() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-        builder.setTitle("Category Selection");
+    public void dialogCategorySelection() {
+        DialogCategory dialogCategory = new DialogCategory(getView(), this);
+        dialogCategory.buildDialog(DialogLanguage.CREATE);
 
-        final ListView categoryListView = new ListView(getView().getContext());
-
-        categoryListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_categories, Categories.categories));
-
-        builder.setView(categoryListView);
-
-        categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedCategory = Categories.get(position);
-            }
-        });
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                if (selectedCategory != null) {
-                    courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
-                    coursePath = courseDirectory.getPath();
-                    FileHandler.createDirectoryAndReturnIt(courseDirectory.getPath(), FileHandler.META);
-                    FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, selectedLanguage, FileHandler.LANGUAGE_SELECTION);
-                    FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null,selectedCategory, FileHandler.CATEGORY_SELECTION);
-                    intentToCreateCourseAndStartActivity();
-                }
-
-            }
-        });
-
-        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
-        builder.show();
     }
 
     private void intentToCreateCourseAndStartActivity() {
@@ -456,7 +389,7 @@ public class TeachOfflineMainFragment extends Fragment {
                             uploadProgress.setVisibility(View.VISIBLE);
                             upload.setEnabled(false);
 
-
+                            enableDisableViewGroup((ViewGroup) getView().getParent(), false);
                             uploadProcedure.setListener(new UploadProcedure.UploadListener() {
                                 @Override
                                 public void onDataLoadedInDatabase() {
@@ -483,6 +416,18 @@ public class TeachOfflineMainFragment extends Fragment {
                 }
             }
         });
+    }
+
+
+    public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
+        int childCount = viewGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = viewGroup.getChildAt(i);
+            view.setEnabled(enabled);
+            if (view instanceof ViewGroup) {
+                enableDisableViewGroup((ViewGroup) view, enabled);
+            }
+        }
     }
 
     private void setCourseAuthorIdentification() {
@@ -521,13 +466,41 @@ public class TeachOfflineMainFragment extends Fragment {
     private void uploadStorageSuccessful() {
         completedStorage = true;
         uploadSuccessful();
+
     }
 
     private void uploadSuccessful() {
         if (completedDatabase && completedStorage) {
             uploadProgress.setVisibility(View.GONE);
-//            Toast.makeText(getView().getContext(), "Upload Successful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), "Upload Successful", Toast.LENGTH_SHORT).show();
             upload.setEnabled(true);
+            enableDisableViewGroup((ViewGroup) getView().getParent(), true);
+
         }
+    }
+
+    public void setLanguageSelected(String s) {
+        selectedLanguage = s;
+    }
+
+    public String getLanguageSelected() {
+        return selectedLanguage;
+    }
+
+    public void setSelectedCategory(String s) {
+        selectedCategory = s;
+    }
+
+    public String getCategorySelected() {
+        return selectedCategory;
+    }
+
+    public void createCourse() {
+        courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
+        coursePath = courseDirectory.getPath();
+        FileHandler.createDirectoryAndReturnIt(courseDirectory.getPath(), FileHandler.META);
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, selectedLanguage, FileHandler.LANGUAGE_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null,selectedCategory, FileHandler.CATEGORY_SELECTION);
+        intentToCreateCourseAndStartActivity();
     }
 }

@@ -76,7 +76,7 @@
         app:layout_constraintHorizontal_bias="0.94"
         app:layout_constraintStart_toEndOf="@+id/list_item_thumbnail"
         app:layout_constraintTop_toBottomOf="@+id/textView"
-        app:srcCompat="@drawable/ic_speak" />
+        app:srcCompat="@drawable/ic_microphone" />
 
     <RelativeLayout
         android:id="@+id/audio_play_layer"

@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.learn.main.online;
+package com.imperial.word2mouth.learn.main.online.teacher;
 
 import com.imperial.word2mouth.shared.CourseItem;
 

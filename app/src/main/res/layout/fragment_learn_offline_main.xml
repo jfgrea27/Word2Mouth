@@ -34,6 +34,8 @@
             android:contentDescription="@string/todo"
             android:paddingTop="25dp"
             android:scaleType="fitCenter"
+
+            android:transitionName="Share Button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/share_button"
             app:layout_constraintHorizontal_bias="0.5"
@@ -61,8 +63,8 @@
 
         <ImageButton
             android:id="@+id/share_button"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="75dp"
+            android:layout_height="75dp"
 
             android:background="@android:color/transparent"
             android:scaleType="fitXY"

@@ -1,36 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout
-xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="horizontal"
-android:layout_width="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:descendantFocusability="blocksDescendants"
-android:layout_height="match_parent">
+    android:orientation="horizontal">
+
 
     <ImageButton
         android:id="@+id/list_item_thumbnail"
         android:layout_width="70dp"
         android:layout_height="70dp"
+        android:layout_centerVertical="true"
         android:layout_gravity="start"
         android:background="@android:color/transparent"
-        android:scaleType="fitXY"
-        android:layout_centerVertical="true"
         android:focusable="false"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_picture" />
 
     <TextView
         android:id="@+id/list_item_text"
-        android:layout_width="155dp"
-        android:layout_height="match_parent"
+        android:layout_width="174dp"
+        android:layout_height="69dp"
         android:layout_centerInParent="true"
-        android:layout_marginLeft="70dp"
-        android:layout_marginEnd="26dp"
-        android:layout_marginRight="26dp"
         android:layout_toStartOf="@+id/list_audio_button"
         android:layout_toLeftOf="@+id/list_audio_button"
         android:layout_toRightOf="@id/list_item_thumbnail"
-        android:textSize="20dp" />
+        android:textSize="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/list_item_thumbnail"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/list_audio_button"
@@ -39,8 +43,40 @@ android:layout_height="match_parent">
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:background="@android:color/transparent"
-        android:scaleType="fitXY"
         android:focusable="false"
-        app:srcCompat="@drawable/ic_speak"/>
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_speak" />
 
-</RelativeLayout>
+    <ImageButton
+        android:id="@+id/flag"
+        android:layout_width="34dp"
+        android:layout_height="38dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@android:color/transparent"
+        android:focusable="false"
+        android:scaleType="fitXY"
+        app:layout_constraintEnd_toStartOf="@+id/list_audio_button"
+        app:layout_constraintStart_toEndOf="@+id/list_item_text"
+        app:layout_constraintTop_toTopOf="@+id/list_audio_button"
+        app:srcCompat="@drawable/ic_flag" />
+
+    <ImageButton
+        android:id="@+id/category"
+        android:layout_width="34dp"
+        android:layout_height="38dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@android:color/transparent"
+        android:focusable="false"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="@+id/list_audio_button"
+        app:layout_constraintEnd_toStartOf="@+id/list_audio_button"
+        app:layout_constraintStart_toEndOf="@+id/list_item_text"
+        app:srcCompat="@drawable/ic_category" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -134,6 +135,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
 
         retrieveSavedSlide();
     }
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Permissions
@@ -399,6 +401,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
     }
 
 
+
     // Video
     private void configureVideoView() {
         videoView = findViewById(R.id.videoview);
@@ -407,7 +410,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
             public void onClick(View v) {
 
                 if (hasCameraPermission) {
-                    ImageDialog imageDialog = new ImageDialog();
+                    ImageDialog imageDialog = new ImageDialog(ImageDialog.SLIDE);
                     imageDialog.show(getSupportFragmentManager(), "Video Dialog");
                 } else {
                     Toast.makeText(TeachCourseCreationSlideActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();

@@ -2,8 +2,6 @@ package com.imperial.word2mouth.learn.main.online;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -16,24 +14,21 @@ import androidx.fragment.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageButton;
-import android.widget.ListView;
-import android.widget.SearchView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.Categories;
-import com.imperial.word2mouth.shared.Languages;
-import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
 
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link LearnOnlineMainFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LearnOnlineMainFragment extends Fragment{
+public class LearnOnlineMainFragment extends Fragment {
+
+    public static final int FINGER_QUERY = 10;
+    public static final int SPEAK_QUERY = 11;
+
 
     // Permissions
     private final int INTERNET_PERMISSION = 1;
@@ -43,22 +38,11 @@ public class LearnOnlineMainFragment extends Fragment{
     private boolean hasReadWriteStorageAccess = false;
 
 
-    // UI
-    private ImageButton personButton;
-    private ImageButton languageButton;
-    private ImageButton categoryButton;
-    private TextView teacherText;
-    private TextView languageText;
-    private TextView categoryText;
 
-    private ImageButton teacherDelete;
-    private ImageButton languageDelete;
-    private ImageButton categoryDelete;
 
-    private ImageButton searchButton;
-    private String selectedUserUID;
+    private ImageButton speak;
 
-    // Model
+    private ImageButton finger;
 
     public LearnOnlineMainFragment() {
         // Required empty public constructor
@@ -67,9 +51,10 @@ public class LearnOnlineMainFragment extends Fragment{
     /**
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
-     *
-     * @return A new instance of fragment LearnOnlineMainFragment.
+
+     * @return A new instance of fragment SearchChooserFragment.
      */
+    // TODO: Rename and change types and number of parameters
     public static LearnOnlineMainFragment newInstance() {
         LearnOnlineMainFragment fragment = new LearnOnlineMainFragment();
         Bundle args = new Bundle();
@@ -77,18 +62,24 @@ public class LearnOnlineMainFragment extends Fragment{
         return fragment;
     }
 
-
     @Override
-    public void onCreate(Bundle savedInstanceState) { super.onCreate(savedInstanceState); }
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+        }
+    }
+
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_learn_online_main, container, false);
+        return inflater.inflate(R.layout.fragment_search_chooser, container, false);
     }
 
-    @SuppressLint("ResourceType")
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -98,7 +89,11 @@ public class LearnOnlineMainFragment extends Fragment{
         if (hasNecessaryPermissions()) {
             setUpUI();
             configureOnClicks();
+
+        } else {
+            getActivity().getSupportFragmentManager().popBackStack();
         }
+
     }
 
 
@@ -145,151 +140,34 @@ public class LearnOnlineMainFragment extends Fragment{
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-    // UI
-
-
     private void setUpUI() {
-        personButton = getView().findViewById(R.id.account_button);
-        categoryButton = getView().findViewById(R.id.category_button);
-        languageButton = getView().findViewById(R.id.language_button);
-
-        languageText = getView().findViewById(R.id.label_language);
-        categoryText = getView().findViewById(R.id.label_category);
-        teacherText = getView().findViewById(R.id.label_teacher);
-
-
-        teacherDelete = getView().findViewById(R.id.delete_teacher_query);
-        languageDelete = getView().findViewById(R.id.delete_language_query);
-        categoryDelete = getView().findViewById(R.id.delete_category_query);
-
-        searchButton = getView().findViewById(R.id.search_button);
+        finger = getView().findViewById(R.id.finger_chooser);
+        speak = getView().findViewById(R.id.speak_chooser);
     }
 
-
-
     private void configureOnClicks() {
-        categoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-                builder.setTitle("Category Selection");
-
-                final ListView categoryListView = new ListView(getView().getContext());
-
-                categoryListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_categories, Categories.categories));
-
-                builder.setView(categoryListView);
-
-                categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        categoryText.setText(Categories.get(position));
-                    }
-                });
-
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-            }
-        });
-
-
-        languageButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(getView().getContext());
-                builder.setTitle("Language Selection");
-
-                final ListView languageListView = new ListView(getView().getContext());
-
-                languageListView.setAdapter(new ArrayAdapterLanguage(getView().getContext(), R.layout.list_language, Languages.languages));
-
-                builder.setView(languageListView);
-
-
-                languageListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        languageText.setText(Languages.get(position));
-                    }
-                });
-
-
-
-                // Set up the buttons
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-            }
-        });
-
-        personButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                FragmentManager manager = getActivity().getSupportFragmentManager();
-                FragmentSearchTeacher frag;
-                frag = FragmentSearchTeacher.newInstance();
-                frag.setFragment(LearnOnlineMainFragment.this);
-                manager.beginTransaction().replace( getView().getId(), frag).addToBackStack(null).commit();
-            }
-        });
-
-        searchButton.setOnClickListener(new View.OnClickListener() {
+        finger.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("ResourceType")
             @Override
             public void onClick(View v) {
-                if (!languageText.getText().toString().equals("") || !categoryText.getText().toString().equals("") || !teacherText.getText().toString().equals("")) {
-                    FragmentManager manager = getActivity().getSupportFragmentManager();
-                    CourseOnlineSelectionFragment frag = CourseOnlineSelectionFragment.newInstance(selectedUserUID, languageText.getText().toString(), categoryText.getText().toString());
-                    manager.beginTransaction().replace(R.id.fragment_learn_online_main, frag).addToBackStack(null).commit();
-
-                }
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                SearchMainPageCourseFragment frag;
+                frag = SearchMainPageCourseFragment.newInstance(FINGER_QUERY);
+                manager.beginTransaction().replace( R.id.fragment_chooser_query, frag).addToBackStack(null).commit();
             }
         });
 
-        categoryDelete.setOnClickListener(new View.OnClickListener() {
+        speak.setOnClickListener(new View.OnClickListener() {
+            @SuppressLint("ResourceType")
             @Override
             public void onClick(View v) {
-                categoryText.setText("");
+                FragmentManager manager = getActivity().getSupportFragmentManager();
+                SearchMainPageCourseFragment frag;
+                frag = SearchMainPageCourseFragment.newInstance(SPEAK_QUERY);
+                manager.beginTransaction().replace( R.id.fragment_chooser_query, frag).addToBackStack(null).commit();
             }
         });
-
-        teacherDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                teacherText.setText("");
-                selectedUserUID = "";
-            }
-        });
-
-        languageDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                languageText.setText("");
-            }
-        });
-
     }
 
 
-    public void setTeacherName(String userName, String userUid) {
-        teacherText.setText(userName);
-        this.selectedUserUID = userUid;
-
-    }
 }

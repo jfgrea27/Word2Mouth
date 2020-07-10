@@ -2,8 +2,6 @@ package com.imperial.word2mouth.learn.main.online;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -24,19 +22,15 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.online.teacher.Teacher;
 import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOnline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
@@ -45,9 +39,9 @@ import com.imperial.word2mouth.shared.UnzipFile;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,9 +49,6 @@ import java.util.Map;
  * create an instance of this fragment.
  */
 public class CourseOnlineSelectionFragment extends Fragment {
-
-
-
 
 
     // Permissions
@@ -84,16 +75,28 @@ public class CourseOnlineSelectionFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_PARAM3 = "param3";
+    private static final String ARG_PARAM4 = "param4";
+    private static final String ARG_PARAM5 = "param5";
 
+
+    private int searchType;
+
+
+    // Search Touch
     private String language;
     private String teacherUID;
     private String category;
-    private ArrayList<CourseItem> onlineCourses;
+
+    // Search Speaking
+    private String speakQuery;
+
 
     // Model
+    private ArrayList<CourseItem> onlineCourses;
     private String courseName = null;
     private CourseItem courseItem = null;
     private String courseIdentification = null;
+
 
 
 
@@ -102,6 +105,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
     private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
     private ArrayList<Teacher> teachers = new ArrayList<>();
+
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -115,12 +119,14 @@ public class CourseOnlineSelectionFragment extends Fragment {
      *
      * @return A new instance of fragment CourseOnlineSelection.
      */
-    public static CourseOnlineSelectionFragment newInstance(String teacher, String language, String category) {
+    public static CourseOnlineSelectionFragment newInstance(String teacher, String language, String category, String speakQuery, int searchType) {
         CourseOnlineSelectionFragment fragment = new CourseOnlineSelectionFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, teacher);
         args.putString(ARG_PARAM2, language);
         args.putString(ARG_PARAM3, category);
+        args.putString(ARG_PARAM4, speakQuery);
+        args.putInt(ARG_PARAM5, searchType);
 
 
         fragment.setArguments(args);
@@ -134,6 +140,10 @@ public class CourseOnlineSelectionFragment extends Fragment {
             teacherUID = getArguments().getString(ARG_PARAM1);
             language = getArguments().getString(ARG_PARAM2);
             category = getArguments().getString(ARG_PARAM3);
+
+            speakQuery = getArguments().getString(ARG_PARAM4);
+            searchType = getArguments().getInt(ARG_PARAM5);
+
         }
     }
 
@@ -157,10 +167,12 @@ public class CourseOnlineSelectionFragment extends Fragment {
             configureUI();
             configureProgressBar();
             configureDownloadButton();
-            configureQuerySearch();
+
+            configureRequest();
             configureListCourses();
         }
     }
+
 
     private void configureProgressBar() {
         progress = getView().findViewById(R.id.progress_download);
@@ -172,6 +184,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
     private void configureUI() {
         download = getView().findViewById(R.id.download_button);
         listCourses = getView().findViewById(R.id.list_courses_per_teacher);
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,8 +229,36 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // UI
+    private void configureRequest() {
+        switch (searchType) {
+            case LearnOnlineMainFragment.FINGER_QUERY:
+                configureQuerySearch();
 
+                break;
+            case LearnOnlineMainFragment.SPEAK_QUERY:
+                configureSpeakSearch();
+                break;
+        }
+
+    }
+
+    private void configureSpeakSearch() {
+        Query query = db.collection("content").whereArrayContainsAny("low_CourseName", Collections.singletonList(speakQuery));
+
+        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                onlineCourses = getCourses(queryDocumentSnapshots.getDocuments());
+                updateListView();
+
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getView().getContext(), "Could not retrieve the query", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 
 
     private void configureQuerySearch() {
@@ -257,7 +298,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
             }
         }
 
-        if (teacherUID != "") {
+        if (teacherUID != "" && teacherUID != null) {
             if (category != "" || language != "") {
                 query = query.whereEqualTo("userUID", teacherUID);
             } else {
@@ -302,7 +343,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     selectedCourse = true;
                     courseItem = onlineCourses.get(position);
-                    download.setColorFilter(null);
+                    download.setVisibility(View.VISIBLE);
                 }
             });
         }
@@ -319,6 +360,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
                 @Override
                 public void onClick(View v) {
                     if (selectedCourse) {
+                        enableDisableViewGroup((ViewGroup)getView().getParent(), false);
                         StorageReference courseRef = FirebaseStorage.getInstance().getReference("/content/" + courseItem.getCourseName() +  courseItem.getCourseOnlineIdentification() + "/" + courseItem.getCourseName() +".zip");
                         progress.setVisibility(View.VISIBLE);
                         File f = new File(getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.zip + courseItem.getCourseName() + ".zip");
@@ -343,9 +385,21 @@ public class CourseOnlineSelectionFragment extends Fragment {
             });
         }
 
-        download.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-
+        download.setVisibility(View.INVISIBLE);
     }
+
+
+    public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
+        int childCount = viewGroup.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            View view = viewGroup.getChildAt(i);
+            view.setEnabled(enabled);
+            if (view instanceof ViewGroup) {
+                enableDisableViewGroup((ViewGroup) view, enabled);
+            }
+        }
+    }
+
 
     private void moveZipCourse(String sourcePath, String destPath) {
         UnzipFile.unzipFile(sourcePath, destPath);
@@ -357,6 +411,9 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
         progress.setVisibility(View.INVISIBLE);
         courseItem = null;
+        enableDisableViewGroup((ViewGroup)getView().getParent(), true);
+        download.setVisibility(View.INVISIBLE);
+
     }
 
 }

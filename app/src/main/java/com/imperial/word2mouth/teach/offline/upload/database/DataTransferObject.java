@@ -11,6 +11,9 @@ public class DataTransferObject {
 
 
     private final String courseName;
+    public String low_Language;
+    public String low_Category;
+    public String low_CourseName;
 
     public DataTransferObject(String userUID, String name, String language, String category) {
         this.userUID = userUID;
@@ -54,4 +57,9 @@ public class DataTransferObject {
     }
 
 
+    public void setLowerCapital() {
+        low_Language = language.toLowerCase();
+        low_Category = category.toLowerCase();
+        low_CourseName = courseName.toLowerCase();
+    }
 }

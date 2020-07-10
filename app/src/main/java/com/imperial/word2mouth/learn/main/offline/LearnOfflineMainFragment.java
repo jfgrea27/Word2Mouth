@@ -2,14 +2,17 @@ package com.imperial.word2mouth.learn.main.offline;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -22,6 +25,7 @@ import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
@@ -30,6 +34,8 @@ import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
+import com.imperial.word2mouth.shared.Categories;
+
 
 import java.io.File;
 import java.util.ArrayList;
@@ -214,9 +220,15 @@ public class LearnOfflineMainFragment extends Fragment {
 
         for (File f : courses) {
 
-            String courseName = FileReaderHelper.readTextFromFile(f.getPath()+ "/meta/title.txt");
+            String courseName = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.title);
+            String courseLanguage = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.language);
+            String courseCategory = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.category);
 
             CourseItem courseItem= new CourseItem(courseName, f.getPath());
+
+            courseItem.setCategory(courseCategory);
+            courseItem.setLanguage(courseLanguage);
+
             courseItems.add(courseItem);
         }
         return courseItems;
@@ -245,6 +257,16 @@ public class LearnOfflineMainFragment extends Fragment {
                     Toast.makeText(getView().getContext(), "Need Storage Permission For Share Button", Toast.LENGTH_SHORT).show();
                 }
 
+            }
+        });
+
+
+        share.setOnLongClickListener(new View.OnLongClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain activity = (LearnActivityMain) getActivity();
+                return true;
             }
         });
     }

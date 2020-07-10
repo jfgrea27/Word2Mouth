@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.shared.Categories;
+import com.imperial.word2mouth.shared.Languages;
 
 import java.util.ArrayList;
 
@@ -42,7 +44,7 @@ public class ArrayAdapterCategories extends ArrayAdapter<String> {
             holder = new ViewHolder();
 
             holder.category= convertView.findViewById(R.id.list_item_text);
-
+            holder.categoryThumbnail = convertView.findViewById(R.id.list_item_thumbnail);
 
 
             convertView.setTag(holder);
@@ -51,7 +53,7 @@ public class ArrayAdapterCategories extends ArrayAdapter<String> {
         }
 
         holder.category.setText(categories.get(position));
-
+        holder.categoryThumbnail.setImageResource(Categories.categoryIconMap.get(Categories.get(position)));
         return convertView;
     }
 

@@ -1,11 +1,8 @@
 package com.imperial.word2mouth.shared;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.util.ArrayMap;
 import android.view.LayoutInflater;
@@ -29,12 +26,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.online.Teacher;
-import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Locale;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -46,6 +41,8 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
     private int layout;
 
     private ViewHolder holder = new ViewHolder();
+    private Categories categories = new Categories();
+    private Languages languages =new Languages();
 
     private FirebaseDatabase database;
     private FirebaseStorage storage;
@@ -120,11 +117,21 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
             holder.audio = convertView.findViewById(R.id.list_audio_button);
             holder.thumbnail = convertView.findViewById(R.id.list_item_thumbnail);
             holder.title = convertView.findViewById(R.id.list_item_text);
+            holder.language = convertView.findViewById(R.id.flag);
+            holder.category = convertView.findViewById(R.id.category);
+
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
 
+        if (courseItems.get(position).getCategory() != null) {
+            holder.category.setImageResource(categories.categoryIconMap.get(courseItems.get(position).getCategory()));
+        }
+
+        if (courseItems.get(position).getLanguage() != null) {
+            holder.language.setImageResource(languages.languageIconMap.get(courseItems.get(position).getLanguage()));
+        }
 
         // Retrieve image
 
@@ -144,11 +151,10 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
                 MediaPlayer player;
                 Uri audioUri = soundThumbnails.get(queryCourses.get(position).getCourseOnlineIdentification());
                 if (audioUri != null) {
-                    holder.audio.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                     player = MediaPlayer.create(getContext(), audioUri);
+
                     if (player != null) {
                         player.start();
-
                         player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mp) {
@@ -209,9 +215,56 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
         ImageView thumbnail;
         TextView title;
 
+        ImageView language;
+        ImageView category;
+
         ImageButton audio;
         public String getCourseName() {
             return title.getText().toString();
         }
     }
+
+
+
+    public class Categories {
+
+        public final ArrayList<String> categories = new ArrayList<>(Arrays.asList("Health", "Mechanical", "Agriculture", "Academic"));
+
+
+
+
+        public final HashMap<String, Integer> categoryIconMap= new HashMap<String, Integer>(){{
+            put("Health", R.drawable.category_health);
+            put("Mechanical", R.drawable.category_mechanical);
+            put("Agriculture", R.drawable.category_agriculture);
+            put("Academic", R.drawable.category_academic);
+        }};
+
+        public String get(int position) {
+            return categories.get(position);
+        }
+
+    }
+
+
+
+    public class Languages {
+
+
+        public  ArrayList<String> languages = new ArrayList<>(Arrays.asList("English", "Francais", "Maures", "Swahili"));
+
+
+        public  HashMap<String, Integer> languageIconMap = new HashMap<String, Integer>(){{
+            put("English", R.drawable.flag_uk);
+            put("Francais", R.drawable.flag_france);
+            put("Maures", R.drawable.flag_burkina);
+            put("Swahili", R.drawable.flag_kenya);
+        }};
+
+        public  String get(int position) {
+            return languages.get(position);
+        }
+
+    }
+
 }

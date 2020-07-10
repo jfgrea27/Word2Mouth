@@ -260,7 +260,7 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
             public void onClick(View v) {
                 if (hasCameraPermission) {
                     if (signedIn) {
-                        ImageDialog imageDialog = new ImageDialog();
+                        ImageDialog imageDialog = new ImageDialog(ImageDialog.PROFILE);
                         imageDialog.show(getSupportFragmentManager(), "Profile Picture Selection");
                     } else {
                         Toast.makeText(TeachLoginActivity.this, "Need to be signed in", Toast.LENGTH_SHORT).show();
