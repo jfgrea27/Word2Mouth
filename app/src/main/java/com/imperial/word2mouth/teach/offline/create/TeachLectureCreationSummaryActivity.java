@@ -42,6 +42,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class TeachLectureCreationSummaryActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
 
@@ -103,6 +104,8 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
     private ImageButton create = null;
     private String courseUID;
     private CourseItem courseItem;
+    private String lectureBluetoothUUID;
+    private String courseBluetoothUUID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,17 +146,38 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
     private void getIntents() {
         lectureName = (String) getIntent().getExtras().get(IntentNames.LECTURE_NAME);
         lecturePath = (String) getIntent().getExtras().get(IntentNames.LECTURE_PATH);
-        courseUID = (String) getIntent().getExtras().get(IntentNames.COURSE_UID);
         courseItem = (CourseItem) getIntent().getExtras().get(IntentNames.COURSE);
 
     }
 
     private void fileCreation() {
+
         // File
         metaDirectory = FileHandler.createDirectoryAndReturnIt(lecturePath, FileHandler.META);
         slideDirectory = FileHandler.createDirectoryAndReturnIt(lecturePath, FileHandler.SLIDES);
         // Creating audioFile
         audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, AUDIO );
+
+
+        String lectureBluetooth = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.lectureBluetooth);
+
+        if (lectureBluetooth.isEmpty()) {
+            lectureBluetoothUUID = UUID.randomUUID().toString();
+            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), lectureBluetoothUUID, FileHandler.LECTURE_UUID_BLUETOOTH );
+
+        } else {
+            lectureBluetoothUUID = lectureBluetooth;
+        }
+
+        String courseBluetooth = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.courseBluetooth);
+
+        if (courseBluetooth.isEmpty()) {
+            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(),courseItem.getBluetoothCourse(), FileHandler.BLUETOOTH_UUID_COURSE );
+            courseBluetoothUUID = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.courseBluetooth);
+        }
+
+        // Bluetooth purposes
+
 
         FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), lectureName, TITLE);
     }

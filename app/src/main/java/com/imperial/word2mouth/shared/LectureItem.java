@@ -12,6 +12,8 @@ public class LectureItem {
 
     private String language = null;
     private String category = null;
+    private String bluetoothCourse;
+    private String bluetoothLecture;
 
     private String lectureIdentification = "";
     private String courseIdentification = "";
@@ -98,5 +100,22 @@ public class LectureItem {
     }
     public String getAuthorUID() {
         return authorUID;
+    }
+
+    public void setBluetoothCourse(String bluetoothCourse) {
+        this.bluetoothCourse = bluetoothCourse;
+    }
+
+    public void setBluetoothLecture(String bluetoothLecture) {
+        this.bluetoothLecture = bluetoothLecture;
+    }
+
+    public String getBluetoothCourse() {
+        return bluetoothCourse;
+
+    }
+
+    public String getBluetoothLecture() {
+        return bluetoothLecture;
     }
 }

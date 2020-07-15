@@ -25,13 +25,24 @@
         android:name="android.permission.CHANGE_WIFI_STATE"
         android:required="true" />
 
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/logo"
         android:roundIcon="@mipmap/logo"
+        android:name=".Word2Mouth"
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <receiver
+            android:name=".background.ConnectivityReceiver"
+            android:enabled="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
         <activity android:name=".teach.online.TeachOnlineCourseSummary"></activity>
         <activity android:name=".learn.main.offline.LearnOfflineCourseSummary" />
         <activity android:name=".teach.offline.TeachOfflineCourseSummary" />

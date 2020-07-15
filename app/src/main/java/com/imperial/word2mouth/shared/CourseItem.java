@@ -8,6 +8,8 @@ import java.io.File;
 
 public class CourseItem implements Parcelable {
 
+    private String courseBluetooth;
+
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
@@ -102,6 +104,14 @@ public class CourseItem implements Parcelable {
     }
 
 
+    public String getBluetoothCourse() {
+        return courseBluetooth;
+    }
+
+    public void setCourseBluetooth(String courseBluetooth) {
+        this.courseBluetooth = courseBluetooth;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -109,6 +119,7 @@ public class CourseItem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.courseBluetooth);
         dest.writeString(this.courseName);
         dest.writeSerializable(this.thumbnail);
         dest.writeSerializable(this.audio);
@@ -120,6 +131,7 @@ public class CourseItem implements Parcelable {
     }
 
     protected CourseItem(Parcel in) {
+        this.courseBluetooth = in.readString();
         this.courseName = in.readString();
         this.thumbnail = (File) in.readSerializable();
         this.audio = (File) in.readSerializable();

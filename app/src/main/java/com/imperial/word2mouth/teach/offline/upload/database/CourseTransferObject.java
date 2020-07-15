@@ -15,6 +15,10 @@ public class CourseTransferObject {
     private String courseUID;
 
 
+
+    private String bluetoothCourse;
+
+
     private final String courseName;
     public String low_Language;
     public String low_Category;
@@ -25,10 +29,20 @@ public class CourseTransferObject {
         this.language = courseItem.getLanguage();
         this.category = courseItem.getCategory();
         this.courseName = courseItem.getCourseName();
+        this.bluetoothCourse = courseItem.getBluetoothCourse();
     }
 
     public String getAuthorUID() {
         return authorUID;
+    }
+
+
+    public String getBluetoothCourse() {
+        return bluetoothCourse;
+    }
+
+    public void setBluetoothCourse(String bluetoothCourse) {
+        this.bluetoothCourse = bluetoothCourse;
     }
 
     public static String userNameRetrieving(String email) {

@@ -36,6 +36,7 @@ public class FileHandler {
     public static final int COURSE_LECTURE_DISTINGUISHING = 112;
     public static final int BLUETOOTH_UUID_COURSE = 113;
     public static final int ONLINE_LECTURE_IDENTIFICATION = 114;
+    public static final int LECTURE_UUID_BLUETOOTH = 115;
 
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
@@ -120,12 +121,14 @@ public class FileHandler {
                 outputAddress += DirectoryConstants.type;
                 return copyTextToFile(outputAddress, script);
             case BLUETOOTH_UUID_COURSE:
-                outputAddress += DirectoryConstants.bluetooth;
+                outputAddress += DirectoryConstants.courseBluetooth;
                 return copyTextToFile(outputAddress, script);
             case ONLINE_LECTURE_IDENTIFICATION:
                 outputAddress += DirectoryConstants.lectureIdentifcation;
                 return copyTextToFile(outputAddress, script);
-
+            case LECTURE_UUID_BLUETOOTH:
+                outputAddress += DirectoryConstants.lectureBluetooth;
+                return copyTextToFile(outputAddress, script);
             default:
                 return null;
         }

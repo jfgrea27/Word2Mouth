@@ -65,9 +65,7 @@ public class DownloadProcedure {
                 downloadLecture(courseFile.getPath());
             }
         });
-        // Retrieve Course ID
 
-        // Retrieve Course Languae
     }
 
 
@@ -107,6 +105,7 @@ public class DownloadProcedure {
         FileHandler.createFileForSlideContentAndReturnIt( path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
         FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getCategory(), FileHandler.CATEGORY_SELECTION);
         FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getAuthorID(), FileHandler.AUTHOR);
+        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getBluetoothCourse(), FileHandler.BLUETOOTH_UUID_COURSE);
 
 
         FileHandler.createDirectoryAndReturnIt(path, FileHandler.LECTURES_DIRECTORY);
@@ -153,7 +152,7 @@ public class DownloadProcedure {
                     moveZipCourse(lectureFile.getPath(), localCoursePath + DirectoryConstants.lectures);
 
                     tidyZipFolder();
-                    activity.signalCompleteDownload();
+                    activity.signalCompleteDownload(lectureItem.getLectureIdentification());
                 }
             });
         }

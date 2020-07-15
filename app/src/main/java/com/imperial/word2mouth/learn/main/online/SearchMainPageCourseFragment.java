@@ -461,7 +461,4 @@ public class SearchMainPageCourseFragment extends Fragment {
         personButton.invalidate();
     }
 
-    public void setLanguageSelected(String s) {
-        selectedLanguage = s;
-    }
 }

@@ -28,14 +28,27 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.CourseItem;
+import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.shared.LectureItem;
 import com.imperial.word2mouth.shared.adapters.ArrayAdapterLectureOnline;
 import com.imperial.word2mouth.teach.offline.create.audio.AudioRecorder;
 
+import org.apache.commons.io.IOUtils;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 
@@ -60,6 +73,10 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     // Controller
     private Uri imageUri = null;
 
+
+
+    private ImageButton followCourse;
+    private ImageButton unfollowCourse;
 
     //////// Audio Thumbnail
     // View
@@ -107,6 +124,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     private ImageButton downloadButton;
     private ProgressBar progress;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
+    private boolean isFollowing = false;
     // Controller
 
 
@@ -122,9 +140,14 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
         getIntents();
 
         // Retrieve Files
-
+        checkIfCourseIsFollowed();
         // List of Lectures
         configureListViewLectures();
+
+        configureFollowButton();
+        configureUnfollowButton();
+        configureUI();
+
 
         // Download Button
         configureDownloadButton();
@@ -139,6 +162,83 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
         fetchThumbnailCourse();
 
     }
+
+    private void checkIfCourseIsFollowed() {
+        File f = new File (getExternalFilesDir(null) + DirectoryConstants.followFoder);
+        File[] following = f.listFiles();
+
+        for (File follow : following) {
+            if (follow.getName().equals(course.getCourseOnlineIdentification() + ".txt")) {
+                isFollowing = true;
+                return;
+            }
+        }
+        isFollowing = false;
+        return ;
+    }
+
+    private void configureUI() {
+        if (isFollowing) {
+            unfollowCourse.setVisibility(View.VISIBLE);
+            followCourse.setVisibility(View.INVISIBLE);
+
+        } else {
+            followCourse.setVisibility(View.VISIBLE);
+            unfollowCourse.setVisibility(View.INVISIBLE);
+
+        }
+    }
+
+    private void configureUnfollowButton() {
+        unfollowCourse = findViewById(R.id.unfollowCourse_button);
+
+        if (isFollowing) {
+            unfollowCourse.setVisibility(View.VISIBLE);
+        }
+
+        unfollowCourse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isFollowing) {
+                    File f = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
+                    if (f.exists()) {
+                        f.delete();
+                    }
+                    isFollowing = false;
+                    unfollowCourse.setVisibility(View.INVISIBLE);
+                    followCourse.setVisibility(View.VISIBLE);
+                }
+            }
+        });
+    }
+
+    private void configureFollowButton() {
+        followCourse = findViewById(R.id.followCourse_button);
+        if (isFollowing) {
+            followCourse.setVisibility(View.INVISIBLE);
+        }
+
+        followCourse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!isFollowing) {
+                    File f = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
+                    if (!f.exists()) {
+                        try {
+                            f.createNewFile();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    isFollowing = true;
+                    unfollowCourse.setVisibility(View.VISIBLE);
+                    followCourse.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+    }
+
     private void configureProgressBar() {
         progress = findViewById(R.id.progress_download);
         progress.bringToFront();
@@ -321,12 +421,31 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
         }
     }
 
-    public void signalCompleteDownload() {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void signalCompleteDownload(String lectureIdentification) {
         Toast.makeText(LearnOnlineCourseSummary.this, "Download Completed", Toast.LENGTH_SHORT).show();
+        updateFollowing(lectureIdentification);
+
 
         progress.setVisibility(View.INVISIBLE);
         lecture = null;
         downloadButton.setVisibility(View.INVISIBLE);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void updateFollowing(String lectureIdentification) {
+        // Adding to following if follow
+        if (isFollowing) {
+            File f = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
+
+            try {
+                Files.write(Paths.get(String.valueOf(f)), lectureIdentification.getBytes(), StandardOpenOption.APPEND);
+            }catch (IOException e) {
+                //exception handling left as an exercise for the reader
+            }
+
+        }
+    }
+
 
 }

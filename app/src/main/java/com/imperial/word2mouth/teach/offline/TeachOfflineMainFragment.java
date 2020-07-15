@@ -342,9 +342,9 @@ public class TeachOfflineMainFragment extends Fragment {
             CourseItem newCourse = new CourseItem(courseName, coursePath);
 
             courseItem = new CourseItem(courseName, coursePath);
-
-            newCourse.setLanguage(selectedCategory);
-            newCourse.setCategory(selectedLanguage);
+            newCourse.setCourseBluetooth(FileReaderHelper.readTextFromFile(coursePath + DirectoryConstants.courseBluetooth));
+            newCourse.setLanguage(selectedLanguage);
+            newCourse.setCategory(selectedCategory);
             newCourse.setCourseName(courseName);
             newCourse.setCoursePath(coursePath);
             createIntent.putExtra(IntentNames.COURSE, newCourse);
@@ -391,34 +391,52 @@ public class TeachOfflineMainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if(courseNumber > -1) {
-                    uploadProgress.setVisibility(View.VISIBLE);
 
-                    UploadProcedure uploadProcedure = new UploadProcedure(localCourses.get(courseNumber), getActivity());
+                    if (user != null) {
+                        String authorCourse = FileReaderHelper.readTextFromFile(localCourses.get(courseNumber).getCoursePath() + DirectoryConstants.meta + DirectoryConstants.author);
 
-                    uploadProcedure.setListener(new UploadProcedure.UploadListener() {
-                        @Override
-                        public void onDataLoadedInDatabase() {
-                            uploadDataBaseSuccessful();
+                        if (user.getUid().equals(authorCourse) || authorCourse == "") {
+                            localCourses.get(courseNumber).setAuthorID(authorCourse);
+                            uploadCourse();
+                        } else {
+                            Toast.makeText(getView().getContext(), "Creating teacher must login to upoad content", Toast.LENGTH_SHORT).show();
                         }
 
-                        @Override
-                        public void onDataLoadedInStorage(String courseIdentification, String lectureIdentification) {
+                    } else {
+                        Toast.makeText(getView().getContext(), "Must Login", Toast.LENGTH_SHORT).show();
 
-                        }
-
-                        @Override
-                        public void onDataLoadedInStorageEntireCourse(String courseIdentification, String lectureIdentification, String lecturePath) {
-                            setCourseIdentification(courseIdentification);
-                            setLectureIdentification(lectureIdentification, lecturePath);
-                            uploadStorageSuccessful();
-                        }
-                    });
-
-                    uploadProcedure.uploadCourse(true);
+                    }
                 }
 
             }
         });
+    }
+
+    private void uploadCourse() {
+            uploadProgress.setVisibility(View.VISIBLE);
+            localCourses.get(courseNumber).setCourseBluetooth(FileReaderHelper.readTextFromFile(localCourses.get(courseNumber).getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
+            UploadProcedure uploadProcedure = new UploadProcedure(localCourses.get(courseNumber), getActivity());
+
+            uploadProcedure.setListener(new UploadProcedure.UploadListener() {
+                @Override
+                public void onDataLoadedInDatabase() {
+                    uploadDataBaseSuccessful();
+                }
+
+                @Override
+                public void onDataLoadedInStorage(String courseIdentification, String lectureIdentification) {
+
+                }
+
+                @Override
+                public void onDataLoadedInStorageEntireCourse(String courseIdentification, String lectureIdentification, String lecturePath) {
+                    setCourseIdentification(courseIdentification);
+                    setLectureIdentification(lectureIdentification, lecturePath);
+                    uploadStorageSuccessful();
+                }
+            });
+
+            uploadProcedure.uploadCourse(true);
     }
 
     private void setLectureIdentification(String identification, String lecturePath) {
@@ -488,7 +506,8 @@ public class TeachOfflineMainFragment extends Fragment {
         if (completedDatabase && completedStorage) {
             uploadProgress.setVisibility(View.GONE);
             Toast.makeText(getView().getContext(), "Upload Successful", Toast.LENGTH_SHORT).show();
-            upload.setVisibility(View.INVISIBLE);
+            upload.setVisibility(View.VISIBLE);
+            uploadProgress.setVisibility(View.INVISIBLE);
             enableDisableViewGroup((ViewGroup) getView().getParent(), true);
 
         }

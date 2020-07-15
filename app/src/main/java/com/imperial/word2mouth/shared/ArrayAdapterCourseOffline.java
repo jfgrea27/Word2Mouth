@@ -178,7 +178,7 @@ public class ArrayAdapterCourseOffline extends ArrayAdapter<CourseItem> {
 
 
 
-    public class Languages {
+    public static class Languages {
 
 
         public  ArrayList<String> languages = new ArrayList<>(Arrays.asList("English", "Francais", "Maures", "Swahili"));

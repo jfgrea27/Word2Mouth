@@ -106,6 +106,7 @@ public class TeachLectureCreationSlideActivity extends AppCompatActivity impleme
 
         // Text
         if (hasReadWriteStorageAccess) {
+
             // Forward and Backward Buttons
             configurePreviousButton();
             configureNextButton();

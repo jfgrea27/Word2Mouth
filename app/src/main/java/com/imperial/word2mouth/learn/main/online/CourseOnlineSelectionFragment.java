@@ -101,7 +101,6 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
 
 
-
     // Firebase
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -168,7 +167,6 @@ public class CourseOnlineSelectionFragment extends Fragment {
         if (hasNecessaryPermissions()) {
             configureUI();
             configureSearchButton();
-
             configureRequest();
             configureListCourses();
         }
@@ -256,7 +254,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
     }
 
     private void configureSpeakSearch() {
-        Query query = db.collection("content").whereArrayContainsAny("low_CourseName", Collections.singletonList(speakQuery));
+        Query query = db.collection("content").whereEqualTo("type", "Course").whereEqualTo("low_CourseName", speakQuery + " ");
 
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -309,7 +307,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
         }
 
         if (teacherUID != "" && teacherUID != null) {
-            query = query.whereEqualTo("userUID", teacherUID);
+            query = query.whereEqualTo("authorUID", teacherUID);
         }
 
         return query;
@@ -335,6 +333,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
             courseItem.setAuthorID((String) course.get("authorUID"));
             courseItem.setLanguage((String) course.get("language"));
             courseItem.setCategory((String) course.get("category"));
+            courseItem.setCourseBluetooth((String) course.get("bluetoothCourse"));
             courseItems.add(courseItem);
         }
         return courseItems;

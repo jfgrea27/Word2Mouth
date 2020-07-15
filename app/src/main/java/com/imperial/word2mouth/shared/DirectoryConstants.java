@@ -5,7 +5,7 @@ public class DirectoryConstants {
     public static final String offline = "/offline/";
     public static final String zip = "/zip/";
     public static final String online = "/online/";
-
+    public static final String followFoder = "/following/";
     public static final String slides = "/slides/";
 
 
@@ -28,5 +28,7 @@ public class DirectoryConstants {
     public static String author = "author.txt";
     public static String title = "title.txt";
     public static String type = "/type.txt";
-    public static String bluetooth = "/bluetooth.txt";
+    public static String courseBluetooth = "/courseBluetooth.txt";
+    public static String lectureBluetooth = "/lectureBluetooth.txt";
+
 }

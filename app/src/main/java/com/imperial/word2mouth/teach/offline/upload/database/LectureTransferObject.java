@@ -12,6 +12,26 @@ public class LectureTransferObject {
     public final String lectureName;
     public  String lectureUID = "";
 
+    public String getBluetoothCourse() {
+        return bluetoothCourse;
+    }
+
+    public void setBluetoothCourse(String bluetoothCourse) {
+        this.bluetoothCourse = bluetoothCourse;
+    }
+
+    public String bluetoothCourse;
+
+    public String getBluetoothLecture() {
+        return bluetoothLecture;
+    }
+
+    public void setBluetoothLecture(String bluetoothLecture) {
+        this.bluetoothLecture = bluetoothLecture;
+    }
+
+    public String bluetoothLecture;
+
     private String courseUID = "";
 
 
@@ -23,6 +43,9 @@ public class LectureTransferObject {
         this.lectureName = lectureItem.getLectureName();
         this.lectureUID = lectureItem.getLectureIdentification();
         this.courseUID = lectureItem.getCourseIdentification();
+        bluetoothCourse = lectureItem.getBluetoothCourse();
+        bluetoothLecture = lectureItem.getBluetoothLecture();
+
     }
 
     public String getCourseUID() {

@@ -34,6 +34,7 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.online.LearnOnlineCourseSummary;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
@@ -68,7 +69,7 @@ public class TeachOfflineCourseSummary extends AppCompatActivity implements Imag
 
     private File metaDirectory = null;
     private File lecturesDirectory = null;
-    private UUID courseUID = UUID.randomUUID();
+    private final String courseUID = UUID.randomUUID().toString();
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -204,36 +205,16 @@ public class TeachOfflineCourseSummary extends AppCompatActivity implements Imag
             public void onClick(View v) {
                 if (selectedLecture) {
                     if (user != null) {
-                        if (checkIsAuthorOfCourse()) {
-                            uploadProgress.setVisibility(View.VISIBLE);
-                            setCourseAuthorIdentification();
-                            localLectures.get(lectureNumber).setLanguage(courseItem.getLanguage());
-                            localLectures.get(lectureNumber).setCategory(courseItem.getCategory());
-                            localLectures.get(lectureNumber).setLectureIdentification(getLectureIdentification());
-                            uploadProcedure = new UploadProcedure(courseItem, localLectures.get(lectureNumber), TeachOfflineCourseSummary.this);
 
-                            uploadProcedure.setListener(new UploadProcedure.UploadListener() {
-                                @Override
-                                public void onDataLoadedInDatabase() {
-                                    uploadDataBaseSuccessful();
-                                }
+                        String authorID = FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.author);
 
-                                @Override
-                                public void onDataLoadedInStorage(String courseIdentification, String lectureIdentification) {
-                                    setCourseIdentification(courseIdentification);
-                                    setLectureIdentification(lectureIdentification);
-                                    uploadStorageSuccessful();
-                                }
-
-                                @Override
-                                public void onDataLoadedInStorageEntireCourse(String courseIdentification, String lectureIdentification, String lecturePath) {
-
-                                }
-                            });
-
-                            uploadProcedure.uploadCourse();
-
+                        if (user.getUid().equals(authorID) || authorID == "") {
+                            uploadCourse();
+                        } else {
+                                Toast.makeText(TeachOfflineCourseSummary.this, "Creating teacher must login to upload content", Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        Toast.makeText(TeachOfflineCourseSummary.this, "Must Login", Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -241,6 +222,40 @@ public class TeachOfflineCourseSummary extends AppCompatActivity implements Imag
 
         upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
 
+    }
+
+    private void uploadCourse() {
+        uploadProgress.setVisibility(View.VISIBLE);
+        setCourseAuthorIdentification();
+        localLectures.get(lectureNumber).setLanguage(courseItem.getLanguage());
+        localLectures.get(lectureNumber).setCategory(courseItem.getCategory());
+        localLectures.get(lectureNumber).setLectureIdentification(getLectureIdentification());
+        courseItem.setCourseBluetooth(FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
+        localLectures.get(lectureNumber).setBluetoothCourse(FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
+        localLectures.get(lectureNumber).setBluetoothLecture(FileReaderHelper.readTextFromFile(lectureItem.getLecturePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
+
+        uploadProcedure = new UploadProcedure(courseItem, localLectures.get(lectureNumber), TeachOfflineCourseSummary.this);
+
+        uploadProcedure.setListener(new UploadProcedure.UploadListener() {
+            @Override
+            public void onDataLoadedInDatabase() {
+                uploadDataBaseSuccessful();
+            }
+
+            @Override
+            public void onDataLoadedInStorage(String courseIdentification, String lectureIdentification) {
+                setCourseIdentification(courseIdentification);
+                setLectureIdentification(lectureIdentification);
+                uploadStorageSuccessful();
+            }
+
+            @Override
+            public void onDataLoadedInStorageEntireCourse(String courseIdentification, String lectureIdentification, String lecturePath) {
+
+            }
+        });
+
+        uploadProcedure.uploadCourse();
     }
 
     private String getLectureIdentification() {
@@ -335,8 +350,16 @@ public class TeachOfflineCourseSummary extends AppCompatActivity implements Imag
 
     private void configureFirstCreationCourse() {
         FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), DirectoryConstants.COURSE, FileHandler.COURSE_LECTURE_DISTINGUISHING);
-        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseUID.toString(), FileHandler.BLUETOOTH_UUID_COURSE);
 
+        String courseBluetooth = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.courseBluetooth);
+
+        if (courseBluetooth.isEmpty()) {
+            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseUID.toString(), FileHandler.BLUETOOTH_UUID_COURSE);
+            courseBluetooth = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.courseBluetooth);
+            courseItem.setCourseBluetooth(courseBluetooth);
+        } else {
+            courseItem.setCourseBluetooth(courseBluetooth);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -373,7 +396,6 @@ public class TeachOfflineCourseSummary extends AppCompatActivity implements Imag
 
         createEditIntent.putExtra(IntentNames.LECTURE_NAME, lectureName);
         createEditIntent.putExtra(IntentNames.LECTURE_PATH, coursePath + DirectoryConstants.lectures + lectureName);
-        createEditIntent.putExtra(IntentNames.COURSE_UID, courseUID.toString());
         createEditIntent.putExtra(IntentNames.COURSE, courseItem);
         startActivity(createEditIntent);
     }

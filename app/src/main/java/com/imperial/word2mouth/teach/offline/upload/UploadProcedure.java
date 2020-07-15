@@ -72,15 +72,29 @@ public class UploadProcedure {
 
 
         if (user != null) {
-            courseItem.setAuthorID(user.getUid());
-            lectureItem.setAuthorID(user.getUid());
-
-            addAllNecessaryFilesToCourse();
-            addAllNecessaryFilesToLecture();
-            uploadCourseToDataBase();
-
+            if (courseItem.getAuthorID().isEmpty()) {
+                courseItem.setAuthorID(user.getUid());
+                lectureItem.setAuthorID(user.getUid());
+                addAllNecessaryFilesToCourse();
+                addAllNecessaryFilesToLecture();
+                uploadCourseToDataBase();
+            } else {
+                if (!user.getUid().equals(courseItem.getAuthorID())) {
+                    Toast.makeText(activity.getApplicationContext(), "Cannot upload a different Teacher's content", Toast.LENGTH_SHORT).show();
+                } else {
+                    courseItem.setAuthorID(user.getUid());
+                    lectureItem.setAuthorID(user.getUid());
+                    addAllNecessaryFilesToCourse();
+                    addAllNecessaryFilesToLecture();
+                    uploadCourseToDataBase();
+                }
+            }
+        }  else {
+            Toast.makeText(activity.getApplicationContext(), "Teacher must login to upload content", Toast.LENGTH_SHORT).show();
 
         }
+
+
     }
 
     private void addAllNecessaryFilesToLecture() {
@@ -106,7 +120,7 @@ public class UploadProcedure {
             // Allow Speak Search //TODO change this using Algolia
             dto.setLowerCapital();
 
-            if (courseItem.getCourseOnlineIdentification().isEmpty()) {
+            if (courseItem.getCourseOnlineIdentification() == null || courseItem.getCourseOnlineIdentification().isEmpty()) {
 
                 db.collection("content").add(dto).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
@@ -350,14 +364,25 @@ public class UploadProcedure {
 
 
         if (user != null) {
-            courseItem.setAuthorID(user.getUid());
-
-            addAllNecessaryFilesToCourse();
-
-            uploadCourseToDataBase();
-
+            if (courseItem.getAuthorID().isEmpty()) {
+                courseItem.setAuthorID(user.getUid());
+                addAllNecessaryFilesToCourse();
+                uploadCourseToDataBase();
+            } else {
+                if (!user.getUid().equals(courseItem.getAuthorID())) {
+                    Toast.makeText(activity, "Cannot upload a different Teacher's content", Toast.LENGTH_SHORT).show();
+                } else {
+                    courseItem.setAuthorID(user.getUid());
+                    addAllNecessaryFilesToCourse();
+                    uploadCourseToDataBase();
+                }
+            }
+        } else {
+            Toast.makeText(activity, "Teacher must login to upload content", Toast.LENGTH_SHORT).show();
 
         }
+
+
     }
 
     // Step 1 to 2 are the same
@@ -372,6 +397,7 @@ public class UploadProcedure {
 
         for (File lecture : lectures) {
             lto = new LectureTransferObject(retrieveLectureContent(lecture));
+            lto.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getAbsolutePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
             // never uploaded to online before
             if (lto.lectureUID.isEmpty()) {
                 db.collection("content").add(lto).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
@@ -404,6 +430,7 @@ public class UploadProcedure {
                 dto.setCourseUID(courseItem.getCourseOnlineIdentification());
                 lectureItem.setCourseIdentification(courseItem.getCourseOnlineIdentification());
                 lectureItem.setPath(lecture.getPath());
+                lto.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getAbsolutePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
 
                 FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
 
@@ -539,6 +566,9 @@ public class UploadProcedure {
         lectureItem.setAuthorID(authorUID);
         lectureItem.setCourseIdentification(courseUID);
         lectureItem.setCourseName(courseName);
+        lectureItem.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
+        lectureItem.setBluetoothCourse(FileReaderHelper.readTextFromFile(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
+
 
         return lectureItem;
     }

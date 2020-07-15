@@ -151,7 +151,7 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
     private void setWelcome(boolean b) {
         if (b) {
             String temp = user.getDisplayName();
-            if (temp.equals("")) {
+            if (temp .isEmpty() || temp.equals("")) {
                 temp = user.getEmail();
             }
 
