@@ -25,7 +25,7 @@ public class StorageUploadPreparation {
     public StorageUploadPreparation(String coursePath, Context context) {
         this.coursePath = coursePath;
         this.context = context;
-        zipCoursePath = context.getExternalFilesDir(null).getPath() + DirectoryConstants.zip + "zipCourse.zip";
+        zipCoursePath = context.getExternalFilesDir(null).getPath() + DirectoryConstants.zip + "zipLecture.zip";
 
         File f = new File(zipCoursePath);
 

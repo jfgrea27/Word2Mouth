@@ -12,7 +12,7 @@ import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.online.SearchMainPageCourseFragment;
 import com.imperial.word2mouth.shared.Categories;
 import com.imperial.word2mouth.teach.offline.TeachOfflineMainFragment;
-import com.imperial.word2mouth.teach.offline.create.ArrayAdapterCategories;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterCategories;
 
 public class DialogCategory {
 

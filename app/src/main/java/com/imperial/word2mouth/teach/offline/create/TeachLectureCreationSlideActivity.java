@@ -19,7 +19,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -32,7 +31,7 @@ import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
 
 import java.io.File;
 
-public class TeachCourseCreationSlideActivity extends AppCompatActivity implements ImageDialog.OnInputListener {
+public class TeachLectureCreationSlideActivity extends AppCompatActivity implements ImageDialog.OnInputListener {
 
     // Permissions
     private final int CAMERA_PERMISSION = 1;
@@ -201,12 +200,12 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
             slideCounter--;
             // reach first slide
             if (slideCounter < 0) {
-                Toast.makeText(TeachCourseCreationSlideActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TeachLectureCreationSlideActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
                 slideCounter++;
             }
             // retrieve previously saved file data
             else {
-                Toast.makeText(TeachCourseCreationSlideActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TeachLectureCreationSlideActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
                 retrieveSavedSlide();
                 updateCurrentView();
             }
@@ -224,12 +223,12 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
                 slideCounter++;
                 // creating a new Slide
                 if(totalNumberSlides <= slideCounter) {
-                    Toast.makeText(TeachCourseCreationSlideActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
                     createBlankSlide();
                 }
                 // retrieve previously saved file data
                 else {
-                    Toast.makeText(TeachCourseCreationSlideActivity.this, "Retrieve Next Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Retrieve Next Slide", Toast.LENGTH_SHORT).show();
                     retrieveSavedSlide();
                     updateCurrentView();
                 }
@@ -368,11 +367,11 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
                     switch (event.getAction()){
                         case MotionEvent.ACTION_DOWN:
                             recordAudioButton.setColorFilter(Color.RED);
-                            Toast.makeText(TeachCourseCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TeachLectureCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
                             recorder.startRecording(audioFile.getPath());
                             return true;
                         case MotionEvent.ACTION_UP:
-                            Toast.makeText(TeachCourseCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TeachLectureCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
                             recorder.stopRecording();
                             recordAudioButton.setColorFilter(null);
 
@@ -381,7 +380,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
                             break;
                     }
                 } else {
-                    Toast.makeText(TeachCourseCreationSlideActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
 
                 }
                 return false;
@@ -393,7 +392,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
             @Override
             public void onClick(View v) {
                 if (audio != null) {
-                    audioPlayer = MediaPlayer.create(TeachCourseCreationSlideActivity.this, audio);
+                    audioPlayer = MediaPlayer.create(TeachLectureCreationSlideActivity.this, audio);
                     audioPlayer.start();
                 }
             }
@@ -413,7 +412,7 @@ public class TeachCourseCreationSlideActivity extends AppCompatActivity implemen
                     ImageDialog imageDialog = new ImageDialog(ImageDialog.SLIDE);
                     imageDialog.show(getSupportFragmentManager(), "Video Dialog");
                 } else {
-                    Toast.makeText(TeachCourseCreationSlideActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
 
                 }
 

@@ -66,35 +66,40 @@ public class SlideLearningActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_slide);
 
-        coursePath = (String) getIntent().getExtras().get(IntentNames.COURSE_PATH);
+        coursePath = (String) getIntent().getExtras().get(IntentNames.LECTURE_PATH);
 
         slidesFolder = new File(coursePath + DirectoryConstants.slides);
 
         // meta
-        totalNumberSlides = slidesFolder.listFiles().length;
+        if (!slidesFolder.exists()) {
+            finish();
+        } else {
+            totalNumberSlides = slidesFolder.listFiles().length;
 
 
-        emptyCourseCheck();
+            emptyCourseCheck();
 
-        // Forward and Backward Buttons
-        configurePreviousButton();
-        configureNextButton();
+            // Forward and Backward Buttons
+            configurePreviousButton();
+            configureNextButton();
 
-        // Title
-        configureSideTitleEdit();
+            // Title
+            configureSideTitleEdit();
 
-        // instructions
-        configureInstructionsEdit();
+            // instructions
+            configureInstructionsEdit();
 
-        // Video
-        configureWatchVideoButton();
-        configureVideoView();
+            // Video
+            configureWatchVideoButton();
+            configureVideoView();
 
-        // Audio
-        configureAudio();
+            // Audio
+            configureAudio();
 
-        retrieveSlide();
-        updateCurrentView();
+            retrieveSlide();
+            updateCurrentView();
+        }
+
     }
 
     private void emptyCourseCheck() {

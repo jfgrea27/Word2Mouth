@@ -1,13 +1,18 @@
 package com.imperial.word2mouth.teach.offline.upload.database;
 
-public class DataTransferObject {
+import com.imperial.word2mouth.shared.CourseItem;
+
+public class CourseTransferObject {
 
 
 
-    private final String userUID;
+
+    public final String type = "Course";
+
+    private final String authorUID;
     private final String language;
     private final String category;
-    private String fileKey;
+    private String courseUID;
 
 
     private final String courseName;
@@ -15,15 +20,15 @@ public class DataTransferObject {
     public String low_Category;
     public String low_CourseName;
 
-    public DataTransferObject(String userUID, String name, String language, String category) {
-        this.userUID = userUID;
-        courseName = name;
-        this.language = language;
-        this.category = category;
+    public CourseTransferObject(CourseItem courseItem) {
+        this.authorUID = courseItem.getAuthorID();
+        this.language = courseItem.getLanguage();
+        this.category = courseItem.getCategory();
+        this.courseName = courseItem.getCourseName();
     }
 
-    public String getUserUID() {
-        return userUID;
+    public String getAuthorUID() {
+        return authorUID;
     }
 
     public static String userNameRetrieving(String email) {
@@ -40,12 +45,12 @@ public class DataTransferObject {
         return courseName;
     }
 
-    public String getKey() {
-        return fileKey;
+    public String getCourseUID() {
+        return courseUID;
     }
 
-    public void setFileKey(String fileKey) {
-        this.fileKey = fileKey;
+    public void setCourseUID(String courseUID) {
+        this.courseUID = courseUID;
     }
 
     public String getLanguage() {
@@ -62,4 +67,8 @@ public class DataTransferObject {
         low_Category = category.toLowerCase();
         low_CourseName = courseName.toLowerCase();
     }
+    public String getType() {
+        return type;
+    }
+
 }

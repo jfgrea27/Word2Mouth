@@ -25,10 +25,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.imperial.word2mouth.shared.CourseItem;
+import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.FileHandler;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterSlideName;
 import com.imperial.word2mouth.teach.offline.create.audio.AudioRecorder;
 import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
 
@@ -40,7 +43,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class TeachCourseCreationSummaryActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
+public class TeachLectureCreationSummaryActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
 
     // Permissions
     private final int CAMERA_PERMISSION = 1;
@@ -53,7 +56,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     private boolean hasCameraPermission = false;
 
 
-    // Video Choice
+    // Camera Choice
     public final int CAMERA_ROLL_SELECTION = 0;
     public final int GALLERY_SELECTION = 1;
 
@@ -69,7 +72,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
     // Text Course Name
     private TextView name = null;
-    private String courseName = null;
+    private String lectureName = null;
 
     // List View of Slides
     private ListView slides = null;
@@ -83,7 +86,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     private File metaDirectory = null;
     private File slideDirectory = null;
     private File audioFile = null;
-    private String courseDirectoryPath = null;
+    private String lecturePath = null;
     private int numberOfSlides = 0;
 
     private Uri imageUri = null;
@@ -98,47 +101,61 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
     // Bottom View Button
     private ImageButton delete = null;
     private ImageButton create = null;
+    private String courseUID;
+    private CourseItem courseItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_teach_course_summary_creation);
+        setContentView(R.layout.activity_teach_lecture_summary);
 
         // get Intents
-        courseName = (String) getIntent().getExtras().get("course name");
-        courseDirectoryPath = (String) getIntent().getExtras().get("course directory path");
+        getIntents();
+
 
         // Permissions
         getPermissions();
 
         if (hasReadWriteStorageAccess) {
-            // File
-            metaDirectory = FileHandler.createDirectoryAndReturnIt(courseDirectoryPath, FileHandler.META);
-            slideDirectory = FileHandler.createDirectoryAndReturnIt(courseDirectoryPath, FileHandler.SLIDES);
-            // Creating audioFile
-            audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, AUDIO );
-            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseName, TITLE);
-
+            fileCreation();
 
             // List of Slides
             configureListViewSlides();
+            // Create Button
             configureCreateButton();
+            // Delete
             configureDeleteButton();
+            // Name
+            configureLectureName();
+            // Thumbnail
+            configureLectureThumbnail();
+            // Audio
+            configureAudio();
 
         } else {
             finish();
         }
 
 
-        // Name
-        configureCourseName();
 
-        // Thumbnail
-        configureCourseThumbnail();
+    }
 
-        // Audio
-        configureAudio();
+    private void getIntents() {
+        lectureName = (String) getIntent().getExtras().get(IntentNames.LECTURE_NAME);
+        lecturePath = (String) getIntent().getExtras().get(IntentNames.LECTURE_PATH);
+        courseUID = (String) getIntent().getExtras().get(IntentNames.COURSE_UID);
+        courseItem = (CourseItem) getIntent().getExtras().get(IntentNames.COURSE);
 
+    }
+
+    private void fileCreation() {
+        // File
+        metaDirectory = FileHandler.createDirectoryAndReturnIt(lecturePath, FileHandler.META);
+        slideDirectory = FileHandler.createDirectoryAndReturnIt(lecturePath, FileHandler.SLIDES);
+        // Creating audioFile
+        audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, AUDIO );
+
+        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), lectureName, TITLE);
     }
 
     @Override
@@ -208,12 +225,12 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
     // List of Slides
     private void configureListViewSlides() {
-        slides = findViewById(R.id.slide_list_view);
+        slides = findViewById(R.id.lecture_list_view);
 
         localSlides = retrieveLocalSlides();
 
         if (localSlides.size() > 0) {
-            adapter = new ArrayAdapterSlideName(TeachCourseCreationSummaryActivity.this, R.layout.list_slide, localSlides);
+            adapter = new ArrayAdapterSlideName(TeachLectureCreationSummaryActivity.this, R.layout.list_slide, localSlides);
             slides.setAdapter(adapter);
         }
 
@@ -254,16 +271,21 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
         ArrayList<String> slideNames = new ArrayList<>();
 
-        File[] slidesFiles = slideDirectory.listFiles();
-        numberOfSlides = slidesFiles.length;
+        if (slideDirectory.exists()) {
+            File[] slidesFiles = slideDirectory.listFiles();
+            numberOfSlides = slidesFiles.length;
 
-        for (File f : slidesFiles) {
+            for (File f : slidesFiles) {
 
-            String slideName;
-            slideName = FileReaderHelper.readTextFromFile(f.getPath()+ "/title.txt");
+                String slideName;
+                slideName = FileReaderHelper.readTextFromFile(f.getPath()+ "/title.txt");
 
-            slideNames.add(slideName);
+                slideNames.add(slideName);
+            }
+        } else {
+            slideNames = null;
         }
+
         return slideNames;
 
     }
@@ -282,12 +304,12 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                 if (hasAudioRecordingPermission) {
                     switch (event.getAction()){
                         case MotionEvent.ACTION_DOWN:
-                            Toast.makeText(TeachCourseCreationSummaryActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TeachLectureCreationSummaryActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
                             audioButton.setColorFilter(Color.RED);
                             recorder.startRecording(audioFile.getPath());
                             return true;
                         case MotionEvent.ACTION_UP:
-                            Toast.makeText(TeachCourseCreationSummaryActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TeachLectureCreationSummaryActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
                             recorder.stopRecording();
                             audioButton.setColorFilter(Color.BLACK);
                             audioUri = Uri.fromFile(audioFile);
@@ -295,7 +317,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                             break;
                     }
                 } else {
-                    Toast.makeText(TeachCourseCreationSummaryActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSummaryActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
                 }
                 return false;
             }
@@ -305,17 +327,24 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
             @Override
             public void onClick(View v) {
                 if (audioUri != null) {
-                    player = MediaPlayer.create(TeachCourseCreationSummaryActivity.this, audioUri);
+                    player = MediaPlayer.create(TeachLectureCreationSummaryActivity.this, audioUri);
                     player.start();
                 }
             }
         });
 
+        if (audioFile.length() != 0) {
+            audioUri = Uri.fromFile(audioFile);
+            audioPreview.setVisibility(View.VISIBLE);
+        } else {
+            audioPreview.setVisibility(View.INVISIBLE);
+        }
 
     }
 
+
     // Thumbnail
-    private void configureCourseThumbnail() {
+    private void configureLectureThumbnail() {
         thumbnail = findViewById(R.id.list_item_thumbnail);
 
         thumbnail.setOnClickListener(new View.OnClickListener() {
@@ -325,7 +354,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                     ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL);
                     imageDialog.show(getSupportFragmentManager(), "Video Dialog");
                 } else {
-                    Toast.makeText(TeachCourseCreationSummaryActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSummaryActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -403,7 +432,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
             public void onClick(View v) {
                 saveMetaData();
 
-                Intent createEditIntent = new Intent(TeachCourseCreationSummaryActivity.this, TeachCourseCreationSlideActivity.class);
+                Intent createEditIntent = new Intent(TeachLectureCreationSummaryActivity.this, TeachLectureCreationSlideActivity.class);
                 // starts at 0
                 if (slideNumber > -1) {
                     createEditIntent.putExtra("slide number", slideNumber);
@@ -412,7 +441,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
                 }
                 // meta not included
-                createEditIntent.putExtra(IntentNames.COURSE_PATH, courseDirectoryPath);
+                createEditIntent.putExtra(IntentNames.COURSE_PATH, lecturePath);
                 createEditIntent.putExtra("number of slides", numberOfSlides);
                 startActivity(createEditIntent);
             }
@@ -422,7 +451,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
     // Delete Button
     private void configureDeleteButton() {
-        delete = findViewById(R.id.delete_button);
+        delete = findViewById(R.id.course_summary_button);
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -453,8 +482,6 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
-
-//                        localSlides.set(currentItem, localSlides.get(nextItem));
 
                             currentItem++;
                             nextItem++;
@@ -488,9 +515,9 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
 
     // Model
 
-    private void configureCourseName() {
+    private void configureLectureName() {
         name = findViewById(R.id.list_item_text);
-        name.setText(courseName);
+        name.setText(lectureName);
     }
 
 
@@ -504,7 +531,7 @@ public class TeachCourseCreationSummaryActivity extends AppCompatActivity implem
             FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), audioUri, getContentResolver(), null, AUDIO);
         }
 
-        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, null, courseName, TITLE);
+        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, null, lectureName, TITLE);
 
     }
 

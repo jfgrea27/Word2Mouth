@@ -9,12 +9,10 @@ import android.widget.ListView;
 import androidx.fragment.app.Fragment;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.online.CourseOnlineSelectionFragment;
-import com.imperial.word2mouth.learn.main.online.LearnOnlineMainFragment;
 import com.imperial.word2mouth.learn.main.online.SearchMainPageCourseFragment;
 import com.imperial.word2mouth.shared.Languages;
 import com.imperial.word2mouth.teach.offline.TeachOfflineMainFragment;
-import com.imperial.word2mouth.teach.offline.create.ArrayAdapterLanguage;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterLanguage;
 
 public class DialogLanguage {
 

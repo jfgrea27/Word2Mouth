@@ -28,10 +28,14 @@ public class FileHandler {
     public static final int IMAGE = 104;
     public static final int META = 105;
     public static final int SLIDES = 106;
-    public static final int ONLINE_IDENTIFICATION = 107;
+    public static final int ONLINE_COURSE_IDENTIFICATION = 107;
     public static final int LANGUAGE_SELECTION = 108;
     public static final int CATEGORY_SELECTION = 109;
     public static final int AUTHOR = 110;
+    public static final int LECTURES_DIRECTORY = 111;
+    public static final int COURSE_LECTURE_DISTINGUISHING = 112;
+    public static final int BLUETOOTH_UUID_COURSE = 113;
+    public static final int ONLINE_LECTURE_IDENTIFICATION = 114;
 
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
@@ -62,6 +66,9 @@ public class FileHandler {
                 break;
             case SLIDES:
                 file = new File(coursePath, DirectoryConstants.slides);
+                break;
+            case LECTURES_DIRECTORY:
+                file = new File(coursePath, DirectoryConstants.lectures);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
@@ -97,7 +104,7 @@ public class FileHandler {
             case IMAGE:
                 outputAddress += "/thumbnail.jpg";
                 return copyVideoToFile(outputAddress, originalUriPath, content);
-            case ONLINE_IDENTIFICATION:
+            case ONLINE_COURSE_IDENTIFICATION:
                 outputAddress += DirectoryConstants.identification;
                 return copyTextToFile(outputAddress, script);
             case LANGUAGE_SELECTION:
@@ -109,6 +116,16 @@ public class FileHandler {
             case AUTHOR:
                 outputAddress += DirectoryConstants.author;
                 return copyTextToFile(outputAddress, script);
+            case COURSE_LECTURE_DISTINGUISHING:
+                outputAddress += DirectoryConstants.type;
+                return copyTextToFile(outputAddress, script);
+            case BLUETOOTH_UUID_COURSE:
+                outputAddress += DirectoryConstants.bluetooth;
+                return copyTextToFile(outputAddress, script);
+            case ONLINE_LECTURE_IDENTIFICATION:
+                outputAddress += DirectoryConstants.lectureIdentifcation;
+                return copyTextToFile(outputAddress, script);
+
             default:
                 return null;
         }

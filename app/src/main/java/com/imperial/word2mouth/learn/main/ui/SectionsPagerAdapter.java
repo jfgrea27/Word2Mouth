@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.offline.LearnOfflineMainFragment;
+import com.imperial.word2mouth.learn.main.offline.LearnOfflineCourseFragment;
 import com.imperial.word2mouth.learn.main.online.LearnOnlineMainFragment;
 
 /**
@@ -32,7 +32,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
         Fragment fragment = null;
         switch (position) {
             case 0:
-                fragment = new LearnOfflineMainFragment();
+                fragment = new LearnOfflineCourseFragment();
                 break;
             case 1:
                 fragment = new LearnOnlineMainFragment();

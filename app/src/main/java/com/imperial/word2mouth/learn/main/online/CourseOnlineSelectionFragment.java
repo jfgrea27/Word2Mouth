@@ -1,7 +1,10 @@
 package com.imperial.word2mouth.learn.main.online;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -11,6 +14,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +35,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.online.teacher.Teacher;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOnline;
+import com.imperial.word2mouth.shared.IntentNames;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseItemsOnline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.UnzipFile;
@@ -59,9 +64,8 @@ public class CourseOnlineSelectionFragment extends Fragment {
     private boolean hasReadWriteStorageAccess = false;
 
 
-    private ImageButton download = null;
+    private ImageButton searchCourse = null;
     private ListView listCourses = null;
-    private ProgressBar progress = null;
 
     // List of Courses
 
@@ -93,9 +97,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
     // Model
     private ArrayList<CourseItem> onlineCourses;
-    private String courseName = null;
     private CourseItem courseItem = null;
-    private String courseIdentification = null;
 
 
 
@@ -105,7 +107,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
     private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
     private ArrayList<Teacher> teachers = new ArrayList<>();
-
+    private int courseNumber = -1;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,24 +167,35 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
         if (hasNecessaryPermissions()) {
             configureUI();
-            configureProgressBar();
-            configureDownloadButton();
+            configureSearchButton();
 
             configureRequest();
             configureListCourses();
         }
     }
 
+    private void configureSearchButton() {
+        searchCourse = getView().findViewById(R.id.search_button);
 
-    private void configureProgressBar() {
-        progress = getView().findViewById(R.id.progress_download);
-        progress.bringToFront();
+        searchCourse.setVisibility(View.INVISIBLE);
 
-        progress.setVisibility(View.INVISIBLE);
+        searchCourse.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (courseNumber > -1) {
+                    Intent courseSummaryIntent = new Intent(getActivity(), LearnOnlineCourseSummary.class);
+                    courseSummaryIntent.putExtra(IntentNames.COURSE, onlineCourses.get(courseNumber));
+                    startActivity(courseSummaryIntent);
+                }
+            }
+        });
     }
 
+
+
+
     private void configureUI() {
-        download = getView().findViewById(R.id.download_button);
+        searchCourse = getView().findViewById(R.id.search_button);
         listCourses = getView().findViewById(R.id.list_courses_per_teacher);
 
     }
@@ -246,6 +259,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
         Query query = db.collection("content").whereArrayContainsAny("low_CourseName", Collections.singletonList(speakQuery));
 
         query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 onlineCourses = getCourses(queryDocumentSnapshots.getDocuments());
@@ -284,26 +298,18 @@ public class CourseOnlineSelectionFragment extends Fragment {
     }
 
     private Query prepareQuery() {
-        Query query = null;
+        Query query = db.collection("content").whereEqualTo("type", "Course");
 
         if (language != "") {
-            query = db.collection("content").whereEqualTo("language", language);
+            query = query.whereEqualTo("language", language);
         }
 
         if (category != "") {
-            if (language != "") {
-                query =  query.whereEqualTo("category", category);
-            } else {
-                query = db.collection("content").whereEqualTo("category", category);
-            }
+            query.whereEqualTo("category", category);
         }
 
         if (teacherUID != "" && teacherUID != null) {
-            if (category != "" || language != "") {
-                query = query.whereEqualTo("userUID", teacherUID);
-            } else {
-                query = db.collection("content").whereEqualTo("userUID", teacherUID);
-            }
+            query = query.whereEqualTo("userUID", teacherUID);
         }
 
         return query;
@@ -325,10 +331,10 @@ public class CourseOnlineSelectionFragment extends Fragment {
         ArrayList<CourseItem> courseItems = new ArrayList<>();
 
         for (DocumentSnapshot course: courses) {
-            CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("key"), true);
+            CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("courseUID"), true);
+            courseItem.setAuthorID((String) course.get("authorUID"));
             courseItem.setLanguage((String) course.get("language"));
             courseItem.setCategory((String) course.get("category"));
-
             courseItems.add(courseItem);
         }
         return courseItems;
@@ -341,52 +347,73 @@ public class CourseOnlineSelectionFragment extends Fragment {
             listCourses.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    selectedCourse = true;
-                    courseItem = onlineCourses.get(position);
-                    download.setVisibility(View.VISIBLE);
+
+                    for (int i = 0; i < adapter.getCount(); i++) {
+                        View item = listCourses.getChildAt(i);
+                        if (item != null) {
+                            item.setBackgroundColor(Color.WHITE);
+                        }
+                    }
+
+                    if (selectedCourse) {
+                        view.setBackgroundColor(Color.WHITE);
+                        courseNumber = -1;
+                        searchCourse.setVisibility(View.INVISIBLE);
+
+                    } else {
+                        view.setBackgroundColor(Color.LTGRAY);
+                        courseNumber = position;
+                        searchCourse.setVisibility(View.VISIBLE);
+                    }
                 }
             });
         }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Download Button
+    // Search Course Button
 
 
 
-    private void configureDownloadButton() {
-        if (download != null) {
-            download.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    if (selectedCourse) {
-                        enableDisableViewGroup((ViewGroup)getView().getParent(), false);
-                        StorageReference courseRef = FirebaseStorage.getInstance().getReference("/content/" + courseItem.getCourseName() +  courseItem.getCourseOnlineIdentification() + "/" + courseItem.getCourseName() +".zip");
-                        progress.setVisibility(View.VISIBLE);
-                        File f = new File(getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.zip + courseItem.getCourseName() + ".zip");
-                        if (!f.exists()) {
-                            try {
-                                f.createNewFile();
-
-                                courseRef.getFile(f).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                                        moveZipCourse(f.getPath(), getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.offline);
-                                        signalCompleteDownload();
-                                    }
-                                });
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-
-                    }
-                }
-            });
-        }
-
-        download.setVisibility(View.INVISIBLE);
-    }
+//    private void configureDownloadButton() {
+//        if (searchCourse != null) {
+//            searchCourse.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    if (selectedCourse) {
+//                        Intent courseIntent = new Intent(getView().getContext(), LearnOnlineCourseSummary.class);
+//                        courseIntent.putExtra(IntentNames.COURSE_ITEM_ONLINE, (Parcelable) courseItem);
+//                        courseIntent.putExtra(IntentNames.COURSE_PATH, courseItem.getCoursePath());
+//
+//                        enableDisableViewGroup((ViewGroup)getView().getParent(), false);
+//
+//
+//                        StorageReference courseRef = FirebaseStorage.getInstance().getReference("/content/" + courseItem.getCourseName() +  courseItem.getCourseOnlineIdentification() + "/" + courseItem.getCourseName() +".zip");
+//                        progress.setVisibility(View.VISIBLE);
+//                        File f = new File(getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.zip + courseItem.getCourseName() + ".zip");
+//                        if (!f.exists()) {
+//                            try {
+//                                f.createNewFile();
+//
+//                                courseRef.getFile(f).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+//                                    @Override
+//                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+//                                        moveZipCourse(f.getPath(), getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.offline);
+//                                        signalCompleteDownload();
+//                                    }
+//                                });
+//                            } catch (IOException e) {
+//                                e.printStackTrace();
+//                            }
+//                        }
+//
+//                    }
+//                }
+//            });
+//        }
+//
+//        searchCourse.setVisibility(View.INVISIBLE);
+//    }
 
 
     public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
@@ -406,14 +433,6 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
     }
 
-    private void signalCompleteDownload() {
-        Toast.makeText(getContext(), "Download Completed", Toast.LENGTH_SHORT).show();
 
-        progress.setVisibility(View.INVISIBLE);
-        courseItem = null;
-        enableDisableViewGroup((ViewGroup)getView().getParent(), true);
-        download.setVisibility(View.INVISIBLE);
-
-    }
 
 }

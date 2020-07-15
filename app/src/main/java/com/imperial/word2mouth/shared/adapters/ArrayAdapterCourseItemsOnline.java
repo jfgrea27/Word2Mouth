@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.shared;
+package com.imperial.word2mouth.shared.adapters;
 
 import android.content.Context;
 import android.media.MediaPlayer;
@@ -26,6 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.shared.CourseItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -76,18 +77,13 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
         photoThumbnails.clear();
 
         for (CourseItem course : courseItems) {
-            String courseName = course.getCourseName();
-            String courseIdentification = course.getCourseOnlineIdentification();
-
-            String courseAddress = courseName + courseIdentification;
-
-            StorageReference imageRef = teacherRef.child(courseAddress + "/Photo Thumbnail");
-            StorageReference soundRef = teacherRef.child(courseAddress + "/Sound Thumbnail");
+            StorageReference imageRef = teacherRef.child(course.getCourseOnlineIdentification() + "/Photo Thumbnail");
+            StorageReference soundRef = teacherRef.child(course.getCourseOnlineIdentification()  + "/Sound Thumbnail");
 
             soundRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    soundThumbnails.put(courseIdentification, uri);
+                    soundThumbnails.put(course.getCourseOnlineIdentification(), uri);
                     notifyDataSetInvalidated();
                     notifyDataSetChanged();
                 }
@@ -96,7 +92,7 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
             imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
                 @Override
                 public void onSuccess(Uri uri) {
-                    photoThumbnails.put(courseIdentification, uri);
+                    photoThumbnails.put(course.getCourseOnlineIdentification(), uri);
                     notifyDataSetInvalidated();
                     notifyDataSetChanged();
                 }

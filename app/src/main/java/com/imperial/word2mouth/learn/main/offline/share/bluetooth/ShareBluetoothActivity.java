@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.FileHandler;
+import com.imperial.word2mouth.shared.IntentNames;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -74,7 +75,6 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
 
     static final int STATE_LISTENING = 1;
-    static final int STATE_CONNECTING = 2;
     static final int STATE_CONNECTED = 3;
     static final int STATE_CONNECTION_FAILED = 4;
     static final int STATE_RECEIVING_CONTENT = 5;
@@ -84,12 +84,15 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
 
     // Send
-    private String zipSendFilePath = null;
-    private String coursePath;
+    private String lecturePath;
+    private String lectureName;
     private String courseName;
+    private String coursePath;
+    private String zipSendLectureZipPath = null;
 
     // Receive
-    private String zipReceivePath = null;
+    private String zipReceiveLecturePath = null;
+
     private SendReceive sendReceive;
 
     private boolean selectedCourse = false;
@@ -160,19 +163,21 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         boolean hasCourse = false;
         boolean hasPath = false;
         Intent intent = getIntent();
-        if (intent.hasExtra("courseName")) {
-            courseName = (String) getIntent().getExtras().get("courseName");
+
+
+        if (intent.hasExtra(IntentNames.COURSE_NAME)) {
+            lectureName = (String) getIntent().getExtras().get(IntentNames.COURSE_NAME);
             hasCourse = true;
 
         } else {
-            courseName = null;
+            lectureName = null;
         }
 
-        if (intent.hasExtra("coursePath")) {
-            coursePath = (String) getIntent().getExtras().get("coursePath");
+        if (intent.hasExtra(IntentNames.COURSE_PATH)) {
+            lecturePath = (String) getIntent().getExtras().get(IntentNames.COURSE_PATH);
             hasPath = true;
         } else {
-            coursePath = null;
+            lecturePath = null;
         }
         if (hasCourse && hasPath) {
             selectedCourse = true;
@@ -181,23 +186,25 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
     ///////// RECEIVE
     private void createReceiveZipFile() {
-        zipReceivePath = getApplicationContext().getExternalFilesDir(null).getPath() +
-                DirectoryConstants.zip + "Received.zip";
+        zipReceiveLecturePath = getApplicationContext().getExternalFilesDir(null).getPath() +
+                DirectoryConstants.zip + "ReceivedLecture.zip";
+
     }
 
     /////////// SEND
 
     private void createSendZipFile() {
-        zipSendFilePath = getApplicationContext().getExternalFilesDir(null).getPath() +
-                DirectoryConstants.zip + courseName + ".zip";
 
-        File zipFile = new File(zipSendFilePath);
+        zipSendLectureZipPath = getApplicationContext().getExternalFilesDir(null).getPath() +
+                DirectoryConstants.zip + lectureName + ".zip";
+
+        File zipFile = new File(zipSendLectureZipPath);
         try {
             zipFile.createNewFile();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        FileZip.zipFileAtPath(coursePath, zipSendFilePath);
+        FileZip.zipFileAtPath(lecturePath, zipSendLectureZipPath);
     }
 
 
@@ -352,7 +359,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                     if (progress.getVisibility() == View.VISIBLE) {
                         progress.setVisibility(View.INVISIBLE);
                     }
-                    unzipFile(zipReceivePath);
+                    unzipFile(zipReceiveLecturePath);
                     break;
                 case STATE_RECEIVING_CONTENT:
                     if (progress.getVisibility() == View.INVISIBLE) {
@@ -386,29 +393,6 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         }
     });
 
-    private void sendToZipFolder(byte[] readBuff) {
-        File file = new File(getExternalFilesDir(null) + DirectoryConstants.zip + "received.zip");
-
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        try {
-            FileOutputStream fos = new FileOutputStream(file);
-
-            fos.write(readBuff);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
 
     private void configureDeviceSelection() {
         listDiscoverableDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -432,8 +416,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (selectedCourse) {
-                    byte[] byteCourse = FileZip.convertFileToByteArray(zipSendFilePath);
-                    sendReceive.write(zipSendFilePath);
+                    sendReceive.write(zipSendLectureZipPath);
                 }
             }
         });
@@ -605,7 +588,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                     while ((count = in.read(buffer)) != -1) {
                         counter += count;
                         if (fos == null) {
-                            fos = new FileOutputStream(new File(zipReceivePath));
+                            fos = new FileOutputStream(new File(zipReceiveLecturePath));
 
                         }
 
@@ -633,11 +616,11 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                         Message message1 = Message.obtain();
                         message1.what = STATE_CONTENT_RECEIVED;
                         connectionHandler.sendMessage(message1);
-                        try {
-                            fos.close();
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
+//                        try {
+//                            fos.close();
+//                        } catch (IOException ex) {
+//                            ex.printStackTrace();
+//                        }
 
                     }
                     try {
@@ -645,7 +628,6 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                     } catch (IOException ex) {
                         ex.printStackTrace();
                     }
-                    running = false;
                     break;
 
                 }
@@ -755,7 +737,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
     }
 
     private void removeZipFile(String path) {
-        File zipped = new File(zipReceivePath);
+        File zipped = new File(zipReceiveLecturePath);
         zipped.delete();
 
         File unzipped = new File(path);
@@ -769,7 +751,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
 
     private void tidyZippedFile() {
-        File f = new File(zipSendFilePath);
+        File f = new File(zipSendLectureZipPath);
         if (f.exists()) {
             FileHandler.deleteRecursive(f);
         }
@@ -778,16 +760,16 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
     private void tidyAnyExtaFiles() {
         File f;
-        if (zipSendFilePath != null) {
-            f = new File(zipSendFilePath);
+        if (zipSendLectureZipPath != null) {
+            f = new File(zipSendLectureZipPath);
             if (f.exists()) {
                 FileHandler.deleteRecursive(f);
             }
         }
 
 
-        if (zipReceivePath != null) {
-            f = new File(zipReceivePath);
+        if (zipReceiveLecturePath != null) {
+            f = new File(zipReceiveLecturePath);
 
             if (f.exists()) {
                 FileHandler.deleteRecursive(f);

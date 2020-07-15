@@ -1,6 +1,7 @@
 package com.imperial.word2mouth.teach.online;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -23,31 +24,24 @@ import android.widget.SearchView;
 import android.widget.Toast;
 
 
-import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOnline;
+import com.imperial.word2mouth.shared.IntentNames;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseItemsOnline;
 import com.imperial.word2mouth.shared.CourseItem;
-import com.imperial.word2mouth.teach.TeachActivityMain;
-import com.imperial.word2mouth.teach.offline.upload.database.DataTransferObject;
+import com.imperial.word2mouth.teach.offline.upload.database.CourseTransferObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -66,7 +60,7 @@ public class TeachOnlineMainFragment extends Fragment {
     // Internet Permission
 
     private ListView onlineListCourses;
-    private ImageButton delete;
+    private ImageButton courseSummaryButton;
 
     // Courses
     private ArrayList<CourseItem> onlineCourses = null;
@@ -87,6 +81,9 @@ public class TeachOnlineMainFragment extends Fragment {
     private String courseName = null;
     private CourseItem courseItem = null;
     private String courseIdentification = null;
+
+    private ImageButton delete;
+    private int courseNumber = -1;
 
     public TeachOnlineMainFragment() {
         // Required empty public constructor
@@ -128,13 +125,86 @@ public class TeachOnlineMainFragment extends Fragment {
 
         getPermissions();
 
-        if (hasNecessaryPermissions()) {
-            configureDeleteButton();
-            configureSearchView();
-            configureListCourses();
-        }
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
+        if (user != null) {
+            if (hasNecessaryPermissions()) {
+                configureCourseSummaryButton();
+                configureSearchView();
+                configureDeleteButton();
+                configureListCourses();
+            }
+
+        } else {
+            Toast.makeText(getView().getContext(), "Need to log in", Toast.LENGTH_SHORT).show();
+        }
     }
+
+    private void configureDeleteButton() {
+        delete = getView().findViewById(R.id.delete_course_button);
+
+        delete.setVisibility(View.INVISIBLE);
+
+        delete.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View v) {
+                if (courseNumber > -1) {
+                    // Find the Lectures and Courses Under that course and Delete them
+                    db.collection("content").whereEqualTo("courseUID", onlineCourses.get(courseNumber).getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            deleteEachItem(queryDocumentSnapshots.getDocuments());
+                        }
+                    });
+
+                    adapter.remove(onlineCourses.get(courseNumber));
+                    adapter.notifyDataSetChanged();
+                    courseNumber = -1;
+                }
+            }
+
+            private void deleteEachItem(List<DocumentSnapshot> documents) {
+                for (DocumentSnapshot doc : documents) {
+                    String type = (String) doc.get("type");
+                    StorageReference itemRef;
+                    switch (type) {
+                        case "Lecture":
+                            itemRef = FirebaseStorage.getInstance().getReference().child("content").child((String) doc.get("lectureUID"));
+                            itemRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
+                                @Override
+                                public void onSuccess(ListResult listResult) {
+                                    deleteEverySubItem(listResult.getItems());
+                                }
+                            });
+                            itemRef.delete();
+
+                            db.collection("content").document((String) doc.get("lectureUID")).delete();
+                            break;
+                        case "Course":
+                            itemRef = FirebaseStorage.getInstance().getReference().child("content").child((String) doc.get("courseUID"));
+                            itemRef.listAll().addOnSuccessListener(new OnSuccessListener<ListResult>() {
+                                @Override
+                                public void onSuccess(ListResult listResult) {
+                                    deleteEverySubItem(listResult.getItems());
+                                }
+                            });
+                            itemRef.delete();
+                            db.collection("content").document((String) doc.get("courseUID")).delete();
+
+                            break;
+                    }
+                }
+            }
+
+            private void deleteEverySubItem(List<StorageReference> items) {
+                for (StorageReference item : items) {
+                    item.delete();
+                }
+            }
+        });
+    }
+
 
     private void configureSearchView() {
         searchView = getView().findViewById(R.id.searchView);
@@ -228,23 +298,26 @@ public class TeachOnlineMainFragment extends Fragment {
 
                     selectedCourse = false;
 
-                    if (delete != null) {
-                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    if (courseSummaryButton != null) {
+                        courseSummaryButton.setVisibility(View.INVISIBLE);
                     }
+                    if (delete != null) {
+                        delete.setVisibility(View.INVISIBLE);
+                    }
+                    courseNumber = -1;
 
-                    courseName = null;
 
                 } else {
                     view.setBackgroundColor(Color.LTGRAY);
 
                     selectedCourse = true;
-                    if (delete != null) {
-                        delete.setColorFilter(null);
+                    if (courseSummaryButton != null) {
+                        courseSummaryButton.setVisibility(View.VISIBLE);
                     }
-
-                    courseItem = (CourseItem) parent.getAdapter().getItem(position);
-                    courseName = courseItem.getCourseName();
-                    courseIdentification = courseItem.getCourseOnlineIdentification();
+                    if (delete != null) {
+                        delete.setVisibility(View.VISIBLE);
+                    }
+                    courseNumber = position;
                 }
 
 
@@ -258,7 +331,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
         if (user != null) {
 
-            db.collection("content").whereEqualTo("userUID", user.getUid()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            db.collection("content").whereEqualTo("authorUID", user.getUid()).whereEqualTo("type", "Course").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -296,7 +369,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
 
         for (DocumentSnapshot course: courses) {
-            CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("key"), true);
+            CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("courseUID"), true);
             courseItem.setLanguage((String) course.get("language"));
             courseItem.setCategory((String) course.get("category"));
 
@@ -305,86 +378,22 @@ public class TeachOnlineMainFragment extends Fragment {
         return courseItems;
     }
 
-    private boolean checkDuplicatesSameCourse(ArrayList<CourseItem> courseItems, DocumentSnapshot course) {
-        CourseItem crs = new CourseItem((String) course.get("courseName"), (String) course.get("key"), true);
-        for (CourseItem c : courseItems) {
-            if (c.getCourseOnlineIdentification().equals(crs.getCourseOnlineIdentification())) {
-                return false;
-            }
-        }
-        return true;
-    }
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void configureDeleteButton() {
-        delete = getView().findViewById(R.id.delete_button);
+    private void configureCourseSummaryButton() {
+        courseSummaryButton = getView().findViewById(R.id.course_summary_button);
 
-        delete.setOnClickListener(new View.OnClickListener() {
+        courseSummaryButton.setVisibility(View.INVISIBLE);
+
+        courseSummaryButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onClick(View v) {
                 if (selectedCourse) {
-
-                    if (courseName != null) {
-
-
-                        // Delete from Firebase
-                        db.collection("content").document(courseIdentification).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getView().getContext(), "Successfully deleted from the Database", Toast.LENGTH_SHORT).show();
-
-                            }
-                        });
-
-
-                        StorageReference courseDirectoryRef = FirebaseStorage.getInstance().getReference("/content/" + courseName + courseIdentification);
-                        StorageReference courseStorageRef = courseDirectoryRef.child(courseName + ".zip");
-                        courseStorageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getView().getContext(), "Course zip has been deleted", Toast.LENGTH_SHORT).show();
-
-                            }
-                        });
-
-                        StorageReference coursePhotoThumbnailRef = courseDirectoryRef.child("Photo Thumbnail");
-                        coursePhotoThumbnailRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getView().getContext(), "Course Photo Thumbnail has been deleted", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-                        StorageReference courseAudioThumbnail = courseDirectoryRef.child("Sound Thumbnail");
-                        courseAudioThumbnail.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getView().getContext(), "Course Audio Thumbnail has been deleted", Toast.LENGTH_SHORT).show();
-
-                            }
-                        });
-
-                        courseDirectoryRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                Toast.makeText(getView().getContext(), "Course Directory has been successfully deleted", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-
-
-                        // delete from the list adapter
-                        adapter.remove(courseItem);
-                        adapter.notifyDataSetChanged();
-                        adapter.notifyDataSetInvalidated();
-
-                        selectedCourse = false;
-
-                        courseName = null;
-                        courseIdentification = null;
-                        courseItem = null;
-
-                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    if (courseNumber != -1) {
+                        Intent intentSummaryCourse = new Intent(getActivity(), TeachOnlineCourseSummary.class);
+                        intentSummaryCourse.putExtra(IntentNames.COURSE, onlineCourses.get(courseNumber));
+                        startActivity(intentSummaryCourse);
 
                     }
 
@@ -392,9 +401,6 @@ public class TeachOnlineMainFragment extends Fragment {
             }
         });
 
-        if (delete != null) {
-            delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-        }
     }
 
 

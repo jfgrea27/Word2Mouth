@@ -8,12 +8,12 @@
 
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/course_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:gravity="center"
-        android:text="@string/course_summary"
+        android:text="Lecture Summary"
         android:textAlignment="center"
         android:backgroundTint="@color/colorAccent"
         android:textColor="@android:color/white"
@@ -40,7 +40,7 @@
         app:layout_constraintBottom_toTopOf="@+id/audio_play_layer"
         app:layout_constraintEnd_toEndOf="@+id/course_thumbnail"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/course_name"
         app:layout_constraintVertical_bias="0.512"
         app:srcCompat="@drawable/ic_picture" />
 
@@ -57,7 +57,7 @@
         android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/list_audio_button"
         app:layout_constraintStart_toEndOf="@+id/list_item_thumbnail"
-        app:layout_constraintTop_toBottomOf="@+id/textView" />
+        app:layout_constraintTop_toBottomOf="@+id/course_name" />
 
 
     <ImageButton
@@ -75,7 +75,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.94"
         app:layout_constraintStart_toEndOf="@+id/list_item_thumbnail"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/course_name"
         app:srcCompat="@drawable/ic_microphone" />
 
     <RelativeLayout
@@ -84,7 +84,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/course_thumbnail"
         android:orientation="vertical"
-        app:layout_constraintBottom_toTopOf="@+id/slide_list_view"
+        app:layout_constraintBottom_toTopOf="@+id/lecture_list_view"
         app:layout_constraintTop_toBottomOf="@+id/list_item_text"
         app:layout_constraintVertical_bias="1.0"
         tools:layout_editor_absoluteX="-16dp">
@@ -122,7 +122,7 @@
         android:layout_below="@+id/course_thumbnail"
         android:background="@color/design_default_color_on_primary"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/slide_list_view"
+        app:layout_constraintTop_toBottomOf="@+id/lecture_list_view"
         app:layout_constraintVertical_bias="1.0"
         tools:layout_editor_absoluteX="-16dp">
 
@@ -163,7 +163,7 @@
         </ImageButton>
 
         <ImageButton
-            android:id="@+id/delete_button"
+            android:id="@+id/course_summary_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_alignParentEnd="true"
@@ -184,13 +184,13 @@
     </RelativeLayout>
 
     <ListView
-        android:id="@+id/slide_list_view"
+        android:id="@+id/lecture_list_view"
         android:layout_width="match_parent"
         android:layout_height="316dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/course_name"
         app:layout_constraintVertical_bias="0.421">
 
     </ListView>

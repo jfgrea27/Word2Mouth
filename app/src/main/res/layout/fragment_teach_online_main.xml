@@ -3,23 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".learn.main.offline.LearnOfflineMainFragment">
+    tools:context=".learn.main.offline.LearnOfflineCourseFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
 
-
         <SearchView
             android:id="@+id/searchView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            android:background="@android:color/white"
             android:clickable="true"
             android:focusable="true"
-            android:background="@android:color/white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"></SearchView>
 
         <ListView
@@ -38,7 +37,24 @@
         </ListView>
 
         <ImageButton
-            android:id="@+id/delete_button"
+            android:id="@+id/course_summary_button"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@android:color/transparent"
+            android:contentDescription="@string/todo"
+            android:paddingTop="25dp"
+            android:scaleType="fitCenter"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/delete_course_button"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:srcCompat="@drawable/ic_teach_black">
+
+        </ImageButton>
+
+
+        <ImageButton
+            android:id="@+id/delete_course_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:background="@android:color/transparent"
@@ -47,7 +63,8 @@
             android:scaleType="fitCenter"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/course_summary_button"
             app:srcCompat="@drawable/ic_delete">
 
         </ImageButton>

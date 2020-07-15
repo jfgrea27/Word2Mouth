@@ -11,9 +11,14 @@ public class DirectoryConstants {
 
     // Meta Directory and Files
     public static final String meta = "/meta/";
+    public static String lectures = "/lectures/";
+    public static final String COURSE = "COURSE";
+    public static final String LECTURE = "LECTURE";
+
 
     // Fles
     public static final String identification = "identification.txt";
+    public static final String lectureIdentifcation = "lectureIdentification.txt";
     public static final String photoThumbnail = "thumbnail.jpg";
     public static final String soundThumbnail = "audio.3gp";
     public static String language = "language.txt";
@@ -22,4 +27,6 @@ public class DirectoryConstants {
     public static String following = "following.txt";
     public static String author = "author.txt";
     public static String title = "title.txt";
+    public static String type = "/type.txt";
+    public static String bluetooth = "/bluetooth.txt";
 }

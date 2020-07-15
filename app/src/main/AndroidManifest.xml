@@ -32,13 +32,19 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".teach.online.TeachOnlineCourseSummary"></activity>
+        <activity android:name=".learn.main.offline.LearnOfflineCourseSummary" />
+        <activity android:name=".teach.offline.TeachOfflineCourseSummary" />
         <activity android:name=".teach.online.account.TeachLoginActivity" />
         <activity android:name=".learn.main.offline.share.bluetooth.ShareBluetoothActivity" />
         <activity
-            android:name=".teach.offline.create.TeachCourseCreationSummaryActivity"
+            android:name=".teach.offline.create.TeachLectureCreationSummaryActivity"
             android:screenOrientation="portrait" />
         <activity
             android:name=".learn.main.offline.SlideLearningActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".learn.main.online.LearnOnlineCourseSummary"
             android:screenOrientation="portrait" />
         <activity
             android:name=".teach.TeachActivityMain"
@@ -60,7 +66,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".teach.offline.create.TeachCourseCreationSlideActivity"
+            android:name=".teach.offline.create.TeachLectureCreationSlideActivity"
             android:screenOrientation="portrait" />
     </application>
 

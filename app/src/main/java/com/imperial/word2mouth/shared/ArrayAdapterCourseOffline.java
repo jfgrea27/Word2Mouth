@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class ArrayAdapterCourseItemsOffline extends ArrayAdapter<CourseItem> {
+public class ArrayAdapterCourseOffline extends ArrayAdapter<CourseItem> {
     private static ArrayList<CourseItem> courseItems;
 
     private int layout;
@@ -38,7 +38,7 @@ public class ArrayAdapterCourseItemsOffline extends ArrayAdapter<CourseItem> {
     private Categories categories = new Categories();
     private Languages languages = new Languages();
 
-    public ArrayAdapterCourseItemsOffline(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
+    public ArrayAdapterCourseOffline(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
@@ -90,11 +90,11 @@ public class ArrayAdapterCourseItemsOffline extends ArrayAdapter<CourseItem> {
 
         final Uri finalAudioUri = audioUri;
 
-        if (courseItems.get(position).getCategory() != null) {
+        if (courseItems.get(position).getCategory() != null && courseItems.get(position).getCategory() != "") {
             holder.category.setImageResource(categories.categoryIconMap.get(courseItems.get(position).getCategory()));
         }
 
-        if (courseItems.get(position).getLanguage() != null) {
+        if (courseItems.get(position).getLanguage() != null && courseItems.get(position).getLanguage() != "") {
             holder.language.setImageResource(languages.languageIconMap.get(courseItems.get(position).getLanguage()));
         }
 

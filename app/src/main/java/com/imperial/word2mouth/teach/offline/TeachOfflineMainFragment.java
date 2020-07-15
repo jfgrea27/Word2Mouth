@@ -32,11 +32,13 @@ import com.imperial.word2mouth.learn.main.online.dialog.DialogCategory;
 import com.imperial.word2mouth.learn.main.online.dialog.DialogLanguage;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
+import com.imperial.word2mouth.shared.ArrayAdapterCourseOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
-import com.imperial.word2mouth.teach.offline.create.TeachCourseCreationSummaryActivity;
+import com.imperial.word2mouth.shared.IntentNames;
+import com.imperial.word2mouth.shared.LectureItem;
+import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
 import com.imperial.word2mouth.teach.offline.upload.UploadProcedure;
 
 import java.io.File;
@@ -74,7 +76,7 @@ public class TeachOfflineMainFragment extends Fragment {
 
     // Adapter for the ListView
     private ArrayList<CourseItem> localCourses = null;
-    private ArrayAdapterCourseItemsOffline adapter = null;
+    private ArrayAdapterCourseOffline adapter = null;
 
     // Upload Listener
     private UploadProcedure uploadProcedure;
@@ -89,6 +91,7 @@ public class TeachOfflineMainFragment extends Fragment {
     private boolean completedStorage = false;
 
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private int courseNumber = -1;
 
 
     public TeachOfflineMainFragment() {
@@ -176,7 +179,7 @@ public class TeachOfflineMainFragment extends Fragment {
         localCourses = retrieveLocalCourses();
 
         if (localCourses.size() > 0) {
-            adapter = new ArrayAdapterCourseItemsOffline(getContext(), R.layout.list_item, localCourses);
+            adapter = new ArrayAdapterCourseOffline(getContext(), R.layout.list_item, localCourses);
             courseList.setAdapter(adapter);
             courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @SuppressLint("ResourceAsColor")
@@ -198,7 +201,7 @@ public class TeachOfflineMainFragment extends Fragment {
                         if (upload != null) {
                             upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                         }
-                        courseName = null;
+                        courseNumber = -1;
 
                     } else {
                         selectedCourse = true;
@@ -210,13 +213,7 @@ public class TeachOfflineMainFragment extends Fragment {
                             upload.setColorFilter(null);
                         }
 
-                        courseItem = (CourseItem) parent.getAdapter().getItem(position);
-                        courseName = courseItem.getCourseName();
-                        coursePath = courseItem.getCoursePath();
-                        courseIdentification = courseItem.getCourseOnlineIdentification();
-                        courseAuthorID = courseItem.getAuthorID();
-                        courseLanguage = courseItem.getLanguage();
-                        courseCategory = courseItem.getCategory();
+                        courseNumber = position;
                     }
                 }
             });
@@ -236,6 +233,7 @@ public class TeachOfflineMainFragment extends Fragment {
 
             CourseItem courseItem= new CourseItem(courseName, f.getPath());
             courseItem.setCourseOnlineIdentification(courseIdentification);
+
             courseItems.add(courseItem);
         }
         return courseItems;
@@ -244,26 +242,25 @@ public class TeachOfflineMainFragment extends Fragment {
     // Delete Button
 
     private void configureDeleteButton() {
-        delete = getView().findViewById(R.id.delete_button);
+        delete = getView().findViewById(R.id.course_summary_button);
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedCourse) {
-                    if (courseName != null) {
-                        File courseFile = new File(courseItem.getCoursePath());
-                        if (courseFile.exists()) {
-                            FileHandler.deleteRecursive(courseFile);
-                            adapter.remove(courseItem);
-                            adapter.notifyDataSetChanged();
-                            adapter.notifyDataSetInvalidated();
-                        }
+                if (courseNumber > -1) {
+                    File courseFile = new File(localCourses.get(courseNumber).getCoursePath());
+                    if (courseFile.exists()) {
+                        FileHandler.deleteRecursive(courseFile);
+                        adapter.remove(localCourses.get(courseNumber));
+                        adapter.notifyDataSetChanged();
+                        adapter.notifyDataSetInvalidated();
                     }
+
+                    courseNumber = -1;
+                    upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    create.setColorFilter(null);
+                    delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                 }
-                selectedCourse = false;
-                upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                create.setColorFilter(null);
-                delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
             }
         });
 
@@ -281,8 +278,7 @@ public class TeachOfflineMainFragment extends Fragment {
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (selectedCourse) {
+                if(courseNumber > -1) {
                     intentToCreateCourseAndStartActivity();
                 } else {
                     dialogNameCourse();
@@ -337,10 +333,25 @@ public class TeachOfflineMainFragment extends Fragment {
     }
 
     private void intentToCreateCourseAndStartActivity() {
-        Intent createIntent = new Intent(getView().getContext(), TeachCourseCreationSummaryActivity.class);
-        createIntent.putExtra("course name", courseName);
-        createIntent.putExtra("course directory path", coursePath);
-        startActivity(createIntent);
+        Intent createIntent = new Intent(getView().getContext(), TeachOfflineCourseSummary.class);
+
+        if (courseNumber > -1) {
+            createIntent.putExtra(IntentNames.COURSE, localCourses.get(courseNumber));
+            startActivity(createIntent);
+        } else {
+            CourseItem newCourse = new CourseItem(courseName, coursePath);
+
+            courseItem = new CourseItem(courseName, coursePath);
+
+            newCourse.setLanguage(selectedCategory);
+            newCourse.setCategory(selectedLanguage);
+            newCourse.setCourseName(courseName);
+            newCourse.setCoursePath(coursePath);
+            createIntent.putExtra(IntentNames.COURSE, newCourse);
+            startActivity(createIntent);
+        }
+
+
     }
 
 
@@ -371,7 +382,6 @@ public class TeachOfflineMainFragment extends Fragment {
     private void configureUploadButton() {
         upload = getView().findViewById(R.id.upload_button);
         uploadProgress = getView().findViewById(R.id.progress_upload);
-        uploadProgress.bringToFront();
 
         if (upload!= null) {
             upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
@@ -380,42 +390,47 @@ public class TeachOfflineMainFragment extends Fragment {
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (selectedCourse) {
-                    if (user != null) {
-                        if (checkNewAuthor()) {
-                            setCourseAuthorIdentification();
-                            uploadProcedure = new UploadProcedure(courseName, coursePath, courseLanguage, courseCategory, courseIdentification, getActivity());
+                if(courseNumber > -1) {
+                    uploadProgress.setVisibility(View.VISIBLE);
 
-                            uploadProgress.setVisibility(View.VISIBLE);
-                            upload.setEnabled(false);
+                    UploadProcedure uploadProcedure = new UploadProcedure(localCourses.get(courseNumber), getActivity());
 
-                            enableDisableViewGroup((ViewGroup) getView().getParent(), false);
-                            uploadProcedure.setListener(new UploadProcedure.UploadListener() {
-                                @Override
-                                public void onDataLoadedInDatabase() {
-                                    uploadDataBaseSuccessful();
-                                }
-
-                                @Override
-                                public void onDataLoadedInStorage(String courseIdentification) {
-                                    setCourseIdentification(courseIdentification);
-                                    uploadStorageSuccessful();
-                                }
-                            });
-
-                            completedDatabase = false;
-                            completedStorage = false;
-                            uploadProcedure.uploadCourse();
-                        } else {
-                            Toast.makeText(getView().getContext(), "Cannot upload another teacher's work to your account", Toast.LENGTH_SHORT).show();
+                    uploadProcedure.setListener(new UploadProcedure.UploadListener() {
+                        @Override
+                        public void onDataLoadedInDatabase() {
+                            uploadDataBaseSuccessful();
                         }
 
-                    }
+                        @Override
+                        public void onDataLoadedInStorage(String courseIdentification, String lectureIdentification) {
 
+                        }
 
+                        @Override
+                        public void onDataLoadedInStorageEntireCourse(String courseIdentification, String lectureIdentification, String lecturePath) {
+                            setCourseIdentification(courseIdentification);
+                            setLectureIdentification(lectureIdentification, lecturePath);
+                            uploadStorageSuccessful();
+                        }
+                    });
+
+                    uploadProcedure.uploadCourse(true);
                 }
+
             }
         });
+    }
+
+    private void setLectureIdentification(String identification, String lecturePath) {
+
+        File course = new File(localCourses.get(courseNumber).getCoursePath() + DirectoryConstants.lectures);
+
+        File[] lectures = course.listFiles();
+        for (File lecture : lectures) {
+            if (lecture.getPath().equals(lecturePath)) {
+                FileHandler.createFileForSlideContentAndReturnIt(lecture.getPath() + DirectoryConstants.meta , null, null, identification, FileHandler.ONLINE_LECTURE_IDENTIFICATION);
+            }
+        }
     }
 
 
@@ -452,7 +467,7 @@ public class TeachOfflineMainFragment extends Fragment {
     }
 
     private void updateCourseIdentificationFile() {
-        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_IDENTIFICATION);
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_COURSE_IDENTIFICATION);
     }
 
 
@@ -473,7 +488,7 @@ public class TeachOfflineMainFragment extends Fragment {
         if (completedDatabase && completedStorage) {
             uploadProgress.setVisibility(View.GONE);
             Toast.makeText(getView().getContext(), "Upload Successful", Toast.LENGTH_SHORT).show();
-            upload.setEnabled(true);
+            upload.setVisibility(View.INVISIBLE);
             enableDisableViewGroup((ViewGroup) getView().getParent(), true);
 
         }
@@ -503,4 +518,5 @@ public class TeachOfflineMainFragment extends Fragment {
         FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null,selectedCategory, FileHandler.CATEGORY_SELECTION);
         intentToCreateCourseAndStartActivity();
     }
+
 }

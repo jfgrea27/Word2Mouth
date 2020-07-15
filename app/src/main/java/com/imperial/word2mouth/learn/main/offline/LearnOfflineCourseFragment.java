@@ -2,7 +2,6 @@ package com.imperial.word2mouth.learn.main.offline;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -30,11 +29,10 @@ import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.offline.share.bluetooth.ShareBluetoothActivity;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseItemsOffline;
+import com.imperial.word2mouth.shared.ArrayAdapterCourseOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
-import com.imperial.word2mouth.shared.Categories;
 
 
 import java.io.File;
@@ -42,10 +40,10 @@ import java.util.ArrayList;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link LearnOfflineMainFragment#newInstance} factory method to
+ * Use the {@link LearnOfflineCourseFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LearnOfflineMainFragment extends Fragment {
+public class LearnOfflineCourseFragment extends Fragment {
 
     // Permission
     private int READ_WRITE_PERMISSION = 1;
@@ -59,7 +57,7 @@ public class LearnOfflineMainFragment extends Fragment {
 
     // ListView
     private ListView courseList;
-    private ArrayAdapterCourseItemsOffline adapter;
+    private ArrayAdapterCourseOffline adapter;
 
     // Model
     private ArrayList<CourseItem> localCourses = null;
@@ -68,7 +66,7 @@ public class LearnOfflineMainFragment extends Fragment {
     private boolean selectedCourse = false;
     private String courseName = null;
 
-    public LearnOfflineMainFragment() {
+    public LearnOfflineCourseFragment() {
         // Required empty public constructor
     }
 
@@ -78,8 +76,8 @@ public class LearnOfflineMainFragment extends Fragment {
      *
      * @return A new instance of fragment LearnOfflineMainFragment.
      */
-    public static LearnOfflineMainFragment newInstance() {
-        LearnOfflineMainFragment fragment = new LearnOfflineMainFragment();
+    public static LearnOfflineCourseFragment newInstance() {
+        LearnOfflineCourseFragment fragment = new LearnOfflineCourseFragment();
         Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
@@ -105,8 +103,8 @@ public class LearnOfflineMainFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         configureLearnButton();
-        configureShareButton();
         configureDeleteButton();
+        configureShareButton();
         configureListView();
 
         getPermissions();
@@ -140,7 +138,10 @@ public class LearnOfflineMainFragment extends Fragment {
         if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
             Toast.makeText(getView().getContext(), "Please allow access to Storage", Toast.LENGTH_SHORT).show();
-            requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
+            int permissionCheck = 0;
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+                requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
+            }
         } else{
             hasReadWriteStorageAccess = true;
         }
@@ -161,13 +162,12 @@ public class LearnOfflineMainFragment extends Fragment {
 
     // UI
     private void configureListView() {
-        courseList = (ListView) getView().findViewById(R.id.list_view_course_offline);
-        getPermissions();
+        courseList = getView().findViewById(R.id.list_view_course_offline);
         if (hasReadWriteStorageAccess) {
             localCourses = retrieveLocalCourses();
 
             if (localCourses.size() > 0) {
-                adapter = new ArrayAdapterCourseItemsOffline(getContext(), R.layout.list_item, localCourses);
+                adapter = new ArrayAdapterCourseOffline(getContext(), R.layout.list_item, localCourses);
 
                 courseList.setAdapter(adapter);
                 courseList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -243,16 +243,13 @@ public class LearnOfflineMainFragment extends Fragment {
             public void onClick(View v) {
 
                 if (hasReadWriteStorageAccess) {
-                        if (selectedCourse) {
-                            Intent sharingIntent = new Intent(getView().getContext(), ShareBluetoothActivity.class);
-                            sharingIntent.putExtra("coursePath", getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName);
-                            sharingIntent.putExtra("courseName", courseName);
-                            startActivity(sharingIntent);
-                        }
-                        else {
-                            Intent sharingIntent = new Intent(getView().getContext(), ShareBluetoothActivity.class);
-                            startActivity(sharingIntent);
-                        }
+
+                    Intent sharingIntent = new Intent(getView().getContext(), ShareBluetoothActivity.class);
+                    if (selectedCourse) {
+                        sharingIntent.putExtra(IntentNames.COURSE_PATH, courseItem.getCoursePath());
+                        sharingIntent.putExtra(IntentNames.COURSE_NAME, courseName);
+                    }
+                    startActivity(sharingIntent);
                 } else {
                     Toast.makeText(getView().getContext(), "Need Storage Permission For Share Button", Toast.LENGTH_SHORT).show();
                 }
@@ -281,7 +278,8 @@ public class LearnOfflineMainFragment extends Fragment {
                 if (hasReadWriteStorageAccess) {
                     if (selectedCourse) {
                         if (courseName != null) {
-                            Intent learnIntent = new Intent(getView().getContext(), SlideLearningActivity.class);
+                            Intent learnIntent = new Intent(getView().getContext(), LearnOfflineCourseSummary.class);
+                            learnIntent.putExtra(IntentNames.COURSE_NAME, courseName);
                             learnIntent.putExtra(IntentNames.COURSE_PATH, getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName);
                             startActivity(learnIntent);
                         }
@@ -300,7 +298,7 @@ public class LearnOfflineMainFragment extends Fragment {
 
     // Delete
     private void configureDeleteButton() {
-        delete = getView().findViewById(R.id.delete_button);
+        delete = getView().findViewById(R.id.course_summary_button);
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
