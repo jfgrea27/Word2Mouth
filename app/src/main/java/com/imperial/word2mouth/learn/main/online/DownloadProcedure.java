@@ -1,8 +1,13 @@
 package com.imperial.word2mouth.learn.main.online;
 
+import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
+import android.view.accessibility.AccessibilityRecord;
 import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -10,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.imperial.word2mouth.background.LearnOnlineNewCourseSummary;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
@@ -21,9 +27,14 @@ import java.io.File;
 import java.io.IOException;
 
 public class DownloadProcedure {
+    public static final int NEW = 0;
+    public static final int ELSE = 1;
+
+    private final int type;
+
     private LectureItem lectureItem;
     private final Context context;
-    private final LearnOnlineCourseSummary activity;
+    private final Activity activity;
     private CourseItem courseItem;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -31,11 +42,12 @@ public class DownloadProcedure {
     private Uri courseSoundUri;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
 
-    public DownloadProcedure(CourseItem courseItem, LectureItem lectureItem, Context context, LearnOnlineCourseSummary activity) {
+    public DownloadProcedure(CourseItem courseItem, LectureItem lectureItem, Context context, Activity activity, int type) {
         this.courseItem = courseItem;
         this.lectureItem = lectureItem;
         this.context = context;
         this.activity = activity;
+        this.type = type;
     }
 
     public void download() {
@@ -146,13 +158,25 @@ public class DownloadProcedure {
             StorageReference lectureRef = FirebaseStorage.getInstance().getReference().child("content").child(lectureItem.getLectureIdentification()).child("Lecture.zip");
 
             lectureRef.getFile(lectureFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                     Toast.makeText(context, "Downloading the Lecture", Toast.LENGTH_SHORT).show();
                     moveZipCourse(lectureFile.getPath(), localCoursePath + DirectoryConstants.lectures);
 
                     tidyZipFolder();
-                    activity.signalCompleteDownload(lectureItem.getLectureIdentification());
+
+                    switch (type) {
+                        case NEW:
+                            LearnOnlineNewCourseSummary temp = (LearnOnlineNewCourseSummary) activity;
+                            temp.signalCompleteDownload(lectureItem.getLectureIdentification());
+                            break;
+                        case ELSE:
+                            LearnOnlineCourseSummary temp2 = (LearnOnlineCourseSummary) activity;
+                            temp2.signalCompleteDownload(lectureItem.getLectureIdentification());
+
+                            break;
+                    }
                 }
             });
         }

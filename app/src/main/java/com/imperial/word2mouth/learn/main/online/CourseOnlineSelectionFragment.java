@@ -129,10 +129,10 @@ public class CourseOnlineSelectionFragment extends Fragment {
         args.putString(ARG_PARAM4, speakQuery);
         args.putInt(ARG_PARAM5, searchType);
 
-
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -368,70 +368,5 @@ public class CourseOnlineSelectionFragment extends Fragment {
             });
         }
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Search Course Button
-
-
-
-//    private void configureDownloadButton() {
-//        if (searchCourse != null) {
-//            searchCourse.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    if (selectedCourse) {
-//                        Intent courseIntent = new Intent(getView().getContext(), LearnOnlineCourseSummary.class);
-//                        courseIntent.putExtra(IntentNames.COURSE_ITEM_ONLINE, (Parcelable) courseItem);
-//                        courseIntent.putExtra(IntentNames.COURSE_PATH, courseItem.getCoursePath());
-//
-//                        enableDisableViewGroup((ViewGroup)getView().getParent(), false);
-//
-//
-//                        StorageReference courseRef = FirebaseStorage.getInstance().getReference("/content/" + courseItem.getCourseName() +  courseItem.getCourseOnlineIdentification() + "/" + courseItem.getCourseName() +".zip");
-//                        progress.setVisibility(View.VISIBLE);
-//                        File f = new File(getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.zip + courseItem.getCourseName() + ".zip");
-//                        if (!f.exists()) {
-//                            try {
-//                                f.createNewFile();
-//
-//                                courseRef.getFile(f).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-//                                    @Override
-//                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-//                                        moveZipCourse(f.getPath(), getContext().getExternalFilesDir(null).getPath() + DirectoryConstants.offline);
-//                                        signalCompleteDownload();
-//                                    }
-//                                });
-//                            } catch (IOException e) {
-//                                e.printStackTrace();
-//                            }
-//                        }
-//
-//                    }
-//                }
-//            });
-//        }
-//
-//        searchCourse.setVisibility(View.INVISIBLE);
-//    }
-
-
-    public static void enableDisableViewGroup(ViewGroup viewGroup, boolean enabled) {
-        int childCount = viewGroup.getChildCount();
-        for (int i = 0; i < childCount; i++) {
-            View view = viewGroup.getChildAt(i);
-            view.setEnabled(enabled);
-            if (view instanceof ViewGroup) {
-                enableDisableViewGroup((ViewGroup) view, enabled);
-            }
-        }
-    }
-
-
-    private void moveZipCourse(String sourcePath, String destPath) {
-        UnzipFile.unzipFile(sourcePath, destPath);
-
-    }
-
-
 
 }

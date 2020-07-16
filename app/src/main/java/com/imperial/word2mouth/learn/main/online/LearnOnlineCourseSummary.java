@@ -255,7 +255,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (lectureNumber > -1) {
-                    DownloadProcedure downloadProcedure = new DownloadProcedure(course, lectures.get(lectureNumber), LearnOnlineCourseSummary.this, LearnOnlineCourseSummary.this);
+                    DownloadProcedure downloadProcedure = new DownloadProcedure(course, lectures.get(lectureNumber), LearnOnlineCourseSummary.this, LearnOnlineCourseSummary.this, DownloadProcedure.ELSE);
                     downloadProcedure.download();
                     progress.setVisibility(View.VISIBLE);
                 }
