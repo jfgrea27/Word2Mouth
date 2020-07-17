@@ -1,14 +1,18 @@
 package com.imperial.word2mouth.learn.main;
 
 import android.annotation.SuppressLint;
+import android.app.Notification;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.tabs.TabLayout;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.NotificationCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -127,9 +131,15 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     protected void onResume() {
         super.onResume();
         // register connection status listener
+        Word2Mouth.activityResumed();
         Word2Mouth.getInstance().setConnectivityListener(this);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Word2Mouth.activityPaused();
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -154,6 +164,7 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -164,184 +175,198 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     private Map<String, ArrayList<String>> outdatedLectures = new HashMap<>();
     private Map<String, ArrayList<String>> newLectures = new HashMap<>();
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onNetworkConnectionChanged(boolean isConnected) {
         if(isConnected){
 
-            File followingFolder = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder);
-            File[] followingCourses = followingFolder.listFiles();
+                File followingFolder = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder);
+                File[] followingCourses = followingFolder.listFiles();
 
-            int numberCourseFollowing = followingCourses.length;
-            ArrayList<String> courseUIDs = new ArrayList<>();
+                int numberCourseFollowing = followingCourses.length;
+                ArrayList<String> courseUIDs = new ArrayList<>();
 
-            for (File course : followingCourses) {
-                // check if course exists on the database:
-                int fileNameLength = course.getName().length();
-                String courseUID = course.getName().substring(0, fileNameLength - 4);
-                courseUIDs.add(courseUID);
-            }
+                for (File course : followingCourses) {
+                    // check if course exists on the database:
+                    int fileNameLength = course.getName().length();
+                    String courseUID = course.getName().substring(0, fileNameLength - 4);
+                    courseUIDs.add(courseUID);
+                }
 
-            int counter = 0;
-            for (File course : followingCourses) {
-                String courseUID = courseUIDs.get(counter);
-                counter++;
+                int counter = 0;
+                for (File course : followingCourses) {
+                    String courseUID = courseUIDs.get(counter);
+                    counter++;
 
-                int finalCounter = counter;
+                    int finalCounter = counter;
 
-                db.collection("content").whereEqualTo("type", "Course").whereEqualTo("courseUID", courseUID).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                    @Override
-                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                        if (checkCourseExists(queryDocumentSnapshots.getDocuments())) {
-                            // get all the names of the lectures already downloaded inside the course following file
-                            getLecturesAlreadyDownloaded(course, courseUID);
+                    db.collection("content").whereEqualTo("type", "Course").whereEqualTo("courseUID", courseUID).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                        @Override
+                        public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                            if (checkCourseExists(queryDocumentSnapshots.getDocuments())) {
+                                // get all the names of the lectures already downloaded inside the course following file
+                                getLecturesAlreadyDownloaded(course, courseUID);
 
-                            // Get Courses that are online under that course
+                                // Get Courses that are online under that course
 
-                            if (finalCounter == numberCourseFollowing) {
-                                getOnlineLectures(courseUIDs);
-                            }
-
-
-                        } else {
-                            // No course of that name in the database - can delete
-
-                            int fileNameLength = course.getName().length();
-                            String courseUID = course.getName().substring(0, fileNameLength - 4);
-                            courseUIDs.remove(courseUID);
-
-                            course.delete();
-
-                            if (finalCounter == numberCourseFollowing - 1) {
-                                getOnlineLectures(courseUIDs);
-                            }
-
-                        }
-                    }
-
-
-                    private void getLecturesAlreadyDownloaded(File course, String coureUID) {
-                        ArrayList<String> lectures = new ArrayList<>();
-
-                        try {
-                            Scanner scanner = new Scanner(course);
-                            while (scanner.hasNextLine()) {
-                                lectures.add(scanner.nextLine());
-                            }
-                            scanner.close();
-                        } catch (FileNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        downloadedLectures.put(coureUID, lectures);
-                    }
-
-                    private void getOnlineLectures(ArrayList<String> courseUIDs) {
-                        int numberCourses = courseUIDs.size();
-                        int counter = 0;
-                        for (String courseUID: courseUIDs) {
-
-                            counter++;
-
-                            int finalCounter1 = counter;
-                            db.collection("content").whereEqualTo("type", "Lecture").whereEqualTo("courseUID", courseUID).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                @Override
-                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                    getOnlineLectures(queryDocumentSnapshots.getDocuments(), courseUID);
-
-                                    getOutDatedLectures(courseUID);
-
-                                   getNewLectures(courseUID);
-
-                                   if (finalCounter1 == numberCourses) {
-                                       // Remove outdated from file
-                                       removeLecturesFromFollowingFile();
-
-                                       // Add new Lectures to 'to DOWNLOAD'
-
-                                       @SuppressLint("ResourceType") TabLayout tabhost = (TabLayout) findViewById(R.id.tabs);
-                                       tabhost.getTabAt(1).select();
-
-                                       ArrayList<String> keysToDelete = new ArrayList<>();
-                                       for (Map.Entry<String, ArrayList<String>> entry : newLectures.entrySet()) {
-                                           if (entry.getValue().size() == 0) {
-                                               keysToDelete.add(entry.getKey());
-                                           }
-                                       }
-
-                                       for (String k : keysToDelete) {
-                                           newLectures.remove(k);
-                                       }
-                                       NewLecturesDialog newLecturesDialog = new NewLecturesDialog(newLectures);
-                                       newLecturesDialog.show(getSupportFragmentManager().beginTransaction(), "newLectures");
-
-                                   }
-
+                                if (finalCounter == numberCourseFollowing) {
+                                    getOnlineLectures(courseUIDs);
                                 }
 
-                                private void removeLecturesFromFollowingFile() {
-                                    for (Map.Entry<String, ArrayList<String>> entry : outdatedLectures.entrySet()) {
-                                        String courseUID = entry.getKey();
-                                        ArrayList<String> toDelete = entry.getValue();
 
-                                        File f = new File(LearnActivityMain.this.getExternalFilesDir(null) + DirectoryConstants.followFoder + courseUID + ".txt");
-                                        for (String lectureCode : toDelete) {
-                                            try {
-                                                FileReaderHelper.removesAnyLineMatchingPatternInFile(LearnActivityMain.this, f,lectureCode );
-                                            } catch (IOException e) {
-                                                e.printStackTrace();
+                            } else {
+                                // No course of that name in the database - can delete
+
+                                int fileNameLength = course.getName().length();
+                                String courseUID = course.getName().substring(0, fileNameLength - 4);
+                                courseUIDs.remove(courseUID);
+
+                                course.delete();
+
+                                if (finalCounter == numberCourseFollowing - 1) {
+                                    getOnlineLectures(courseUIDs);
+                                }
+
+                            }
+                        }
+
+
+                        private void getLecturesAlreadyDownloaded(File course, String coureUID) {
+                            ArrayList<String> lectures = new ArrayList<>();
+
+                            try {
+                                Scanner scanner = new Scanner(course);
+                                while (scanner.hasNextLine()) {
+                                    lectures.add(scanner.nextLine());
+                                }
+                                scanner.close();
+                            } catch (FileNotFoundException e) {
+                                e.printStackTrace();
+                            }
+                            downloadedLectures.put(coureUID, lectures);
+                        }
+
+                        private void getOnlineLectures(ArrayList<String> courseUIDs) {
+                            int numberCourses = courseUIDs.size();
+                            int counter = 0;
+                            for (String courseUID: courseUIDs) {
+
+                                counter++;
+
+                                int finalCounter1 = counter;
+                                db.collection("content").whereEqualTo("type", "Lecture").whereEqualTo("courseUID", courseUID).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        getOnlineLectures(queryDocumentSnapshots.getDocuments(), courseUID);
+
+                                        getOutDatedLectures(courseUID);
+
+                                        getNewLectures(courseUID);
+
+                                        if (finalCounter1 == numberCourses) {
+                                            // Remove outdated from file
+                                            removeLecturesFromFollowingFile();
+
+                                            // Add new Lectures to 'to DOWNLOAD'
+
+                                            @SuppressLint("ResourceType") TabLayout tabhost = (TabLayout) findViewById(R.id.tabs);
+                                            tabhost.getTabAt(1).select();
+
+                                            ArrayList<String> keysToDelete = new ArrayList<>();
+                                            for (Map.Entry<String, ArrayList<String>> entry : newLectures.entrySet()) {
+                                                if (entry.getValue().size() == 0) {
+                                                    keysToDelete.add(entry.getKey());
+                                                }
+                                            }
+
+                                            for (String k : keysToDelete) {
+                                                newLectures.remove(k);
+                                            }
+
+                                            if (Word2Mouth.isActivityVisible()) {
+                                                NewLecturesDialog newLecturesDialog = new NewLecturesDialog(newLectures);
+                                                newLecturesDialog.show(getSupportFragmentManager().beginTransaction(), "newLectures");
+                                            } else {
+                                                @SuppressLint("WrongConstant") Notification.Builder builder = new Notification.Builder(LearnActivityMain.this, "Channel").setSmallIcon(R.drawable.category_academic)
+                                                        .setContentTitle("Test")
+                                                        .setContentText("Test2")
+                                                        .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+                                            }
+
+
+                                        }
+
+                                    }
+
+                                    private void removeLecturesFromFollowingFile() {
+                                        for (Map.Entry<String, ArrayList<String>> entry : outdatedLectures.entrySet()) {
+                                            String courseUID = entry.getKey();
+                                            ArrayList<String> toDelete = entry.getValue();
+
+                                            File f = new File(LearnActivityMain.this.getExternalFilesDir(null) + DirectoryConstants.followFoder + courseUID + ".txt");
+                                            for (String lectureCode : toDelete) {
+                                                try {
+                                                    FileReaderHelper.removesAnyLineMatchingPatternInFile(LearnActivityMain.this, f,lectureCode );
+                                                } catch (IOException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+
+                                    private void getNewLectures(String courseUID) {
+
+                                        ArrayList<String> temp = new ArrayList<>();
+
+                                        for (String lec : onlineLectures.get(courseUID)) {
+                                            if (!downloadedLectures.get(courseUID).contains(lec)) {
+                                                temp.add(lec);
                                             }
                                         }
-
+                                        newLectures.put(courseUID, temp);
                                     }
 
-                                }
+                                    private void getOutDatedLectures(String courseUID) {
+                                        ArrayList<String> temp = new ArrayList<>();
 
-                                private void getNewLectures(String courseUID) {
-
-                                    ArrayList<String> temp = new ArrayList<>();
-
-                                    for (String lec : onlineLectures.get(courseUID)) {
-                                        if (!downloadedLectures.get(courseUID).contains(lec)) {
-                                            temp.add(lec);
+                                        for (String lec : downloadedLectures.get(courseUID)) {
+                                            if (!onlineLectures.get(courseUID).contains(lec)) {
+                                                temp.add(lec);
+                                            }
                                         }
+                                        outdatedLectures.put(courseUID, temp);
                                     }
-                                    newLectures.put(courseUID, temp);
-                                }
 
-                                private void getOutDatedLectures(String courseUID) {
-                                    ArrayList<String> temp = new ArrayList<>();
+                                    private void getOnlineLectures(List<DocumentSnapshot> documents, String courseUID) {
+                                        ArrayList<String> lectures = new ArrayList<>();
 
-                                    for (String lec : downloadedLectures.get(courseUID)) {
-                                        if (!onlineLectures.get(courseUID).contains(lec)) {
-                                            temp.add(lec);
+                                        for (DocumentSnapshot doc : documents) {
+                                            lectures.add((String) doc.get("lectureUID"));
                                         }
+                                        onlineLectures.put(courseUID, lectures);
                                     }
-                                    outdatedLectures.put(courseUID, temp);
-                                }
+                                });
 
-                                private void getOnlineLectures(List<DocumentSnapshot> documents, String courseUID) {
-                                    ArrayList<String> lectures = new ArrayList<>();
+                            }
 
-                                    for (DocumentSnapshot doc : documents) {
-                                        lectures.add((String) doc.get("lectureUID"));
-                                    }
-                                    onlineLectures.put(courseUID, lectures);
-                                }
-                            });
 
                         }
 
-
-                    }
-
-                    private boolean checkCourseExists(List<DocumentSnapshot> documents) {
-                        if (documents.isEmpty()) {
-                            return false;
+                        private boolean checkCourseExists(List<DocumentSnapshot> documents) {
+                            if (documents.isEmpty()) {
+                                return false;
+                            }
+                            return true;
                         }
-                        return true;
-                    }
-                });
+                    });
+
 
             }
+
+
         } else {
 
             outdatedLectures.clear();

@@ -19,7 +19,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -28,11 +27,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.online.DownloadProcedure;
-import com.imperial.word2mouth.learn.main.online.LearnOnlineCourseSummary;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.LectureItem;
-import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseItemsOnline;
 import com.imperial.word2mouth.shared.adapters.ArrayAdapterLectureOnline;
 
 import java.io.File;
@@ -41,9 +38,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicMarkableReference;
 
 public class LearnOnlineNewCourseSummary extends AppCompatActivity {
 

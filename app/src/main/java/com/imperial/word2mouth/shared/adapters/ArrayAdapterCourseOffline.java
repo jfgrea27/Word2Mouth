@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.shared;
+package com.imperial.word2mouth.shared.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -18,9 +18,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.background.LearnOnlineNewLecturesSelectionFragment;
+import com.imperial.word2mouth.background.ListNewLectures;
+import com.imperial.word2mouth.learn.main.offline.LearnOfflineCourseFragment;
 import com.imperial.word2mouth.shared.Categories;
+import com.imperial.word2mouth.shared.CourseItem;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -28,6 +33,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class ArrayAdapterCourseOffline extends ArrayAdapter<CourseItem> {
+
+    public static final int OFFLINE_MAIN = 0;
+
     private static ArrayList<CourseItem> courseItems;
 
     private int layout;

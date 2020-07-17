@@ -34,7 +34,6 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.online.LearnOnlineCourseSummary;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
@@ -54,7 +53,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.UUID;
 
-public class TeachOfflineCourseSummary extends AppCompatActivity implements ImageDialog.OnInputListener {
+public class    TeachOfflineCourseSummary extends AppCompatActivity implements ImageDialog.OnInputListener {
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Permissions
     private final int CAMERA_PERMISSION = 1;
@@ -405,7 +404,7 @@ public class TeachOfflineCourseSummary extends AppCompatActivity implements Imag
         AlertDialog.Builder builder = new AlertDialog.Builder(TeachOfflineCourseSummary.this);
         builder.setTitle("Lecture Name");
         final EditText input = new EditText(TeachOfflineCourseSummary.this);
-        input.setHint("Type Course Name");
+        input.setHint("Type Lecture Name");
         input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
         builder.setView(input);
 
@@ -415,7 +414,7 @@ public class TeachOfflineCourseSummary extends AppCompatActivity implements Imag
             public void onClick(DialogInterface dialog, int which) {
                 lectureName = input.getText().toString();
                 if (lectureName.isEmpty()) {
-                    lectureName = "Untitled Course";
+                    lectureName = "Untitled Lecture";
                 }
                 intentCreateLecture();
             }
@@ -436,13 +435,14 @@ public class TeachOfflineCourseSummary extends AppCompatActivity implements Imag
         coursePath = courseItem.getCoursePath();
         courseName = courseItem.getCourseName();
 
+
         lectureItem = new LectureItem(courseName, lectureName);
 
     }
 
     // Delete Button
     private void configureDeleteButton() {
-        delete = findViewById(R.id.course_summary_button);
+        delete = findViewById(R.id.delete_button);
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override

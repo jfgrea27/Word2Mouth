@@ -1,9 +1,6 @@
 package com.imperial.word2mouth.background;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +13,6 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.online.SearchMainPageCourseFragment;
 
 import java.util.ArrayList;
 import java.util.Map;

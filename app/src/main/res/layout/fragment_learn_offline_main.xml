@@ -16,7 +16,7 @@
             android:layout_width="match_parent"
             android:layout_height="350dp"
             android:focusable="false"
-            app:layout_constraintBottom_toTopOf="@+id/course_summary_button"
+            app:layout_constraintBottom_toTopOf="@+id/delete_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -40,13 +40,13 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/share_button"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/course_summary_button"
+            app:layout_constraintStart_toEndOf="@+id/delete_button"
             app:srcCompat="@drawable/ic_learn">
 
         </ImageButton>
 
         <ImageButton
-            android:id="@+id/course_summary_button"
+            android:id="@+id/delete_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_below="@id/share_button"

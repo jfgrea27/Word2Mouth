@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.learn.main.online.teacher;
+package com.imperial.word2mouth.shared.adapters;
 
 import android.content.Context;
 import android.net.Uri;
@@ -42,8 +42,6 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
     private ArrayList<Teacher> teachers = new ArrayList<>();
     private ArrayList<Teacher> queryTeachers;
 
-    private ArrayList<String> followingEmailTeachers = new ArrayList<>();
-
     private Context context;
 
     private ArrayMap<String, Uri> profilePictures = new ArrayMap<>();
@@ -57,6 +55,8 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
         layout = resource;
         queryTeachers = objects;
         this.context = context;
+
+        teachers.clear();
         teachers.addAll(queryTeachers);
 
     }
@@ -86,10 +86,6 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
     }
 
 
-    private boolean isFollowing(String email) {
-        return followingEmailTeachers.contains(email);
-    }
-
 
 
     @NonNull
@@ -103,7 +99,6 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
 
             holder.thumbnail = convertView.findViewById(R.id.list_item_thumbnail);
             holder.title = convertView.findViewById(R.id.name_Teacher);
-            holder.addButton = convertView.findViewById(R.id.follow_button);
 
             convertView.setTag(holder);
         } else {
@@ -125,59 +120,9 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
         }
 
 
-
-        if (isFollowing(queryTeachers.get(position).getTeacherEmail())) {
-            holder.addButton.setImageResource(R.drawable.ic_unfollow);
-        } else {
-            holder.addButton.setImageResource(R.drawable.ic_follow);
-        }
-
-        holder.addButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (isFollowing(queryTeachers.get(position).getTeacherEmail())) {
-                    unsubscribeTeacher(context, queryTeachers.get(position).getTeacherEmail());
-                    holder.addButton.setImageResource(R.drawable.ic_follow);
-                } else {
-                    try {
-                        subscribeTeacher(queryTeachers.get(position).getTeacherEmail());
-                        holder.addButton.setImageResource(R.drawable.ic_unfollow);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        });
-
-
         return convertView;
     }
 
-    private void unsubscribeTeacher(Context c, String teacherName) {
-        File followingFile = new File(context.getExternalFilesDir(null) + DirectoryConstants.cache + DirectoryConstants.following);
-
-        try {
-            FileReaderHelper.removesAnyLineMatchingPatternInFile(c, followingFile, teacherName);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void subscribeTeacher(String teacherName) throws IOException {
-        File followingFile = new File(context.getExternalFilesDir(null) + DirectoryConstants.cache + DirectoryConstants.following);
-        if (!followingFile.exists()) {
-            try {
-                followingFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        FileWriter fw = new FileWriter(followingFile, true);
-        BufferedWriter bw = new BufferedWriter(fw);
-        bw.write(teacherName);
-        bw.newLine();
-        bw.close();
-    }
 
     private String setUserNameOnly(String email) {
         String temp = email;
@@ -221,10 +166,6 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
 
     }
 
-    public void setFollowingTeachersArray(ArrayList<String> followingEmailTeachers) {
-        this.followingEmailTeachers = followingEmailTeachers;
-    }
-
     public Uri getThumbnail(String name) {
         return profilePictures.get(name);
     }
@@ -233,7 +174,6 @@ public class ArrayAdapterTeacher  extends ArrayAdapter<Teacher> {
     public class ViewHolder {
         ImageView thumbnail;
         TextView title;
-        ImageButton addButton;
         public String getCourseName() {
             return title.getText().toString();
         }

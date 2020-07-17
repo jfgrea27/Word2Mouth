@@ -151,8 +151,8 @@ public class LearnOnlineMainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getActivity().getSupportFragmentManager();
-                SearchMainPageCourseFragment frag;
-                frag = SearchMainPageCourseFragment.newInstance(FINGER_QUERY);
+                LearnSearchFingerCourseFragment frag;
+                frag = LearnSearchFingerCourseFragment.newInstance();
                 manager.beginTransaction().replace( R.id.fragment_chooser_query, frag).addToBackStack(null).commit();
             }
         });
@@ -162,8 +162,8 @@ public class LearnOnlineMainFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 FragmentManager manager = getActivity().getSupportFragmentManager();
-                SearchMainPageCourseFragment frag;
-                frag = SearchMainPageCourseFragment.newInstance(SPEAK_QUERY);
+                LearnSearchSpeakCourseFragment frag;
+                frag = LearnSearchSpeakCourseFragment.newInstance();
                 manager.beginTransaction().replace( R.id.fragment_chooser_query, frag).addToBackStack(null).commit();
             }
         });

@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -23,19 +22,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.offline.LearnOfflineCourseFragment;
-import com.imperial.word2mouth.learn.main.online.CourseOnlineSelectionFragment;
-import com.imperial.word2mouth.learn.main.online.LearnOnlineCourseSummary;
-import com.imperial.word2mouth.learn.main.online.LearnOnlineMainFragment;
 import com.imperial.word2mouth.shared.CourseItem;
-import com.imperial.word2mouth.shared.IntentNames;
-import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseItemsOnline;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseOnline;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class LearnOnlineNewLecturesSelectionFragment extends Fragment {
@@ -50,7 +42,7 @@ public class LearnOnlineNewLecturesSelectionFragment extends Fragment {
     private boolean selectedCourse = false;
 
     private ArrayList<CourseItem> onlineCourses;
-    private ArrayAdapterCourseItemsOnline adapter;
+    private ArrayAdapterCourseOnline adapter;
     private ArrayList<ListNewLectures> listLectures;
 
 
@@ -180,7 +172,7 @@ public class LearnOnlineNewLecturesSelectionFragment extends Fragment {
     private void updateListView() {
         if (onlineCourses.size() > 0) {
             if (getView() != null) {
-                adapter = new ArrayAdapterCourseItemsOnline(getView().getContext(), R.layout.list_item, onlineCourses);
+                adapter = new ArrayAdapterCourseOnline(getView().getContext(), R.layout.list_item, onlineCourses);
                 adapter.loadThumbnails();
                 listCourses.setAdapter(adapter);
             }

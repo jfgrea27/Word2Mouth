@@ -22,13 +22,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.online.SearchMainPageCourseFragment;
-import com.imperial.word2mouth.shared.DirectoryConstants;
+import com.imperial.word2mouth.learn.main.online.LearnSearchFingerCourseFragment;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterTeacher;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,12 +39,11 @@ public class TeacherSearchFragment extends Fragment  {
     private ListView listTeachers;
     private SearchView searchTeacher;
 
-    private SearchMainPageCourseFragment frag;
+    private LearnSearchFingerCourseFragment frag;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ArrayList<Teacher> registeredTeachers = new ArrayList<>();
     private ArrayAdapterTeacher adapter;
-    private ArrayList<String> followingEmailTeachers = new ArrayList<>();
 
     public TeacherSearchFragment() {
         // Required empty public constructor
@@ -92,12 +87,6 @@ public class TeacherSearchFragment extends Fragment  {
 
         setUpTeacherList();
 
-        try {
-            retrieveFollowingTeachers();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         retrieveAllTeachers();
     }
 
@@ -108,32 +97,6 @@ public class TeacherSearchFragment extends Fragment  {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-    private void retrieveFollowingTeachers() throws IOException {
-        File followingFile = new File(getView().getContext().getExternalFilesDir(null) + DirectoryConstants.cache + DirectoryConstants.following);
-
-        if (!followingFile.exists()) {
-            try {
-                followingFile.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        BufferedReader reader = null;
-        String line = null;
-        try {
-            reader = new BufferedReader(new FileReader(followingFile));
-            line = reader.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        while (line != null) {
-            followingEmailTeachers.add(line);
-            line = reader.readLine();
-        }
-    }
 
 
 
@@ -168,7 +131,6 @@ public class TeacherSearchFragment extends Fragment  {
         if (registeredTeachers.size() > 0) {
             if (getView() != null) {
                 adapter = new ArrayAdapterTeacher(getView().getContext(), R.layout.list_teacher, registeredTeachers);
-                adapter.setFollowingTeachersArray(followingEmailTeachers);
                 adapter.loadThumbnails();
                 listTeachers.setAdapter(adapter);
             }
@@ -217,7 +179,7 @@ public class TeacherSearchFragment extends Fragment  {
         });
     }
 
-    public void setFragment(SearchMainPageCourseFragment searchMainPageCourseFragment) {
-        this.frag = searchMainPageCourseFragment;
+    public void setFragment(LearnSearchFingerCourseFragment learnSearchFingerCourseFragment) {
+        this.frag = learnSearchFingerCourseFragment;
     }
 }

@@ -90,13 +90,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/course_summary_button"
+        app:layout_constraintStart_toEndOf="@+id/delete_button"
         app:srcCompat="@drawable/ic_learn">
 
     </ImageButton>
 
     <ImageButton
-        android:id="@+id/course_summary_button"
+        android:id="@+id/delete_button"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentEnd="true"

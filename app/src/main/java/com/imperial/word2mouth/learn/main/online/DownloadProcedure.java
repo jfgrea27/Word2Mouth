@@ -11,7 +11,9 @@ import androidx.annotation.RequiresApi;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -177,6 +179,8 @@ public class DownloadProcedure {
 
                             break;
                     }
+                    // Update Downloads Counter of the lecture
+                    db.collection("content").document(lectureItem.getLectureIdentification()).update("downloadCounter", FieldValue.increment(1));
                 }
             });
         }

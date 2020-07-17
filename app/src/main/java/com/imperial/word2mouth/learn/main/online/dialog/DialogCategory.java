@@ -9,7 +9,7 @@ import android.widget.ListView;
 import androidx.fragment.app.Fragment;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.learn.main.online.SearchMainPageCourseFragment;
+import com.imperial.word2mouth.learn.main.online.LearnSearchFingerCourseFragment;
 import com.imperial.word2mouth.shared.Categories;
 import com.imperial.word2mouth.teach.offline.TeachOfflineMainFragment;
 import com.imperial.word2mouth.shared.adapters.ArrayAdapterCategories;
@@ -49,7 +49,7 @@ public class DialogCategory {
                 categoryListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        SearchMainPageCourseFragment f = (SearchMainPageCourseFragment) fragment;
+                        LearnSearchFingerCourseFragment f = (LearnSearchFingerCourseFragment) fragment;
                         f.setCategory(Categories.get(position));
                     }
                 });

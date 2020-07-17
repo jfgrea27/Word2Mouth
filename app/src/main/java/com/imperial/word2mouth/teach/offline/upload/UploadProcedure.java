@@ -222,7 +222,6 @@ public class UploadProcedure {
             } else {
 
                 // Fetch all the lectures under that course
-                uploadEachCourseToDatBase();
                 // Upload these on by one to the Firestore and Storage
 
             }

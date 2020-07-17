@@ -3,7 +3,7 @@ package com.imperial.word2mouth.teach.online;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
@@ -28,10 +28,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.online.LearnOnlineCourseSummary;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.shared.LectureItem;
 import com.imperial.word2mouth.shared.adapters.ArrayAdapterLectureOnline;
+import com.imperial.word2mouth.teach.offline.TeachOfflineCourseSummary;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,6 +48,8 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
     private ImageButton delete;
     private CourseItem courseItem;
 
+    private ImageButton lectureSummaryButton;
+
     private Uri audioUri;
 
     private FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -57,6 +61,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
     private LectureItem lecture;
     private boolean selectedLecture = false;
     private int lectureNumber = -1;
+    private Uri imageUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,9 +75,25 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
         configureListLectures();
         configureDeleteButton();
+        configureLectureSummaryButton();
+    }
+
+    private void configureLectureSummaryButton() {
+        lectureSummaryButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        lectureSummaryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (lectureNumber > -1) {
+                    Intent intent = new Intent(TeachOnlineCourseSummary.this, TeachOnlineLectureSummary.class);
+                    intent.putExtra("lecture", lectures.get(lectureNumber));
+                    startActivity(intent);
+                }
+            }
+        });
     }
 
     private void configureDeleteButton() {
+        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,6 +156,8 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
             }
         });
 
+        lectureSummaryButton = findViewById(R.id.lecture_summary_button);
+
         fetchThumbnailCourse();
 
 
@@ -143,7 +166,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
         title.setText(courseItem.getCourseName());
 
         lecturesView = findViewById(R.id.lecture_list_view);
-        delete = findViewById(R.id.course_summary_button);
+        delete = findViewById(R.id.delete_button);
     }
 
     private void fetchThumbnailCourse() {
@@ -190,9 +213,11 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
         }
     }
 
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void updateListView() {
         if (lectures.size() > 0) {
+
             adapter = new ArrayAdapterLectureOnline(TeachOnlineCourseSummary.this, R.layout.list_lectures, lectures);
             adapter.loadThumbnails();
             lecturesView.setAdapter(adapter);
@@ -213,6 +238,9 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
                         if (delete != null) {
                             delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                         }
+                        if (lectureSummaryButton != null) {
+                            lectureSummaryButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                        }
                         lectureNumber = -1;
 
                     } else {
@@ -221,6 +249,9 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
                         if (delete != null) {
                             delete.setColorFilter(null);
                         }
+                        if (lectureSummaryButton != null) {
+                            lectureSummaryButton.setColorFilter(null);
+                        }
                         lectureNumber = position;
                     }
                 }
@@ -228,6 +259,8 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
         }
     }
+
+
 
     private ArrayList<LectureItem> retrieveCourses(List<DocumentSnapshot> documents) {
         ArrayList<LectureItem> items = new ArrayList<>();
@@ -238,6 +271,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
         }
         return items;
     }
+
 
 
 }

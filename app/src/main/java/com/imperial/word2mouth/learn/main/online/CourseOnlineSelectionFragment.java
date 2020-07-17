@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -14,14 +13,13 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
@@ -30,21 +28,14 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FileDownloadTask;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.online.teacher.Teacher;
 import com.imperial.word2mouth.shared.IntentNames;
-import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseItemsOnline;
+import com.imperial.word2mouth.shared.StringEditor;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseOnline;
 import com.imperial.word2mouth.shared.CourseItem;
-import com.imperial.word2mouth.shared.DirectoryConstants;
-import com.imperial.word2mouth.shared.UnzipFile;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -69,7 +60,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
     // List of Courses
 
-    private ArrayAdapterCourseItemsOnline adapter;
+    private ArrayAdapterCourseOnline adapter;
 
 
     private boolean selectedCourse = false;
@@ -107,6 +98,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
     private HashMap<String, Teacher> teachersHashMap = new HashMap<>();
     private ArrayList<Teacher> teachers = new ArrayList<>();
     private int courseNumber = -1;
+    private ImageView noResults;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,7 +162,9 @@ public class CourseOnlineSelectionFragment extends Fragment {
             configureRequest();
             configureListCourses();
         }
+
     }
+
 
     private void configureSearchButton() {
         searchCourse = getView().findViewById(R.id.search_button);
@@ -195,6 +189,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
     private void configureUI() {
         searchCourse = getView().findViewById(R.id.search_button);
         listCourses = getView().findViewById(R.id.list_courses_per_teacher);
+        noResults = getView().findViewById(R.id.no_result);
 
     }
 
@@ -243,8 +238,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
     private void configureRequest() {
         switch (searchType) {
             case LearnOnlineMainFragment.FINGER_QUERY:
-                configureQuerySearch();
-
+                configureFingerSearch();
                 break;
             case LearnOnlineMainFragment.SPEAK_QUERY:
                 configureSpeakSearch();
@@ -254,26 +248,56 @@ public class CourseOnlineSelectionFragment extends Fragment {
     }
 
     private void configureSpeakSearch() {
-        Query query = db.collection("content").whereEqualTo("type", "Course").whereEqualTo("low_CourseName", speakQuery + " ");
-
-        query.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        db.collection("content").whereEqualTo("type", "Course").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                onlineCourses = getCourses(queryDocumentSnapshots.getDocuments());
+                onlineCourses = retrieveCoursesMatchPattern(queryDocumentSnapshots.getDocuments());
                 updateListView();
+            }
 
+            private ArrayList<CourseItem> retrieveCoursesMatchPattern(List<DocumentSnapshot> documents) {
+                ArrayList<CourseItem> courseItems = new ArrayList<>();
+
+                String[] speakQueryWords = StringEditor.splitString(speakQuery);
+
+                String[] lowerCase = StringEditor.lowerCase(speakQueryWords);
+
+                for (DocumentSnapshot doc : documents) {
+                    if (titleContainsSpeakSearch(lowerCase, (String) doc.get("courseName"))) {
+                        CourseItem courseItem = new CourseItem((String) doc.get("courseName"), (String) doc.get("courseUID"), true);
+                        courseItem.setAuthorID((String) doc.get("authorUID"));
+                        courseItem.setLanguage((String) doc.get("language"));
+                        courseItem.setCategory((String) doc.get("category"));
+                        courseItem.setCourseBluetooth((String) doc.get("bluetoothCourse"));
+                        courseItems.add(courseItem);
+                    }
+
+                }
+
+                return courseItems;
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getView().getContext(), "Could not retrieve the query", Toast.LENGTH_SHORT).show();
+
+            private boolean titleContainsSpeakSearch(String[] speakQueryWords, String courseName) {
+                for (String word : speakQueryWords) {
+                    if (courseName.toLowerCase().contains(word)) {
+                        return true;
+                    }
+                }
+                return false;
             }
+
         });
+
+
     }
 
 
-    private void configureQuerySearch() {
+
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    private void configureFingerSearch() {
 
 
         Query query = prepareQuery();
@@ -284,6 +308,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 onlineCourses = getCourses(queryDocumentSnapshots.getDocuments());
                updateListView();
+
            }
        }).addOnFailureListener(new OnFailureListener() {
            @Override
@@ -294,7 +319,6 @@ public class CourseOnlineSelectionFragment extends Fragment {
        });
 
     }
-
     private Query prepareQuery() {
         Query query = db.collection("content").whereEqualTo("type", "Course");
 
@@ -314,14 +338,21 @@ public class CourseOnlineSelectionFragment extends Fragment {
     }
 
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void updateListView() {
         if (onlineCourses.size() > 0) {
+            noResults.setVisibility(View.INVISIBLE);
+
             if (getView() != null) {
-                adapter = new ArrayAdapterCourseItemsOnline(getView().getContext(), R.layout.list_item, onlineCourses);
+                adapter = new ArrayAdapterCourseOnline(getView().getContext(), R.layout.list_item, onlineCourses);
                 adapter.loadThumbnails();
                 listCourses.setAdapter(adapter);
             }
+        } else {
+            noResults.setVisibility(View.VISIBLE);
         }
     }
 
@@ -339,6 +370,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
         return courseItems;
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
 
     private void configureListCourses() {

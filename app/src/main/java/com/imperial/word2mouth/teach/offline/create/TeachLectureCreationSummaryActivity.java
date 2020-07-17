@@ -206,6 +206,14 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
             hasReadWriteStorageAccess = true;
         }
 
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
+            Toast.makeText(this, "Please allow access to Camera", Toast.LENGTH_SHORT).show();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
+        } else{
+            hasCameraPermission = true;
+        }
+
+
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)){
             Toast.makeText(this, "Please allow access to Audio", Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_RECORDING_PERMISSION);
@@ -213,12 +221,6 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
             hasAudioRecordingPermission = true;
         }
 
-        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
-            Toast.makeText(this, "Please allow access to Camera", Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
-        } else{
-            hasCameraPermission = true;
-        }
     }
 
     @Override
@@ -475,7 +477,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
 
     // Delete Button
     private void configureDeleteButton() {
-        delete = findViewById(R.id.course_summary_button);
+        delete = findViewById(R.id.delete_button);
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override

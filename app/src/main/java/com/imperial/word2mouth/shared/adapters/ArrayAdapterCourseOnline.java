@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
+public class ArrayAdapterCourseOnline extends ArrayAdapter<CourseItem> {
 
     private static ArrayList<CourseItem> courseItems = new ArrayList<>();
     private final Context context;
@@ -58,13 +58,14 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
 
 
 
-    public ArrayAdapterCourseItemsOnline(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
+    public ArrayAdapterCourseOnline(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
         this.context = context;
         queryCourses = objects;
 
+        courseItems.clear();
         courseItems.addAll(queryCourses);
     }
 
@@ -193,6 +194,7 @@ public class ArrayAdapterCourseItemsOnline  extends ArrayAdapter<CourseItem> {
     public void filter(String query) {
         query = query.toLowerCase(Locale.getDefault());
         queryCourses.clear();
+
         if (query.length() == 0) {
             queryCourses.addAll(courseItems);
         } else {

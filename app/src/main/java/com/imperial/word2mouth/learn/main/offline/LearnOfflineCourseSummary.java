@@ -130,7 +130,7 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
 
         lecturesDirectory = new File(coursePath + DirectoryConstants.lectures);
 //        // Creating audioFile
-        audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, FileHandler.AUDIO );
+        audioFile = new File(metaDirectory.getPath() + "/" + DirectoryConstants.soundThumbnail);
 
 
     }
@@ -188,22 +188,24 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
     }
 
     private void configureDeleteButton() {
-        deleteButton = findViewById(R.id.course_summary_button);
+        deleteButton = findViewById(R.id.delete_button);
 
         deleteButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 if (selectedLecture) {
-                    FileHandler.deleteRecursive(new File (lecturesDirectory.getPath() + "/" + localLectures.get(lectureNumber).getLectureName()));
-                    selectedLecture = false;
+                    if (lectureNumber > -1) {
+                        FileHandler.deleteRecursive(new File (lecturesDirectory.getPath() + "/" + localLectures.get(lectureNumber).getLectureName()));
+                        selectedLecture = false;
 
-                    deleteButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                    adapter.remove(localLectures.get(lectureNumber));
-                    adapter.notifyDataSetInvalidated();
-                    adapter.notifyDataSetChanged();
-                    lectureNumber = -1;
-                    numberLectures--;
+                        deleteButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                        adapter.remove(localLectures.get(lectureNumber));
+                        adapter.notifyDataSetInvalidated();
+                        adapter.notifyDataSetChanged();
+                        lectureNumber = -1;
+                        numberLectures--;
+                    }
                 }
             }
         });
@@ -220,12 +222,19 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
         learnButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent learnIntent = new Intent(LearnOfflineCourseSummary.this, SlideLearningActivity.class);
-                learnIntent.putExtra(IntentNames.LECTURE_PATH,  coursePath + DirectoryConstants.lectures + localLectures.get(lectureNumber).getLectureName());
-                learnIntent.putExtra(IntentNames.LECTURE_NAME, localLectures.get(lectureNumber).getLectureName());
-                startActivity(learnIntent);
+                if (lectureNumber > -1) {
+                    Intent learnIntent = new Intent(LearnOfflineCourseSummary.this, SlideLearningActivity.class);
+                    learnIntent.putExtra(IntentNames.LECTURE_PATH,  coursePath + DirectoryConstants.lectures + localLectures.get(lectureNumber).getLectureName());
+                    learnIntent.putExtra(IntentNames.LECTURE_NAME, localLectures.get(lectureNumber).getLectureName());
+                    startActivity(learnIntent);
+                }
             }
         });
+
+        if (learnButton != null) {
+            learnButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+        }
+
     }
 
     private void configureListViewLectures() {
@@ -254,6 +263,10 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
                     if (deleteButton != null) {
                         deleteButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                     }
+                    if (learnButton != null) {
+                        learnButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                    }
+
                     lectureNumber = -1;
 
 
@@ -264,6 +277,9 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
                     view.setBackgroundColor(Color.LTGRAY);
                     if (deleteButton != null) {
                         deleteButton.setColorFilter(null);
+                    }
+                    if (learnButton != null) {
+                        learnButton.setColorFilter(null);
                     }
                 }
             }
@@ -288,7 +304,7 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
                 // Title
                 lectureName = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.title);
                 LectureItem item = new LectureItem(courseName, lectureName);
-
+                item.setLecturePath(f.getPath());
                 lectureItems.add(item);
             }
         }

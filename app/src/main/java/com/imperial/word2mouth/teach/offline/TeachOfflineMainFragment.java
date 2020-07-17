@@ -32,13 +32,11 @@ import com.imperial.word2mouth.learn.main.online.dialog.DialogCategory;
 import com.imperial.word2mouth.learn.main.online.dialog.DialogLanguage;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseOffline;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.IntentNames;
-import com.imperial.word2mouth.shared.LectureItem;
-import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
 import com.imperial.word2mouth.teach.offline.upload.UploadProcedure;
 
 import java.io.File;
@@ -242,7 +240,7 @@ public class TeachOfflineMainFragment extends Fragment {
     // Delete Button
 
     private void configureDeleteButton() {
-        delete = getView().findViewById(R.id.course_summary_button);
+        delete = getView().findViewById(R.id.delete_button);
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -463,13 +461,6 @@ public class TeachOfflineMainFragment extends Fragment {
         }
     }
 
-    private void setCourseAuthorIdentification() {
-        if (courseAuthorID == "") {
-            courseAuthorID = user.getUid();
-            courseItem.setAuthorID(user.getUid());
-            updateCourseAuthorFile(user.getUid());
-        }
-    }
 
     private void updateCourseAuthorFile(String uid) {
         FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, uid, FileHandler.AUTHOR);

@@ -36,9 +36,8 @@ import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.IntentNames;
-import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseItemsOnline;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseOnline;
 import com.imperial.word2mouth.shared.CourseItem;
-import com.imperial.word2mouth.teach.offline.upload.database.CourseTransferObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,7 +66,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
 
     // Adapter
-    private ArrayAdapterCourseItemsOnline adapter = null;
+    private ArrayAdapterCourseOnline adapter = null;
 
     private SearchView searchView;
 
@@ -142,8 +141,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
     private void configureDeleteButton() {
         delete = getView().findViewById(R.id.delete_course_button);
-
-        delete.setVisibility(View.INVISIBLE);
+        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
 
         delete.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -203,6 +201,16 @@ public class TeachOnlineMainFragment extends Fragment {
                 }
             }
         });
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (onlineCourses != null ) {
+            onlineCourses.clear();
+            configureListCourses();
+        }
     }
 
 
@@ -299,10 +307,10 @@ public class TeachOnlineMainFragment extends Fragment {
                     selectedCourse = false;
 
                     if (courseSummaryButton != null) {
-                        courseSummaryButton.setVisibility(View.INVISIBLE);
+                        courseSummaryButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                     }
                     if (delete != null) {
-                        delete.setVisibility(View.INVISIBLE);
+                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                     }
                     courseNumber = -1;
 
@@ -312,10 +320,12 @@ public class TeachOnlineMainFragment extends Fragment {
 
                     selectedCourse = true;
                     if (courseSummaryButton != null) {
-                        courseSummaryButton.setVisibility(View.VISIBLE);
+                        courseSummaryButton.setColorFilter(null);
+
                     }
                     if (delete != null) {
-                        delete.setVisibility(View.VISIBLE);
+                        delete.setColorFilter(null);
+
                     }
                     courseNumber = position;
                 }
@@ -356,7 +366,7 @@ public class TeachOnlineMainFragment extends Fragment {
     private void updateListView() {
         if (onlineCourses.size() > 0) {
             if (getView() != null) {
-                adapter = new ArrayAdapterCourseItemsOnline(getView().getContext(), R.layout.list_item, onlineCourses);
+                adapter = new ArrayAdapterCourseOnline(getView().getContext(), R.layout.list_item, onlineCourses);
                 adapter.loadThumbnails();
                 onlineListCourses.setAdapter(adapter);
             }
@@ -381,9 +391,10 @@ public class TeachOnlineMainFragment extends Fragment {
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void configureCourseSummaryButton() {
-        courseSummaryButton = getView().findViewById(R.id.course_summary_button);
+        courseSummaryButton = getView().findViewById(R.id.delete_button);
 
-        courseSummaryButton.setVisibility(View.INVISIBLE);
+        courseSummaryButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+
 
         courseSummaryButton.setOnClickListener(new View.OnClickListener() {
             @RequiresApi(api = Build.VERSION_CODES.KITKAT)

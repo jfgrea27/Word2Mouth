@@ -29,7 +29,7 @@ import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.offline.share.bluetooth.ShareBluetoothActivity;
-import com.imperial.word2mouth.shared.ArrayAdapterCourseOffline;
+import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseOffline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
@@ -156,6 +156,10 @@ public class LearnOfflineCourseFragment extends Fragment {
             }
         }
     }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -298,7 +302,7 @@ public class LearnOfflineCourseFragment extends Fragment {
 
     // Delete
     private void configureDeleteButton() {
-        delete = getView().findViewById(R.id.course_summary_button);
+        delete = getView().findViewById(R.id.delete_button);
 
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -313,15 +317,16 @@ public class LearnOfflineCourseFragment extends Fragment {
                                 adapter.notifyDataSetChanged();
                                 adapter.notifyDataSetInvalidated();
                             }
+                            selectedCourse = false;
+                            learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                            delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+
+                        } else {
+                            Toast.makeText(getView().getContext(), "Need Storage Permission For Learn Button", Toast.LENGTH_SHORT).show();
+
                         }
                     }
-                    selectedCourse = false;
-                    learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                    delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                } else {
-                    Toast.makeText(getView().getContext(), "Need Storage Permission For Learn Button", Toast.LENGTH_SHORT).show();
                 }
-
             }
         });
 

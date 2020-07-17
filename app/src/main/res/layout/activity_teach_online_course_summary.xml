@@ -50,15 +50,15 @@
         android:layout_height="65dp"
         android:layout_centerInParent="true"
         android:layout_toStartOf="@+id/list_audio_button"
-        android:textAlignment="center"
         android:layout_toLeftOf="@+id/list_audio_button"
         android:layout_toEndOf="@id/list_item_thumbnail"
         android:layout_toRightOf="@id/list_item_thumbnail"
+        android:gravity="center_horizontal"
+        android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/course_name"
-        android:gravity="center_horizontal" />
+        app:layout_constraintTop_toBottomOf="@+id/course_name" />
 
     <ImageButton
         android:id="@+id/audio_button"
@@ -79,7 +79,23 @@
 
 
     <ImageButton
-        android:id="@+id/course_summary_button"
+        android:id="@+id/lecture_summary_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/todo"
+        android:paddingTop="25dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/delete_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_teach_black">
+
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/delete_button"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentEnd="true"
@@ -91,11 +107,10 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/lecture_summary_button"
         app:srcCompat="@drawable/ic_delete">
 
     </ImageButton>
-
 
     <ListView
         android:id="@+id/lecture_list_view"
@@ -106,6 +121,31 @@
         app:layout_constraintTop_toBottomOf="@+id/audio_button">
 
     </ListView>
+
+
+
+
+<!--    <TextView-->
+<!--        android:id="@+id/textView"-->
+<!--        android:layout_width="350dp"-->
+<!--        android:layout_height="54dp"-->
+<!--        android:text="TextView"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/delete_button"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.502"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/lecture_list_view"-->
+<!--        app:layout_constraintVertical_bias="0.0" />-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/textView2"-->
+<!--        android:layout_width="347dp"-->
+<!--        android:layout_height="52dp"-->
+<!--        android:text="TextView"-->
+<!--        app:layout_constraintBottom_toTopOf="@+id/delete_button"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/textView" />-->
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

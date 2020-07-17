@@ -28,12 +28,15 @@
         <ListView
             android:id="@+id/list_teachers"
             android:layout_width="match_parent"
-            android:layout_height="534dp"
+            android:layout_height="340dp"
+            android:layout_marginBottom="208dp"
             android:background="@android:color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_following" />
+            app:layout_constraintTop_toBottomOf="@+id/search_teacher"
+            app:layout_constraintVertical_bias="1.0" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,13 +1,21 @@
 package com.imperial.word2mouth.shared;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.File;
 
-public class LectureItem {
+public class LectureItem implements Parcelable {
 
     private String courseName = null;
     private String lectureName = null;
     private File thumbnail = null;
     private File audio = null;
+
+    public void setLecturePath(String lecturePath) {
+        this.lecturePath = lecturePath;
+    }
+
     private String lecturePath = null;
 
     private String language = null;
@@ -118,4 +126,52 @@ public class LectureItem {
     public String getBluetoothLecture() {
         return bluetoothLecture;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.courseName);
+        dest.writeString(this.lectureName);
+        dest.writeSerializable(this.thumbnail);
+        dest.writeSerializable(this.audio);
+        dest.writeString(this.lecturePath);
+        dest.writeString(this.language);
+        dest.writeString(this.category);
+        dest.writeString(this.bluetoothCourse);
+        dest.writeString(this.bluetoothLecture);
+        dest.writeString(this.lectureIdentification);
+        dest.writeString(this.courseIdentification);
+        dest.writeString(this.authorUID);
+    }
+
+    protected LectureItem(Parcel in) {
+        this.courseName = in.readString();
+        this.lectureName = in.readString();
+        this.thumbnail = (File) in.readSerializable();
+        this.audio = (File) in.readSerializable();
+        this.lecturePath = in.readString();
+        this.language = in.readString();
+        this.category = in.readString();
+        this.bluetoothCourse = in.readString();
+        this.bluetoothLecture = in.readString();
+        this.lectureIdentification = in.readString();
+        this.courseIdentification = in.readString();
+        this.authorUID = in.readString();
+    }
+
+    public static final Parcelable.Creator<LectureItem> CREATOR = new Parcelable.Creator<LectureItem>() {
+        @Override
+        public LectureItem createFromParcel(Parcel source) {
+            return new LectureItem(source);
+        }
+
+        @Override
+        public LectureItem[] newArray(int size) {
+            return new LectureItem[size];
+        }
+    };
 }

@@ -28,6 +28,22 @@
         </ListView>
 
 
+        <ImageView
+            android:id="@+id/no_result"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:background="@android:color/transparent"
+            android:paddingTop="25dp"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="@+id/list_courses_per_teacher"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/not_found">
+        </ImageView>
+
+
+
         <ImageButton
             android:id="@+id/search_button"
             android:layout_width="100dp"
@@ -42,6 +58,7 @@
             app:srcCompat="@drawable/ic_search">
 
         </ImageButton>
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

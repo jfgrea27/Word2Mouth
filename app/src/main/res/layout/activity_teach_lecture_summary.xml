@@ -163,7 +163,7 @@
         </ImageButton>
 
         <ImageButton
-            android:id="@+id/course_summary_button"
+            android:id="@+id/delete_button"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:layout_alignParentEnd="true"
