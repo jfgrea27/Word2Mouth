@@ -289,6 +289,7 @@ public class LearnSearchFingerCourseFragment extends Fragment {
                 teacherText.setText("");
                 selectedUserUID = "";
                 teacherDelete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+                personButton.setImageResource(R.drawable.ic_account_black);
 
                 if (languageText.getText().toString().equals("") && categoryText.getText().toString().equals("")) {
                     searchable = false;
