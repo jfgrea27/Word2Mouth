@@ -82,7 +82,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
     private String teacherUID;
     private String category;
 
-    // Search Speaking
+    // Search Speakinglayout_constraintBottom_toTopOf="@+id/relativeLayout"
     private String speakQuery;
 
 
@@ -327,7 +327,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
         }
 
         if (category != "") {
-            query.whereEqualTo("category", category);
+            query = query.whereEqualTo("category", category);
         }
 
         if (teacherUID != "" && teacherUID != null) {
