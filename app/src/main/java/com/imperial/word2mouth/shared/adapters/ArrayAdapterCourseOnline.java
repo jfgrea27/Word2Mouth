@@ -141,7 +141,6 @@ public class ArrayAdapterCourseOnline extends ArrayAdapter<CourseItem> {
         }
 
 
-
         holder.audio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

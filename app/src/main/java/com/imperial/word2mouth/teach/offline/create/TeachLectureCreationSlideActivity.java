@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -30,6 +31,7 @@ import com.imperial.word2mouth.teach.offline.create.audio.AudioRecorder;
 import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
 
 import java.io.File;
+import java.util.Locale;
 
 public class TeachLectureCreationSlideActivity extends AppCompatActivity implements ImageDialog.OnInputListener {
 
@@ -87,6 +89,8 @@ public class TeachLectureCreationSlideActivity extends AppCompatActivity impleme
     public static final int VIDEO = 101;
     public static final int INSTRUCTIONS = 102;
     public static final int AUDIO = 103;
+    private TextToSpeech textToSpeech;
+    private boolean recording = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +138,8 @@ public class TeachLectureCreationSlideActivity extends AppCompatActivity impleme
         }
 
         retrieveSavedSlide();
+        configureTextToSpeech();
+        configureLongClicks();
     }
 
 
@@ -359,32 +365,29 @@ public class TeachLectureCreationSlideActivity extends AppCompatActivity impleme
         playAudioButton = findViewById(R.id.button_play_audio);
         // record button
         recordAudioButton = findViewById(R.id.button_audio);
-        recordAudioButton.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (hasAudioRecordingPermission) {
-                    currentSlideDirectory = FileHandler.createDirectoryForSlideAndReturnIt(coursePath, slideCounter);
-                    audioFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), null, getContentResolver(), null, AUDIO);
-                    switch (event.getAction()){
-                        case MotionEvent.ACTION_DOWN:
-                            recordAudioButton.setColorFilter(Color.RED);
-                            Toast.makeText(TeachLectureCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
-                            recorder.startRecording(audioFile.getPath());
-                            return true;
-                        case MotionEvent.ACTION_UP:
-                            Toast.makeText(TeachLectureCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
-                            recorder.stopRecording();
-                            recordAudioButton.setColorFilter(null);
 
-                            audio = Uri.fromFile(audioFile);
-                            playAudioButton.setVisibility(View.VISIBLE);
-                            break;
+        recordAudioButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (hasAudioRecordingPermission) {
+                    if (!recording) {
+                        recordAudioButton.setColorFilter(Color.RED);
+                        Toast.makeText(TeachLectureCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                        recorder.startRecording(audioFile.getPath());
+                        recording = true;
+                    } else {
+                        Toast.makeText(TeachLectureCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                        recorder.stopRecording();
+                        recordAudioButton.setColorFilter(null);
+
+                        audio = Uri.fromFile(audioFile);
+                        playAudioButton.setVisibility(View.VISIBLE);
+                        recording = false;
                     }
                 } else {
                     Toast.makeText(TeachLectureCreationSlideActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
-
                 }
-                return false;
+
             }
         });
 
@@ -533,5 +536,71 @@ public class TeachLectureCreationSlideActivity extends AppCompatActivity impleme
             videoFile = FileHandler.createFileForSlideContentAndReturnIt(currentSlideDirectory.getPath(), video, getContentResolver(), null, VIDEO);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        super.onDestroy();
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(TeachLectureCreationSlideActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void configureLongClicks() {
+        nextSlide.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.nextSlide));
+                return true;
+            }
+        });
+
+        previousSlide.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.previousSLide));
+                return true;
+            }
+        });
+        recordAudioButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.recordWithMicrophone));
+                return true;
+            }
+        });
+
+
+    }
+
+
 
 }

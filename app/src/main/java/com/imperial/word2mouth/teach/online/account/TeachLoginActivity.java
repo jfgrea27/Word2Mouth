@@ -12,6 +12,7 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -30,6 +31,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.DirectoryConstants;
+import com.imperial.word2mouth.teach.TeachActivityMain;
 import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
 
 import java.io.File;
@@ -38,6 +40,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class TeachLoginActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
@@ -74,6 +77,7 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
     private Bitmap imageBitmap = null;
     private Uri imageUri = null;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private TextToSpeech textToSpeech;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @Override
@@ -94,6 +98,8 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
         configureLogOutButton();
 
         configureImageButton();
+
+        configureTextToSpeech();
     }
 
 
@@ -400,5 +406,69 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        super.onDestroy();
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(TeachLoginActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(TeachLoginActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void configureOnLongClicks() {
+        login.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.login));
+                return true;
+
+            }
+        });
+
+        logout.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.logout));
+                return true;
+            }
+        });
+
+        thumbnail.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.profilePicture));
+                return true;
+            }
+        });
+    }
 
 }

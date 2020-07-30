@@ -29,6 +29,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
 import com.imperial.word2mouth.learn.main.online.teacher.Teacher;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.shared.StringEditor;
@@ -191,6 +192,18 @@ public class CourseOnlineSelectionFragment extends Fragment {
         listCourses = getView().findViewById(R.id.list_courses_per_teacher);
         noResults = getView().findViewById(R.id.no_result);
 
+        configureOnLongClicks();
+    }
+
+    private void configureOnLongClicks() {
+        searchCourse.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.search));
+                return true;
+            }
+        });
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

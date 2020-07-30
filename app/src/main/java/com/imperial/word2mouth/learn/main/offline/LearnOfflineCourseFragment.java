@@ -16,7 +16,10 @@ import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.StrictMode;
+import android.speech.tts.TextToSpeech;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -37,6 +40,7 @@ import com.imperial.word2mouth.shared.FileReaderHelper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -266,7 +270,8 @@ public class LearnOfflineCourseFragment extends Fragment {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean onLongClick(View v) {
-                LearnActivityMain activity = (LearnActivityMain) getActivity();
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.bluetooth));
                 return true;
             }
         });
@@ -294,16 +299,29 @@ public class LearnOfflineCourseFragment extends Fragment {
             }
         });
 
+        learn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.learn));
+                return true;
+            }
+        });
+
 
         if (learn != null) {
             learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
+
     // Delete
     private void configureDeleteButton() {
         delete = getView().findViewById(R.id.delete_button);
-
         delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -330,10 +348,22 @@ public class LearnOfflineCourseFragment extends Fragment {
             }
         });
 
+        delete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.delete));
+                return true;
+            }
+        });
+
         if (delete != null) {
             delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
         }
     }
+
+
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 

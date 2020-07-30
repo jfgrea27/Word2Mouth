@@ -37,6 +37,7 @@ import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.IntentNames;
+import com.imperial.word2mouth.teach.TeachActivityMain;
 import com.imperial.word2mouth.teach.offline.upload.UploadProcedure;
 
 import java.io.File;
@@ -134,6 +135,8 @@ public class TeachOfflineMainFragment extends Fragment {
             configureDeleteButton();
             configureListView();
         }
+
+        configureLongClicks();
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -397,7 +400,7 @@ public class TeachOfflineMainFragment extends Fragment {
                             localCourses.get(courseNumber).setAuthorID(authorCourse);
                             uploadCourse();
                         } else {
-                            Toast.makeText(getView().getContext(), "Creating teacher must login to upoad content", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getView().getContext(), "Creating teacher must login to upload content", Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
@@ -410,7 +413,7 @@ public class TeachOfflineMainFragment extends Fragment {
         });
     }
 
-    private void uploadCourse() {
+    private void  uploadCourse() {
             uploadProgress.setVisibility(View.VISIBLE);
             localCourses.get(courseNumber).setCourseBluetooth(FileReaderHelper.readTextFromFile(localCourses.get(courseNumber).getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
             UploadProcedure uploadProcedure = new UploadProcedure(localCourses.get(courseNumber), getActivity());
@@ -461,11 +464,6 @@ public class TeachOfflineMainFragment extends Fragment {
         }
     }
 
-
-    private void updateCourseAuthorFile(String uid) {
-        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, uid, FileHandler.AUTHOR);
-
-    }
 
     private void setCourseIdentification(String identification) {
         if (courseIdentification == "") {
@@ -527,6 +525,41 @@ public class TeachOfflineMainFragment extends Fragment {
         FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, selectedLanguage, FileHandler.LANGUAGE_SELECTION);
         FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null,selectedCategory, FileHandler.CATEGORY_SELECTION);
         intentToCreateCourseAndStartActivity();
+    }
+
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    private void configureLongClicks() {
+        create.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                TeachActivityMain act = (TeachActivityMain) getActivity();
+                if (selectedCourse) {
+                    act.speak(getString(R.string.editCourse));
+                } else {
+                    act.speak(getString(R.string.createCourse));
+                }
+                return true;
+            }
+        });
+
+        upload.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                TeachActivityMain act = (TeachActivityMain) getActivity();
+                act.speak(getString(R.string.uploadCourse));
+                return true;            }
+        });
+        delete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                TeachActivityMain act = (TeachActivityMain) getActivity();
+                act.speak(getString(R.string.delete));
+                return true;
+            }
+        });
     }
 
 }

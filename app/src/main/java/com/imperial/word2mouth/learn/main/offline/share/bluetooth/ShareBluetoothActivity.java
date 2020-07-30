@@ -616,11 +616,6 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                         Message message1 = Message.obtain();
                         message1.what = STATE_CONTENT_RECEIVED;
                         connectionHandler.sendMessage(message1);
-//                        try {
-//                            fos.close();
-//                        } catch (IOException ex) {
-//                            ex.printStackTrace();
-//                        }
 
                     }
                     try {
@@ -632,7 +627,11 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
                 }
 
-            }
+            }//                        try {
+//                            fos.close();
+//                        } catch (IOException ex) {
+//                            ex.printStackTrace();
+//                        }
 
         }
 

@@ -15,9 +15,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -38,7 +40,7 @@ public class LearnOnlineMainFragment extends Fragment {
     private boolean hasReadWriteStorageAccess = false;
 
 
-
+    private TextView title;
 
     private ImageButton speak;
 
@@ -143,6 +145,7 @@ public class LearnOnlineMainFragment extends Fragment {
     private void setUpUI() {
         finger = getView().findViewById(R.id.finger_chooser);
         speak = getView().findViewById(R.id.speak_chooser);
+        title = getView().findViewById(R.id.title);
     }
 
     private void configureOnClicks() {
@@ -165,6 +168,35 @@ public class LearnOnlineMainFragment extends Fragment {
                 LearnSearchSpeakCourseFragment frag;
                 frag = LearnSearchSpeakCourseFragment.newInstance();
                 manager.beginTransaction().replace( R.id.fragment_chooser_query, frag).addToBackStack(null).commit();
+            }
+        });
+
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // Speak
+        speak.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.speakSearch));
+                return true;
+            }
+        });
+        finger.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.fingerQuery));
+                return true;
+            }
+        });
+
+        title.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.query));
+                return true;
             }
         });
     }

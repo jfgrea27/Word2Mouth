@@ -38,6 +38,7 @@ import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseOnline;
 import com.imperial.word2mouth.shared.CourseItem;
+import com.imperial.word2mouth.teach.TeachActivityMain;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -134,6 +135,7 @@ public class TeachOnlineMainFragment extends Fragment {
                 configureListCourses();
             }
 
+            configureLongClicks();
         } else {
             Toast.makeText(getView().getContext(), "Need to log in", Toast.LENGTH_SHORT).show();
         }
@@ -409,6 +411,27 @@ public class TeachOnlineMainFragment extends Fragment {
                     }
 
                 }
+            }
+        });
+
+    }
+
+
+    public void configureLongClicks() {
+        delete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                TeachActivityMain act = (TeachActivityMain) getActivity();
+                act.speak(getString(R.string.delete));
+                return true;
+            }
+        });
+        courseSummaryButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                TeachActivityMain act = (TeachActivityMain) getActivity();
+                act.speak(getString(R.string.course_summary));
+                return true;
             }
         });
 

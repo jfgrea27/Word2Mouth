@@ -10,6 +10,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -33,10 +34,12 @@ import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.shared.LectureItem;
 import com.imperial.word2mouth.shared.adapters.ArrayAdapterLectureOnline;
+import com.imperial.word2mouth.teach.TeachActivityMain;
 import com.imperial.word2mouth.teach.offline.TeachOfflineCourseSummary;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class TeachOnlineCourseSummary extends AppCompatActivity {
 
@@ -62,6 +65,8 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
     private boolean selectedLecture = false;
     private int lectureNumber = -1;
     private Uri imageUri;
+    private TextToSpeech textToSpeech;
+    private TextView followersCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,6 +81,24 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
         configureListLectures();
         configureDeleteButton();
         configureLectureSummaryButton();
+        configureTextToSpeech();
+        configureLongClicks();
+        configureFollowersCounter();
+    }
+
+    private void configureFollowersCounter() {
+        followersCounter = findViewById(R.id.number_followers);
+
+        db.collection("content").document(courseItem.getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.get("followersCounter") != null) {
+                    followersCounter.setText(documentSnapshot.get("followersCounter").toString());
+                }
+            }
+        });
+
     }
 
     private void configureLectureSummaryButton() {
@@ -272,6 +295,62 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
         return items;
     }
 
+
+
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        super.onDestroy();
+    }
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(TeachOnlineCourseSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(TeachOnlineCourseSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void configureLongClicks() {
+        delete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.delete));
+                return true;
+            }
+        });
+        lectureSummaryButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.lectureSummary));
+                return true;
+            }
+        });
+
+    }
 
 
 }

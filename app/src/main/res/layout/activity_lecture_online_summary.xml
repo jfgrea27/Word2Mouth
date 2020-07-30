@@ -91,24 +91,22 @@
     </ListView>
 
 
-
-
-        <TextView
-            android:id="@+id/data_title"
-            android:layout_width="match_parent"
-            android:layout_height="54dp"
-            android:background="@color/fui_bgAnonymous"
-            android:text="Lecture Data Summary"
-            android:textColor="@color/colorWhite"
-            android:textAlignment="center"
-            android:textSize="25sp"
-            app:layout_constraintBottom_toTopOf="@+id/delete_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.502"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lecture_list_view"
-            app:layout_constraintVertical_bias="0.0"
-            android:gravity="center_horizontal" />
+    <TextView
+        android:id="@+id/data_title"
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:background="@color/fui_bgAnonymous"
+        android:gravity="center_horizontal"
+        android:text="Lecture Data Summary"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="25sp"
+        app:layout_constraintBottom_toTopOf="@+id/delete_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.502"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/lecture_list_view"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TableLayout
         android:layout_width="match_parent"
@@ -122,7 +120,7 @@
 
             <TextView
                 android:padding="3dip"
-                android:text="# Downloads"
+                android:text="@string/downloads"
                 android:textSize="15sp" />
 
             <TextView
@@ -133,21 +131,21 @@
                 android:text="0"
                 tools:ignore="RtlCompat" />
         </TableRow>
-        <TableRow>
+<!--        <TableRow>-->
 
-            <TextView
-                android:padding="3dip"
-                android:text="# Likes"
-                android:textSize="15sp" />
+<!--            <TextView-->
+<!--                android:padding="3dip"-->
+<!--                android:text="# Likes"-->
+<!--                android:textSize="15sp" />-->
 
-            <TextView
-                android:id="@+id/number_likes"
-                android:gravity="right"
-                android:padding="3dip"
-                android:textAlignment="center"
-                android:text="0"
-                tools:ignore="RtlCompat" />
-        </TableRow>
+<!--            <TextView-->
+<!--                android:id="@+id/number_likes"-->
+<!--                android:gravity="right"-->
+<!--                android:padding="3dip"-->
+<!--                android:textAlignment="center"-->
+<!--                android:text="0"-->
+<!--                tools:ignore="RtlCompat" />-->
+<!--        </TableRow>-->
 
     </TableLayout>
 

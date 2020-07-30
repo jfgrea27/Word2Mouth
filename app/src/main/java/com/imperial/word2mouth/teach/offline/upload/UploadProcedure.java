@@ -2,7 +2,6 @@ package com.imperial.word2mouth.teach.offline.upload;
 
 import android.app.Activity;
 import android.net.Uri;
-import android.util.Pair;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -25,8 +24,6 @@ import com.imperial.word2mouth.teach.offline.upload.database.LectureTransferObje
 import com.imperial.word2mouth.teach.offline.upload.storage.StorageUploadPreparation;
 
 import java.io.File;
-import java.util.AbstractQueue;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -223,6 +220,7 @@ public class UploadProcedure {
 
                 // Fetch all the lectures under that course
                 // Upload these on by one to the Firestore and Storage
+                uploadCourseToDatabase();
 
             }
 
@@ -387,7 +385,7 @@ public class UploadProcedure {
     // Step 1 to 2 are the same
 
     // Step 3b
-    private void uploadEachCourseToDatBase() {
+    private void uploadCourseToDatabase() {
         File f = new File(courseItem.getCoursePath() + DirectoryConstants.lectures);
 
         File[] lectures = f.listFiles();

@@ -89,7 +89,7 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         lectureName.setText(lecture.getLectureName());
 
         downloadCounter = findViewById(R.id.number_downloads);
-        likeCounter = findViewById(R.id.number_likes);
+//        likeCounter = findViewById(R.id.number_likes);
 
         // TODO LIST OF SLIDES?
 
@@ -103,7 +103,6 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 downloadCounter.setText(documentSnapshot.get("downloadCounter").toString());
-                // TODO Likes button
             }
         });
     }

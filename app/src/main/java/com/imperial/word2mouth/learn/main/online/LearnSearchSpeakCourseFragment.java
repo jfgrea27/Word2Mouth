@@ -4,10 +4,12 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
@@ -20,6 +22,7 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -106,6 +109,47 @@ public class LearnSearchSpeakCourseFragment extends Fragment {
 
         searchButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
 
+        setOnLongClicks();
+    }
+
+
+    private void setOnLongClicks() {
+        speakDelete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.delete));
+                return true;
+            }
+        });
+
+        listenSearch.setOnLongClickListener(new View.OnLongClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.P)
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.listenSearch));
+                return true;
+            }
+        });
+
+
+        recordSearch.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.recordSearch));
+                return true;
+            }
+        });
+
+        searchButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.search));
+                return true;             }
+        });
     }
 
 

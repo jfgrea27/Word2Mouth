@@ -9,17 +9,27 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Handler;
+import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
 import com.imperial.word2mouth.teach.online.account.TeachLoginActivity;
 import com.imperial.word2mouth.teach.ui.main.SectionsPagerAdapter;
 
+import java.util.Locale;
+
 public class TeachActivityMain extends AppCompatActivity {
 
+
+    private TextToSpeech textToSpeech;
+    private TabLayout tabs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,11 +41,16 @@ public class TeachActivityMain extends AppCompatActivity {
 
         setToolBar();
 
-        TabLayout tabs = findViewById(R.id.tabs);
+        tabs = findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
         tabs.getTabAt(0).setIcon(R.drawable.ic_teach_offline_online_0);
         tabs.getTabAt(1).setIcon(R.drawable.ic_teach_offline_online_1);
+
+
+        configureTextToSpeech();
     }
+
+
 
 
     @Override
@@ -49,7 +64,7 @@ public class TeachActivityMain extends AppCompatActivity {
     private void setToolBar() {
         androidx.appcompat.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.teach_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Word 2 Mouth");
+        getSupportActionBar().setTitle(getString(R.string.teaching));
     }
 
 
@@ -80,5 +95,44 @@ public class TeachActivityMain extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        super.onDestroy();
+    }
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(TeachActivityMain.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(TeachActivityMain.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 }

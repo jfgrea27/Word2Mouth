@@ -25,6 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
 import com.imperial.word2mouth.learn.main.online.dialog.DialogCategory;
 import com.imperial.word2mouth.learn.main.online.dialog.DialogLanguage;
 import com.imperial.word2mouth.learn.main.online.teacher.TeacherSearchFragment;
@@ -205,9 +206,72 @@ public class LearnSearchFingerCourseFragment extends Fragment {
 
         searchButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
 
+        setLongHoldSpeak();
+
 
     }
 
+
+    public void setLongHoldSpeak() {
+        personButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.searchProfile));
+                return true;
+            }
+        });
+
+        categoryButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.searchCategory));
+                return true;
+            }
+        });
+
+        languageButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.searchLanguage));
+                return true;
+            }
+        });
+
+
+        teacherDelete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.delete));
+                return true;            }
+        });
+        languageDelete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.delete));
+                return true;            }
+        });
+        categoryDelete.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.delete));
+                return true;            }
+        });
+
+        searchButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                LearnActivityMain act = (LearnActivityMain) getActivity();
+                act.speak(getString(R.string.search));
+                return true;
+            }
+        });
+    }
 
 
     private void configureOnClicks() {
@@ -321,7 +385,6 @@ public class LearnSearchFingerCourseFragment extends Fragment {
 
 
     }
-
 
     public void setTeacherName(String userName, String userUid) {
         teacherText.setText(userName);

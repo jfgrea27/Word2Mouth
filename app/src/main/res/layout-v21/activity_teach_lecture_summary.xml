@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -14,7 +13,7 @@
         android:background="?attr/colorPrimary"
         android:backgroundTint="@color/fui_bgAnonymous"
         android:gravity="center"
-        android:text="Lecture Summary"
+        android:text="@string/lectureSummary"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="30sp"

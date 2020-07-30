@@ -8,6 +8,7 @@ import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -17,6 +18,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
+import com.imperial.word2mouth.learn.main.online.LearnOnlineCourseSummary;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
@@ -27,6 +30,7 @@ import com.imperial.word2mouth.teach.offline.create.audio.AudioRecorder;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class LearnOfflineCourseSummary extends AppCompatActivity {
 
@@ -91,6 +95,7 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
     private ImageButton learnButton;
     // Model
     private String lectureName;
+    private TextToSpeech textToSpeech;
     // Controller
 
 
@@ -122,7 +127,65 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
         // Audio
         configureAudio();
 
+        configureTextToSpeech();
+        configureOnLongClicks();
     }
+
+    private void configureOnLongClicks() {
+        learnButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.learn));
+                return true;
+            }
+        });
+
+        deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.delete));
+                return true;
+            }
+        });
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(LearnOfflineCourseSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(LearnOfflineCourseSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        super.onDestroy();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
 
     private void fetchAndCreateInformationAboutCourse() {
         // File

@@ -74,6 +74,8 @@ public class ArrayAdapterLectureOffline extends ArrayAdapter<LectureItem>
         }
 
 
+
+
         // Audio
 
         if (lectureItems.get(position).getAudio() != null) {
@@ -111,7 +113,6 @@ public class ArrayAdapterLectureOffline extends ArrayAdapter<LectureItem>
                 }
             });
         }
-
 
         return convertView;
     }

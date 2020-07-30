@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="login_failed">" échec de la connexion"</string>
+    <string name="invalid_password">" Le mot de passe doit contenir > 5 caractères"</string>
+    <string name="invalid_username">" Nom d'utilisateur invalide"</string>
+    <string name="action_sign_in_short">se connecté</string>
+    <string name="action_sign_in">"Connexion ou Inscription "</string>
+    <string name="welcome">"Bienvenu! "</string>
+    <string name="prompt_password">Mot de passe</string>
+    <string name="prompt_email">Email</string>
+    <string name="teaching">Enseigné</string>
+    <string name="login">Connexion</string>
+    <string name="settings">Parametrage</string>
+    <string name="bluetooth">Partage sans Internet via Bluetooth</string>
+    <string name="learn">Apprendre</string>
+    <string name="delete">Suprimé contenu</string>
+    <string name="gallery">"photo de la galerie "</string>
+    <string name="course_summary">"Résumé du cours "</string>
+    <string name="instructions">Instructions</string>
+    <string name="title">Titre</string>
+    <string name="share">Partage</string>
+    <string name="video_selector">"Sélecteur vidéo "</string>
+    <string name="offline">"Sur l'appareil "</string>
+    <string name="online">Sur Internet</string>
+    <string name="query">"Méthode de recherche "</string>
+    <string name="speakSearch">Parler la recherche</string>
+    <string name="fingerQuery">recherche au doigt</string>
+    <string name="searchProfile">recherche par profil</string>
+    <string name="searchCategory">recherche par catégorie</string>
+    <string name="searchLanguage">recherche par langue</string>
+    <string name="search">recherche</string>
+    <string name="listenSearch">Entendre la Recherche</string>
+    <string name="recordSearch">enregistrer un discours Recherche</string>
+    <string name="unfollowCourse">Arrêtez de Suivre le cours. Vous ne serez pas averti lorsqu\'une nouvelle leçon sera disponible en ligne.</string>
+    <string name="followCourse">Suivez le cours. Vous serez averti lorsqu\'une nouvelle leçon sera disponible</string>
+    <string name="downloadLecture">Télécharger la leçon</string>
+    <string name="nextSlide">page suivante</string>
+    <string name="previousSLide">page précédente</string>
+    <string name="uploadCourse">mettre le cours sélectionné en ligne</string>
+    <string name="editCourse">modifier le cours sélectionné</string>
+    <string name="createCourse">créer un cours</string>
+    <string name="uploadLesson">mettre la leçon sélectionné sur Firebase</string>
+    <string name="editLecture">modifier la leçon sélectionné</string>
+    <string name="createLecture">créer une leçon</string>
+    <string name="recordWithMicrophone">enregistrer un message vocale</string>
+    <string name="createSlide">créer une page</string>
+    <string name="addPhotoThumbnail">ajouter une photo</string>
+    <string name="lectureSummary">Résumé de la leçon</string>
+    <string name="editSlide">modifier la page sélectionné</string>
+    <string name="logout">déconnexion</string>
+    <string name="profilePicture">Ajoutez une photo de profil à votre compte.</string>
+    <string name="followers"># Suiveurs</string>
+    <string name="course_data_summary">Résumé des données du cours</string>
+    <string name="downloads"># Téléchargements</string>
+
+
+</resources>

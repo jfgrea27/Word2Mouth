@@ -7,6 +7,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -22,11 +23,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
@@ -50,6 +53,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicMarkableReference;
 
 public class LearnOnlineCourseSummary extends AppCompatActivity {
@@ -125,6 +129,8 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     private ProgressBar progress;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
     private boolean isFollowing = false;
+    private TextToSpeech textToSpeech;
+
     // Controller
 
 
@@ -161,6 +167,10 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
 
         fetchThumbnailCourse();
 
+        configureTextToSpeech();
+        configureOnLongClicks();
+
+
     }
 
     private void checkIfCourseIsFollowed() {
@@ -177,6 +187,15 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
         return ;
     }
 
+    @Override
+    protected void onDestroy() {
+        if (textToSpeech != null) {
+            textToSpeech.stop();
+            textToSpeech.shutdown();
+        }
+        super.onDestroy();
+    }
+
     private void configureUI() {
         if (isFollowing) {
             unfollowCourse.setVisibility(View.VISIBLE);
@@ -187,6 +206,31 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
             unfollowCourse.setVisibility(View.INVISIBLE);
 
         }
+    }
+
+    private void configureOnLongClicks() {
+        unfollowCourse.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.unfollowCourse));
+                return true;
+            }
+        });
+        followCourse.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.followCourse));
+                return true;
+            }
+        });
+        downloadButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.downloadLecture));
+                return true;
+            }
+        });
+
     }
 
     private void configureUnfollowButton() {
@@ -207,6 +251,9 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
                     isFollowing = false;
                     unfollowCourse.setVisibility(View.INVISIBLE);
                     followCourse.setVisibility(View.VISIBLE);
+                    // update firbase counter for course
+                    db.collection("content").document(course.getCourseOnlineIdentification()).update("followersCounter", FieldValue.increment(-1));
+
                 }
             }
         });
@@ -233,6 +280,9 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
                     isFollowing = true;
                     unfollowCourse.setVisibility(View.VISIBLE);
                     followCourse.setVisibility(View.INVISIBLE);
+                    // update firbase counter for course
+
+                    db.collection("content").document(course.getCourseOnlineIdentification()).update("followersCounter", FieldValue.increment(1));
                 }
             }
         });
@@ -445,6 +495,33 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
             }
 
         }
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    // Speak stuff
+
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(LearnOnlineCourseSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(LearnOnlineCourseSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
     }
 
 
