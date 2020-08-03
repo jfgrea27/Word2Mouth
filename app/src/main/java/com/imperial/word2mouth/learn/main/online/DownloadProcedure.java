@@ -77,9 +77,9 @@ public class DownloadProcedure {
                 insertCourseMetaFiles(courseFile.getPath());
                 fetchThumbnailCourse(courseFile.getPath());
                 downloadLecture(courseFile.getPath());
+
             }
         });
-
     }
 
 
@@ -144,10 +144,20 @@ public class DownloadProcedure {
                 courseSoundUri = uri;
             }
         });
+
+
     }
 
 
     private void downloadLecture(String localCoursePath) {
+
+        // Retrieve Previous Version And Delete From the  cache Folder
+        String version = FileReaderHelper.readTextFromFile(localCoursePath + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+        File f = new File(activity.getExternalFilesDir(null) + DirectoryConstants.cache + version + ".txt");
+        if (f.exists()) {
+            f.delete();
+        }
+
         File lectureFile = new File(context.getExternalFilesDir(null).getPath() + DirectoryConstants.zip + lectureItem.getLectureName() + ".zip");
         if (!lectureFile.exists()) {
             try {
@@ -166,6 +176,7 @@ public class DownloadProcedure {
                     Toast.makeText(context, "Downloading the Lecture", Toast.LENGTH_SHORT).show();
                     moveZipCourse(lectureFile.getPath(), localCoursePath + DirectoryConstants.lectures);
 
+                    createACacheForNewVersion(localCoursePath + DirectoryConstants.lectures + "/" + lectureItem.getLectureName());
                     tidyZipFolder();
 
                     switch (type) {
@@ -181,6 +192,13 @@ public class DownloadProcedure {
                     }
                     // Update Downloads Counter of the lecture
                     db.collection("content").document(lectureItem.getLectureIdentification()).update("downloadCounter", FieldValue.increment(1));
+                }
+
+                private void createACacheForNewVersion(String lecturePath) {
+                    String version = FileReaderHelper.readTextFromFile(lecturePath + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+                    File f = new File(localCoursePath + DirectoryConstants.lectures + lectureItem.getLectureName() + DirectoryConstants.slides);
+                    int numberSlides = f.listFiles().length;
+                    FileHandler.createFileForLectureTracking(version, numberSlides, activity);
                 }
             });
         }
@@ -198,7 +216,6 @@ public class DownloadProcedure {
 
     private void moveZipCourse(String sourcePath, String destPath) {
         UnzipFile.unzipFile(sourcePath, destPath);
-
     }
 
     private String checkCourseExistOnDevice() {

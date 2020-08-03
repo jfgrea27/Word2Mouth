@@ -26,7 +26,6 @@ public class CourseItem implements Parcelable {
 
 
     private String authorID = "";
-
     private String courseOnlineIdentification = null;
 
     // For offline purposes

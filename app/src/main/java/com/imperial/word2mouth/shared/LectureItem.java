@@ -26,6 +26,7 @@ public class LectureItem implements Parcelable {
     private String lectureIdentification = "";
     private String courseIdentification = "";
 
+    private String version = "";
     private String authorUID = "";
 
 
@@ -174,4 +175,12 @@ public class LectureItem implements Parcelable {
             return new LectureItem[size];
         }
     };
+
+    public String getVersion() {
+        return version;
+    }
+
+    public void setVersion(String version) {
+        this.version = version;
+    }
 }

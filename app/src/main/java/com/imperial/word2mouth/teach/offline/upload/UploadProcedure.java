@@ -10,22 +10,28 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.imperial.word2mouth.learn.main.offline.tracker.LectureTracker;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.LectureItem;
 import com.imperial.word2mouth.teach.offline.upload.database.CourseTransferObject;
+import com.imperial.word2mouth.teach.offline.upload.database.LectureTrackerObject;
 import com.imperial.word2mouth.teach.offline.upload.database.LectureTransferObject;
 import com.imperial.word2mouth.teach.offline.upload.storage.StorageUploadPreparation;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public class UploadProcedure {
 
@@ -49,7 +55,8 @@ public class UploadProcedure {
     private UploadListener listener;
     private boolean uploadEntireCourse = false;
     private HashMap<LectureTransferObject, LectureItem> mapLTOItem = new HashMap<>();
-
+    private String previousVersion = null;
+    private int numberSlidesPerLecture;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -99,6 +106,14 @@ public class UploadProcedure {
         FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getCategory(), FileHandler.CATEGORY_SELECTION);
         FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getAuthorUID(), FileHandler.AUTHOR);
 
+        previousVersion = FileReaderHelper.readTextFromFile(lectureItem.getLecturePath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+
+        lectureItem.setVersion(UUID.randomUUID().toString());
+
+        numberSlidesPerLecture = new File(lectureItem.getLecturePath() + DirectoryConstants.slides).listFiles().length;
+        FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getVersion(), FileHandler.VERSION);
+        FileHandler.createFileForLectureTracking(lectureItem, activity);
+
     }
 
     private void addAllNecessaryFilesToCourse() {
@@ -114,7 +129,7 @@ public class UploadProcedure {
             dto = new CourseTransferObject(courseItem);
             contentRef = database.getReference("/content/");
 
-            // Allow Speak Search //TODO change this using Algolia
+            // Allow Speak Search
             dto.setLowerCapital();
 
             if (courseItem.getCourseOnlineIdentification() == null || courseItem.getCourseOnlineIdentification().isEmpty()) {
@@ -141,6 +156,8 @@ public class UploadProcedure {
                                 uploadThumbnailCourseStorage();
                             }
                         });
+
+
 
                     }
                 });
@@ -220,7 +237,7 @@ public class UploadProcedure {
 
                 // Fetch all the lectures under that course
                 // Upload these on by one to the Firestore and Storage
-                uploadCourseToDatabase();
+                uploadAllLecturesToDatabase();
 
             }
 
@@ -235,8 +252,33 @@ public class UploadProcedure {
 
         lto = new LectureTransferObject(lectureItem);
 
+        lto.versionUID = lectureItem.getVersion();
+
+        // delete current version
+        if (!previousVersion.isEmpty() && previousVersion != null) {
+            // delete from firebase
+            db.collection("track").whereEqualTo("version", previousVersion).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
+                    for (DocumentSnapshot doc : docs) {
+                        doc.getReference().delete();
+                    }
+                }
+            });
+        }
+
+        LectureTrackerObject lTrackO = new LectureTrackerObject(lto.versionUID, numberSlidesPerLecture);
+
+        db.collection("track").add(lTrackO).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+            @Override
+            public void onSuccess(DocumentReference documentReference) {
+
+            }
+        });
 
         if (lectureItem.getLectureIdentification().isEmpty()) {
+
 
             db.collection("content").add(lto).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
@@ -385,7 +427,7 @@ public class UploadProcedure {
     // Step 1 to 2 are the same
 
     // Step 3b
-    private void uploadCourseToDatabase() {
+    private void uploadAllLecturesToDatabase() {
         File f = new File(courseItem.getCoursePath() + DirectoryConstants.lectures);
 
         File[] lectures = f.listFiles();
@@ -393,7 +435,38 @@ public class UploadProcedure {
         int max = lectures.length;
 
         for (File lecture : lectures) {
-            lto = new LectureTransferObject(retrieveLectureContent(lecture));
+
+            // delete current version
+            String version = getCurrentVersion(lecture);
+
+            if (!version.isEmpty() && version != null) {
+                // delete from firebase
+                db.collection("track").whereEqualTo("version", version).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                    @Override
+                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                        List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
+                        for (DocumentSnapshot doc : docs) {
+                            doc.getReference().delete();
+                        }
+                    }
+                });
+            }
+
+
+            LectureItem temp = retrieveLectureContent(lecture);
+            lto = new LectureTransferObject(temp);
+            lto.versionUID = temp.getVersion();
+            // Upload the version of the lecture
+            FileHandler.createFileForSlideContentAndReturnIt(lecture.getPath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getVersion(), FileHandler.VERSION);
+
+            LectureTrackerObject lTrackO = new LectureTrackerObject(lto.versionUID, collectNumberSlides(lecture));
+
+            db.collection("track").add(lTrackO).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                @Override
+                public void onSuccess(DocumentReference documentReference) {
+
+                }
+            });
             lto.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getAbsolutePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
             // never uploaded to online before
             if (lto.lectureUID.isEmpty()) {
@@ -447,6 +520,11 @@ public class UploadProcedure {
                 });
             }
         }
+    }
+
+    private String getCurrentVersion(File lecture) {
+        File f = new File(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+        return FileReaderHelper.readTextFromFile(f.getPath());
     }
 
     private void uploadEachLectureThumbnailToStorage() {
@@ -532,7 +610,6 @@ public class UploadProcedure {
         FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getAuthorID(), FileHandler.AUTHOR);
         FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, activity.getContentResolver(), key, FileHandler.ONLINE_LECTURE_IDENTIFICATION);
 
-
     }
 
 
@@ -565,11 +642,15 @@ public class UploadProcedure {
         lectureItem.setCourseName(courseName);
         lectureItem.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
         lectureItem.setBluetoothCourse(FileReaderHelper.readTextFromFile(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
-
+        lectureItem.setVersion(UUID.randomUUID().toString());
 
         return lectureItem;
     }
 
+    private int collectNumberSlides(File lecture) {
+        File f = new File(lecture + DirectoryConstants.slides);
+        return f.listFiles().length;
+    }
 
 
 

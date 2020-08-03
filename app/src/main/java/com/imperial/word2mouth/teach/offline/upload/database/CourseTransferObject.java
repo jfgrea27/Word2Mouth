@@ -14,7 +14,6 @@ public class CourseTransferObject {
     private final String category;
     public int followersCounter = 0;
     private String courseUID;
-
     private String bluetoothCourse;
 
 

@@ -29,6 +29,7 @@ import com.imperial.word2mouth.shared.adapters.ArrayAdapterLectureOffline;
 import com.imperial.word2mouth.teach.offline.create.audio.AudioRecorder;
 
 import java.io.File;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -99,6 +100,12 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
     // Controller
 
 
+    // Data
+    // time spent data
+    private long start;
+    private long end;
+
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -129,6 +136,9 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
 
         configureTextToSpeech();
         configureOnLongClicks();
+
+        start = System.currentTimeMillis();
+
     }
 
     private void configureOnLongClicks() {
@@ -181,6 +191,15 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
             textToSpeech.stop();
             textToSpeech.shutdown();
         }
+
+        // Time span data
+        end = System.currentTimeMillis();
+        long differenceTime = end - start;
+
+        // Upload the time spent in the data tracking
+        // TODO
+
+
         super.onDestroy();
     }
 

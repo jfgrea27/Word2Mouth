@@ -31,4 +31,10 @@ public class DirectoryConstants {
     public static String courseBluetooth = "/courseBluetooth.txt";
     public static String lectureBluetooth = "/lectureBluetooth.txt";
 
+    public static String versionLecture = "/version.txt";
+
+    // Tracking stuff
+    public static String lectureTracking = "/lectureTracker.txt";
+    public static String slideTracker = "/slideTracker.txt";
+    public static String tracking = "/track/";
 }

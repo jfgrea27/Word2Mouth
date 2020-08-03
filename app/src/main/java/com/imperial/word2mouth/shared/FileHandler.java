@@ -1,22 +1,32 @@
 package com.imperial.word2mouth.shared;
 
+import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
 
 import androidx.annotation.Nullable;
 
+import com.imperial.word2mouth.learn.main.offline.tracker.LectureTracker;
+import com.imperial.word2mouth.learn.main.offline.tracker.SlideTracker;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Collection;
+import java.util.Scanner;
 
 public class FileHandler {
 
@@ -37,6 +47,8 @@ public class FileHandler {
     public static final int BLUETOOTH_UUID_COURSE = 113;
     public static final int ONLINE_LECTURE_IDENTIFICATION = 114;
     public static final int LECTURE_UUID_BLUETOOTH = 115;
+    public static final int VERSION = 116;
+    public static final int LECTURE_TRACKING = 117;
 
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
@@ -129,10 +141,49 @@ public class FileHandler {
             case LECTURE_UUID_BLUETOOTH:
                 outputAddress += DirectoryConstants.lectureBluetooth;
                 return copyTextToFile(outputAddress, script);
+            case VERSION:
+                outputAddress += DirectoryConstants.versionLecture;
+                return copyTextToFile(outputAddress, script);
+            case LECTURE_TRACKING:
+                outputAddress += DirectoryConstants.lectureTracking;
+                return copyTextToFile(outputAddress, script);
             default:
                 return null;
         }
     }
+
+//    public static File createFileForTrackingData(String lectureTrackerPath, ContentResolver content, LectureTracker tracker) {
+//        File f = new File(lectureTrackerPath);
+//
+//        FileWriter fw;
+//        try {
+//            fw = new FileWriter("tmp");
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        BufferedReader br = null;
+//        try {
+//            br = new BufferedReader(new FileReader(f));
+//
+//            br.readLine();
+//
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//
+////
+////        while (scanner.hasNextLine()) {
+////
+////            updateCurrentl
+////            System.out.println(scanner.nextLine());
+////        }
+////
+////        for (SlideTracker s : tracker.slides) {
+////
+////        }
+////        return updateTrackingFile(versionUID, slidetracker)
+//    }
 
     // Text
 
@@ -241,10 +292,6 @@ public class FileHandler {
 
     }
 
-    public static void shuffleUpFiles(File second, File First) {
-
-    }
-
 
     public static void addTree(File file, Collection<File> all) {
         File[] children = file.listFiles();
@@ -256,20 +303,6 @@ public class FileHandler {
         }
     }
 
-    public static boolean copyFile(InputStream inputStream, OutputStream out) {
-        byte buf[] = new byte[1024];
-        int len;
-        try {
-            while ((len = inputStream.read(buf)) != -1) {
-                out.write(buf, 0, len);
-            }
-            out.close();
-            inputStream.close();
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
-    }
 
 
     public static void saveUriFileToDestination(Uri sourceuri, String destinationPath)
@@ -299,4 +332,144 @@ public class FileHandler {
             }
         }
     }
+
+    public static void createFileForLectureTracking(LectureItem lectureItem, Activity activity) {
+
+        File lectureDirectory = new File(lectureItem.getLecturePath() + DirectoryConstants.slides);
+        int numberSlides = lectureDirectory.listFiles().length;
+
+
+        File trackerSlides = new File(activity.getExternalFilesDir(null).getPath() + DirectoryConstants.cache + lectureItem.getVersion() + ".txt");
+        if (!trackerSlides.exists()) {
+            try {
+                trackerSlides.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(trackerSlides);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+
+        try {
+            bw.write(lectureItem.getVersion());
+            bw.newLine();
+
+            for (int i = 0; i < numberSlides; i++) {
+                bw.write("0, 0, 0");
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void createFileForLectureTracking(String version, int numberSlides, Activity activity) {
+
+        File trackerSlides = new File(activity.getExternalFilesDir(null).getPath() + DirectoryConstants.cache + version + ".txt");
+        if (!trackerSlides.exists()) {
+            try {
+                trackerSlides.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(trackerSlides);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+
+        try {
+            bw.write(version);
+            bw.newLine();
+            for (int i = 0; i < numberSlides; i++) {
+                bw.write("0,0,0");
+                bw.newLine();
+            }
+            bw.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public static void updateTracker(LectureTracker lectureTracker, Activity activity, String lecturePath) {
+        int counter = 0;
+
+        String version = FileReaderHelper.readTextFromFile(lecturePath + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+        File lectureTrackerFile = new File(activity.getExternalFilesDir(null).getPath() + DirectoryConstants.cache + version + ".txt");
+
+        if (lectureTrackerFile.exists()) {
+            FileInputStream fis = null;
+            try {
+                fis = new FileInputStream(lectureTrackerFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            // Retrieve data and Update Lecture Tracker
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+            try {
+                version = br.readLine();
+                String entry = br.readLine();
+                while (entry != null && !entry.isEmpty()) {
+                    // Update within the LectureTracker
+                    String[] data = entry.split("\\s*,\\s*");
+                    long time = Long.parseLong(data[0]);
+                    int videoCounter = Integer.parseInt(data[1]);
+                    int soundCounter = Integer.parseInt(data[2]);
+
+                    lectureTracker.slides.get(counter).updateEntries(time, videoCounter, soundCounter);
+
+                    counter++;
+                    entry = br.readLine();
+                }
+                br.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+            // Store LectureTracker Inside file
+            FileOutputStream fos = null;
+            try {
+                fos = new FileOutputStream(lectureTrackerFile);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+
+            try {
+                bw.write(version);
+                bw.newLine();
+
+                for (SlideTracker s : lectureTracker.slides) {
+                    String data = s.getTimeSpent() + "," + s.getVideoCounter() + "," + s.getSoundCounter();
+                    bw.write(data);
+                    bw.newLine();
+                }
+                bw.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+
 }
+

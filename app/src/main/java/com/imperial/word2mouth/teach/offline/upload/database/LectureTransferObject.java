@@ -11,7 +11,7 @@ public class LectureTransferObject {
     public final String category;
     public final String lectureName;
     public int downloadCounter = 0;
-
+    public String versionUID = null;
     public  String lectureUID = "";
 
     public String getBluetoothCourse() {

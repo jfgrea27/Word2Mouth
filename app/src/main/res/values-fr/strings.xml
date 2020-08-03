@@ -8,7 +8,7 @@
     <string name="welcome">"Bienvenu! "</string>
     <string name="prompt_password">Mot de passe</string>
     <string name="prompt_email">Email</string>
-    <string name="teaching">Enseigné</string>
+    <string name="teaching">Enseigner</string>
     <string name="login">Connexion</string>
     <string name="settings">Parametrage</string>
     <string name="bluetooth">Partage sans Internet via Bluetooth</string>

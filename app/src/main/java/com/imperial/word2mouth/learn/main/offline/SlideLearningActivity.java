@@ -13,6 +13,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.imperial.word2mouth.learn.main.offline.tracker.LectureTracker;
+import com.imperial.word2mouth.learn.main.offline.tracker.SlideTracker;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.R;
@@ -20,6 +22,7 @@ import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.shared.FileHandler;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.util.Locale;
 
 public class SlideLearningActivity extends AppCompatActivity {
@@ -52,7 +55,7 @@ public class SlideLearningActivity extends AppCompatActivity {
     // Model Variables
     private int slideCounter = 0;
     private int totalNumberSlides = 0;
-    private String coursePath;
+    private String lecturePath;
 
 
     // File Management
@@ -64,15 +67,23 @@ public class SlideLearningActivity extends AppCompatActivity {
     private File instructionsFile = null;
 
     private TextToSpeech textToSpeech;
+    private LectureTracker lectureTracker;
+
+    // Time Start and end for each slide
+    private long start;
+    private long end;
+    private int videoCounter = 0;
+    private int soundCounter = 0;
+    private String versionUID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_slide);
 
-        coursePath = (String) getIntent().getExtras().get(IntentNames.LECTURE_PATH);
+        lecturePath = (String) getIntent().getExtras().get(IntentNames.LECTURE_PATH);
 
-        slidesFolder = new File(coursePath + DirectoryConstants.slides);
+        slidesFolder = new File(lecturePath + DirectoryConstants.slides);
 
         // meta
         if (!slidesFolder.exists()) {
@@ -107,6 +118,19 @@ public class SlideLearningActivity extends AppCompatActivity {
         configureTextToSpeech();
         configureLongClicks();
 
+        // Data
+        configureLectureTracker();
+        configureInitialSlideTracker();
+    }
+
+    private void configureInitialSlideTracker() {
+        versionUID = FileReaderHelper.readTextFromFile(lecturePath + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+
+        lectureTracker = new LectureTracker(versionUID, totalNumberSlides);
+    }
+
+    private void configureLectureTracker() {
+        start = System.currentTimeMillis();
     }
 
     private void configureLongClicks() {
@@ -157,6 +181,10 @@ public class SlideLearningActivity extends AppCompatActivity {
             textToSpeech.stop();
             textToSpeech.shutdown();
         }
+
+        // Update the current state of the lecture
+        FileHandler.updateTracker(lectureTracker, this, lecturePath);
+
         super.onDestroy();
     }
 
@@ -183,6 +211,7 @@ public class SlideLearningActivity extends AppCompatActivity {
         previousSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                updateDataTrackingForCurrentSlide();
                 slideCounter--;
                 // reach first slide
                 if(slideCounter < 0) {
@@ -198,11 +227,26 @@ public class SlideLearningActivity extends AppCompatActivity {
         });
     }
 
+    private void updateDataTrackingForCurrentSlide() {
+        // Add time for the current slide and then new tracker
+        end = System.currentTimeMillis();
+        lectureTracker.getSlideTracker(slideCounter).setTimeSpent(end - start);
+        lectureTracker.getSlideTracker(slideCounter).setSoundCounter(soundCounter);
+        lectureTracker.getSlideTracker(slideCounter).setVideoCounter(videoCounter);
+
+        end = 0;
+        start = System.currentTimeMillis();
+        soundCounter = 0;
+        videoCounter = 0;
+    }
+
     private void configureNextButton() {
         nextSlide = findViewById(R.id.button_next);
         nextSlide.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                updateDataTrackingForCurrentSlide();
+
                 slideCounter++;
                 // creating a new Slide
                 if(totalNumberSlides <= slideCounter) {
@@ -244,7 +288,7 @@ public class SlideLearningActivity extends AppCompatActivity {
     }
 
     private void retrieveSlide() {
-        currentSlideDirectory = FileHandler.retrieveSlideDirectoryByNumber(coursePath, slideCounter);
+        currentSlideDirectory = FileHandler.retrieveSlideDirectoryByNumber(lecturePath, slideCounter);
 
         if (currentSlideDirectory != null) {
             // title
@@ -300,8 +344,10 @@ public class SlideLearningActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (audio != null) {
+                    soundCounter++;
                     audioPlayer = MediaPlayer.create(SlideLearningActivity.this, audio);
                     audioPlayer.start();
+
                 }
             }
         });
@@ -325,6 +371,7 @@ public class SlideLearningActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (videoView != null) {
+                    videoCounter++;
                     videoButton.setVisibility(View.INVISIBLE);
                     videoView.start();
                     videoView.setBackgroundColor(Color.TRANSPARENT);
