@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import com.imperial.word2mouth.learn.main.offline.tracker.LectureTracker;
 import com.imperial.word2mouth.learn.main.offline.tracker.SlideTracker;
@@ -25,7 +27,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.Collection;
+import java.util.List;
 import java.util.Scanner;
 
 public class FileHandler {
@@ -469,6 +475,46 @@ public class FileHandler {
         }
 
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static void updateTeacherTracker(File trackingFile, String currentTime, List<Long> time, List<Long> audio, List<Long> video) {
+
+        // Store LectureTracker Inside file
+        try {
+
+            BufferedWriter out = new BufferedWriter(
+                    new FileWriter(trackingFile, true));
+
+            out.write(currentTime);
+            out.write("\n");
+            out.write(listToStringConvert(time));
+            out.write("\n");
+            out.write(listToStringConvert(video));
+            out.write("\n");
+            out.write(listToStringConvert(audio));
+            out.write("\n");
+            out.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    private static String listToStringConvert(List<Long> items) {
+        String result = new String();
+
+        int lengthList = items.size();
+
+        for (int i = 0; i < lengthList - 1; i++) {
+            result += items.get(i).toString() + ",";
+        }
+        result += items.get(lengthList - 1);
+
+        return result;
+    }
+
 
 
 }

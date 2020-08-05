@@ -59,6 +59,7 @@
     <string name="followers"># Followers</string>
     <string name="course_data_summary">Course Data Summary</string>
     <string name="downloads"># Downloads</string>
+    <string name="statistics" />
 
 
 </resources>

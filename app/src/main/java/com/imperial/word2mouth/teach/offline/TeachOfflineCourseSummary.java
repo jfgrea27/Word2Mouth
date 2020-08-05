@@ -457,6 +457,13 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
             public void onClick(View v) {
 
                 if (selectedLecture) {
+
+                    String version = FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+                    File f = new File(getExternalFilesDir(null) + DirectoryConstants.cache + version + ".txt");
+                    if (f.exists()) {
+                        f.delete();
+                    }
+
                     FileHandler.deleteRecursive(new File (lecturesDirectory.getPath() + "/" + localLectures.get(lectureNumber).getLectureName()));
                     selectedLecture = false;
 

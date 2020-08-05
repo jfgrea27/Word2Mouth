@@ -18,55 +18,12 @@
         android:textColor="@android:color/white"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:targetApi="lollipop">
 
     </TextView>
 
-    <TextView
-        android:id="@+id/data_title"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:background="@color/colorAccent"
-        android:gravity="center_horizontal"
-        android:text="@string/course_data_summary"
-        android:textAlignment="center"
-        android:textColor="@color/colorWhite"
-        android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/delete_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/list_item_text"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/data_title">
-
-        <TableRow>
-
-            <TextView
-                android:padding="3dip"
-                android:text="@string/followers"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/number_followers"
-                android:gravity="right"
-                android:padding="3dip"
-                android:text="0"
-                android:textAlignment="center"
-                tools:ignore="RtlCompat" />
-        </TableRow>
-    </TableLayout>
 
     <ImageButton
         android:id="@+id/list_item_thumbnail"
@@ -120,6 +77,33 @@
         app:srcCompat="@drawable/ic_speak" />
 
 
+    <TextView
+        android:id="@+id/lectureTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:background="@color/colorAccent"
+        android:gravity="center"
+        android:text="Lectures Under this Course"
+        android:textAlignment="center"
+        android:textColor="@android:color/white"
+        android:textSize="20sp"
+        app:layout_constraintTop_toBottomOf="@+id/list_item_text"
+        tools:targetApi="lollipop">
+
+    </TextView>
+
+
+    <ListView
+        android:id="@+id/lecture_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/lectureTitle">
+
+    </ListView>
+
     <ImageButton
         android:id="@+id/lecture_summary_button"
         android:layout_width="100dp"
@@ -131,7 +115,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/delete_button"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/statistics"
         app:srcCompat="@drawable/ic_teach_black">
 
     </ImageButton>
@@ -154,40 +138,19 @@
 
     </ImageButton>
 
-    <ListView
-        android:id="@+id/lecture_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="318dp"
-        android:layout_marginTop="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+
+    <ImageButton
+        android:id="@+id/statistics"
+        android:layout_width="85dp"
+        android:layout_height="85dp"
+        android:background="@color/colorWhite"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/lecture_summary_button"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tableLayout">
+        app:srcCompat="@drawable/ic_statistics">
 
-    </ListView>
-
-
-    <!--    <TextView-->
-<!--        android:id="@+id/textView"-->
-<!--        android:layout_width="350dp"-->
-<!--        android:layout_height="54dp"-->
-<!--        android:text="TextView"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/delete_button"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.502"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/lecture_list_view"-->
-<!--        app:layout_constraintVertical_bias="0.0" />-->
-
-<!--    <TextView-->
-<!--        android:id="@+id/textView2"-->
-<!--        android:layout_width="347dp"-->
-<!--        android:layout_height="52dp"-->
-<!--        android:text="TextView"-->
-<!--        app:layout_constraintBottom_toTopOf="@+id/delete_button"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/textView" />-->
-
+    </ImageButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

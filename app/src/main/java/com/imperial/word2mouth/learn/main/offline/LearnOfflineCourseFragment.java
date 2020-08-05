@@ -329,12 +329,24 @@ public class LearnOfflineCourseFragment extends Fragment {
                     if (selectedCourse) {
                         if (courseName != null) {
                             File courseFile = new File(courseItem.getCoursePath());
+                            File lectureFolder = new File(courseFile.getPath() + DirectoryConstants.lectures);
+                            File[] lectures = lectureFolder.listFiles();
+
+                            for (File l : lectures) {
+                                String version = FileReaderHelper.readTextFromFile(l.getPath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+                                File f = new File(getActivity().getExternalFilesDir(null )+ DirectoryConstants.cache + version + ".txt");
+                                if (f.exists()) {
+                                    f.delete();
+                                }
+                            }
+
                             if (courseFile.exists()) {
                                 FileHandler.deleteRecursive(courseFile);
                                 adapter.remove(courseItem);
                                 adapter.notifyDataSetChanged();
                                 adapter.notifyDataSetInvalidated();
                             }
+
                             selectedCourse = false;
                             learn.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
                             delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);

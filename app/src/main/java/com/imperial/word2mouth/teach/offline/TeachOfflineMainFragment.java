@@ -250,6 +250,18 @@ public class TeachOfflineMainFragment extends Fragment {
             public void onClick(View v) {
                 if (courseNumber > -1) {
                     File courseFile = new File(localCourses.get(courseNumber).getCoursePath());
+                    File lectureFolder = new File(courseFile.getPath() + DirectoryConstants.lectures);
+                    File[] lectures = lectureFolder.listFiles();
+
+                    for (File l : lectures) {
+                        String version = FileReaderHelper.readTextFromFile(l.getPath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+                        File f = new File(getActivity().getExternalFilesDir(null )+ DirectoryConstants.cache + version + ".txt");
+                        if (f.exists()) {
+                            f.delete();
+                        }
+                    }
+
+
                     if (courseFile.exists()) {
                         FileHandler.deleteRecursive(courseFile);
                         adapter.remove(localCourses.get(courseNumber));

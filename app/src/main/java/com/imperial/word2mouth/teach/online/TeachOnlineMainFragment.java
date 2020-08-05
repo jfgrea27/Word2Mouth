@@ -35,11 +35,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.shared.adapters.ArrayAdapterCourseOnline;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.teach.TeachActivityMain;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -178,8 +180,28 @@ public class TeachOnlineMainFragment extends Fragment {
                                 }
                             });
                             itemRef.delete();
-
+                            String version = (String) doc.get("versionUID");
+                            db.collection("track").whereEqualTo("version", version).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                    List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
+                                    if (docs.size() == 1) {
+                                        DocumentSnapshot doc = docs.get(0);
+                                        doc.getReference().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                File f = new File(getActivity().getExternalFilesDir(null) + DirectoryConstants.lecturerTracking + version + ".txt");
+                                                if (f.exists()) {
+                                                    f.delete();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
                             db.collection("content").document((String) doc.get("lectureUID")).delete();
+
+
                             break;
                         case "Course":
                             itemRef = FirebaseStorage.getInstance().getReference().child("content").child((String) doc.get("courseUID"));

@@ -266,6 +266,12 @@ public class UploadProcedure {
                     }
                 }
             });
+
+            // delete file from tracker
+            File trackingData = new File(activity.getExternalFilesDir(null) + DirectoryConstants.lecturerTracking +  previousVersion + ".txt");
+            if (trackingData.exists()) {
+                trackingData.delete();
+            }
         }
 
         LectureTrackerObject lTrackO = new LectureTrackerObject(lto.versionUID, numberSlidesPerLecture);
@@ -450,6 +456,12 @@ public class UploadProcedure {
                         }
                     }
                 });
+            }
+
+            // delete file from tracker
+            File trackingData = new File(activity.getExternalFilesDir(null) + DirectoryConstants.lecturerTracking +  version + ".txt");
+            if (trackingData.exists()) {
+                trackingData.delete();
             }
 
 

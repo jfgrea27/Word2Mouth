@@ -35,6 +35,5 @@ public class DirectoryConstants {
 
     // Tracking stuff
     public static String lectureTracking = "/lectureTracker.txt";
-    public static String slideTracker = "/slideTracker.txt";
-    public static String tracking = "/track/";
+    public static String lecturerTracking = "/lecturerTracking/";
 }

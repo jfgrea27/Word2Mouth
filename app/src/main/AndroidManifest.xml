@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     package="com.imperial.word2mouth">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -33,7 +32,8 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".teach.online.TeachOnlineLectureSummary"></activity>
+        <activity android:name=".teach.online.TeachOnlineCourseStatistics"></activity>
+        <activity android:name=".teach.online.TeachOnlineLectureSummary" />
         <activity android:name=".background.LearnOnlineNewCourseSummary" />
 
         <receiver

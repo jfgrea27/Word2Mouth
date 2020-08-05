@@ -52,6 +52,7 @@
     <string name="followers"># Suiveurs</string>
     <string name="course_data_summary">Résumé des données du cours</string>
     <string name="downloads"># Téléchargements</string>
+    <string name="statistics" />
 
 
 </resources>

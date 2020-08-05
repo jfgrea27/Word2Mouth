@@ -7,33 +7,25 @@ import android.os.Build;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
 
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NotificationCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Parcelable;
 import android.speech.tts.TextToSpeech;
-import android.view.DragEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
-
-import android.speech.tts.TextToSpeech.OnInitListener;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.Word2Mouth;
 import com.imperial.word2mouth.background.ConnectivityReceiver;
-import com.imperial.word2mouth.background.LearnOnlineNewLecturesSelectionFragment;
 import com.imperial.word2mouth.background.NewLecturesDialog;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.R;
@@ -43,15 +35,11 @@ import com.imperial.word2mouth.shared.FileReaderHelper;
 import com.imperial.word2mouth.teach.TeachActivityMain;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -128,6 +116,11 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
         }
 
         f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.followFoder);
+        if (!f.exists()) {
+            f.mkdirs();
+        }
+
+        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.lecturerTracking);
         if (!f.exists()) {
             f.mkdirs();
         }
@@ -267,8 +260,9 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
                         if (docs.size() == 1) {
                             DocumentSnapshot doc = docs.get(0);
 
-                            List<Integer> audioFirebase = (List<Integer>) doc.get("audio");
-                            List<Integer> videoFirebase = (List<Integer>) doc.get("video");
+
+                            List<Long> audioFirebase = (List<Long>) doc.get("audio");
+                            List<Long> videoFirebase = (List<Long>) doc.get("video");
                             List<Long> timeFirebase = (List<Long>) doc.get("time");
 
                             try {
@@ -276,15 +270,18 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
                                 entry = br.readLine();
                                 int counter = 0;
                                 while (entry != null && !entry.isEmpty()) {
+
+
+
                                     // Update within the LectureTracker
                                     String[] data = entry.split("\\s*,\\s*");
                                     long time = Long.parseLong(data[0]);
                                     int videoCounter = Integer.parseInt(data[1]);
                                     int soundCounter = Integer.parseInt(data[2]);
 
-                                    audioFirebase.set(counter, audioFirebase.get(counter) + soundCounter);
-                                    videoFirebase.set(counter, videoCounter + videoFirebase.get(counter));
-                                    timeFirebase.set(counter, time + timeFirebase.get(counter));
+                                    audioFirebase.set(counter, new Long(audioFirebase.get(counter) + soundCounter));
+                                    videoFirebase.set(counter, new Long(videoCounter + videoFirebase.get(counter)));
+                                    timeFirebase.set(counter, new Long(time + timeFirebase.get(counter)));
 
                                     counter++;
                                     entry = br.readLine();
@@ -293,6 +290,12 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
+
+                            // Update Firebase
+                            doc.getReference().update("audio", audioFirebase);
+                            doc.getReference().update("time", timeFirebase);
+                            doc.getReference().update("video", videoFirebase);
+
 
                             // clear the File on Learner Track
                             trackLecture.delete();

@@ -31,12 +31,14 @@ import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.online.LearnOnlineCourseSummary;
 import com.imperial.word2mouth.shared.CourseItem;
+import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.IntentNames;
 import com.imperial.word2mouth.shared.LectureItem;
 import com.imperial.word2mouth.shared.adapters.ArrayAdapterLectureOnline;
 import com.imperial.word2mouth.teach.TeachActivityMain;
 import com.imperial.word2mouth.teach.offline.TeachOfflineCourseSummary;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -50,6 +52,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
     private ListView lecturesView;
     private ImageButton delete;
     private CourseItem courseItem;
+    private ImageButton statistics;
 
     private ImageButton lectureSummaryButton;
 
@@ -83,23 +86,21 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
         configureLectureSummaryButton();
         configureTextToSpeech();
         configureLongClicks();
-        configureFollowersCounter();
+        configureStatisticsButton();
     }
 
-    private void configureFollowersCounter() {
-        followersCounter = findViewById(R.id.number_followers);
-
-        db.collection("content").document(courseItem.getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @RequiresApi(api = Build.VERSION_CODES.N)
+    private void configureStatisticsButton() {
+        statistics.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot.get("followersCounter") != null) {
-                    followersCounter.setText(documentSnapshot.get("followersCounter").toString());
-                }
+            public void onClick(View v) {
+                Intent courseStat = new Intent(TeachOnlineCourseSummary.this, TeachOnlineCourseStatistics.class);
+                courseStat.putExtra(IntentNames.COURSE, courseItem);
+                startActivity(courseStat);
             }
         });
-
     }
+
+
 
     private void configureLectureSummaryButton() {
         lectureSummaryButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
@@ -133,19 +134,54 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
                     });
                     lectureRef.delete();
 
-                    // Delete from Firebase FireStore
-                    db.collection("content").document(lectures.get(lectureNumber).getLectureIdentification()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    db.collection("content").document(lectures.get(lectureNumber).getLectureIdentification()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                         @Override
-                        public void onSuccess(Void aVoid) {
-                            Toast.makeText(TeachOnlineCourseSummary.this, "Finished Deleting Lecture", Toast.LENGTH_SHORT).show();
+                        public void onSuccess(DocumentSnapshot documentSnapshot) {
+                            String version = (String) documentSnapshot.get("versionUID");
+
+                            // Delete from Firebase FireStore
+                            db.collection("content").document(lectures.get(lectureNumber).getLectureIdentification()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    // delete from the list adapter
+                                    adapter.remove(lectures.get(lectureNumber));
+                                    adapter.notifyDataSetChanged();
+                                    adapter.notifyDataSetInvalidated();
+                                    lectureNumber = -1;
+                                }
+                            });
+
+                            db.collection("track").whereEqualTo("version", version).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                @Override
+                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+
+                                    List<DocumentSnapshot> docs = queryDocumentSnapshots.getDocuments();
+                                    if (docs.size() == 1) {
+                                        DocumentSnapshot doc = docs.get(0);
+                                        doc.getReference().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                File f = new File(getExternalFilesDir(null) + DirectoryConstants.lecturerTracking + version + ".txt");
+                                                if (f.exists()) {
+                                                    f.delete();
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+
+                            db.collection("track").document(version).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+
+                                }
+                            });
                         }
                     });
 
-                    // delete from the list adapter
-                    adapter.remove(lectures.get(lectureNumber));
-                    adapter.notifyDataSetChanged();
-                    adapter.notifyDataSetInvalidated();
-                    lectureNumber = -1;
+
+
                 }
             }
 
@@ -190,6 +226,9 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
         lecturesView = findViewById(R.id.lecture_list_view);
         delete = findViewById(R.id.delete_button);
+
+        // Statsitics
+        statistics = findViewById(R.id.statistics);
     }
 
     private void fetchThumbnailCourse() {
@@ -346,6 +385,14 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
             @Override
             public boolean onLongClick(View v) {
                 speak(getString(R.string.lectureSummary));
+                return true;
+            }
+        });
+
+        statistics.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.statistics));
                 return true;
             }
         });

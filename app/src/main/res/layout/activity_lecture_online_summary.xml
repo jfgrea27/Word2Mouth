@@ -80,75 +80,190 @@
         app:srcCompat="@drawable/ic_speak" />
 
 
-    <ListView
-        android:id="@+id/lecture_list_view"
+    <ScrollView
+        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="318dp"
+        android:layout_height="515dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/audio_button">
+        app:layout_constraintTop_toBottomOf="@+id/list_item_text">
 
-    </ListView>
-
-
-    <TextView
-        android:id="@+id/data_title"
-        android:layout_width="match_parent"
-        android:layout_height="54dp"
-        android:background="@color/fui_bgAnonymous"
-        android:gravity="center_horizontal"
-        android:text="Lecture Data Summary"
-        android:textAlignment="center"
-        android:textColor="@color/colorWhite"
-        android:textSize="25sp"
-        app:layout_constraintBottom_toTopOf="@+id/delete_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/lecture_list_view"
-        app:layout_constraintVertical_bias="0.0" />
-
-    <TableLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/data_title">
-
-        <TableRow>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
             <TextView
-                android:padding="3dip"
-                android:text="@string/downloads"
-                android:textSize="15sp" />
-
-            <TextView
-                android:id="@+id/number_downloads"
-                android:gravity="right"
-                android:padding="3dip"
+                android:id="@+id/data_title"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:background="@color/fui_bgAnonymous"
+                android:gravity="center_horizontal"
+                android:text="Lecture Data Summary"
                 android:textAlignment="center"
-                android:text="0"
-                tools:ignore="RtlCompat" />
-        </TableRow>
-<!--        <TableRow>-->
+                android:textColor="@color/colorWhite"
+                android:textSize="25sp"
+                app:layout_constraintBottom_toTopOf="@+id/delete_button"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.502"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
-<!--            <TextView-->
-<!--                android:padding="3dip"-->
-<!--                android:text="# Likes"-->
-<!--                android:textSize="15sp" />-->
+            <TableLayout
+                android:id="@+id/tableLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/data_title">
 
-<!--            <TextView-->
-<!--                android:id="@+id/number_likes"-->
-<!--                android:gravity="right"-->
-<!--                android:padding="3dip"-->
-<!--                android:textAlignment="center"-->
-<!--                android:text="0"-->
-<!--                tools:ignore="RtlCompat" />-->
-<!--        </TableRow>-->
+                <TableRow>
 
-    </TableLayout>
+                    <TextView
+                        android:padding="3dip"
+                        android:text="@string/downloads"
+                        android:textSize="15sp" />
 
+                    <TextView
+                        android:id="@+id/number_downloads"
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text="0"
+                        android:textAlignment="center"
+                        tools:ignore="RtlCompat" />
+                </TableRow>
+            </TableLayout>
+
+
+            <TextView
+                android:id="@+id/time_graph_Title"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@color/fui_bgAnonymous"
+                android:gravity="center_horizontal"
+                android:text="Time Metrics"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
+
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/timeGraph"
+                android:layout_width="match_parent"
+
+                android:layout_height="200dip"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/time_graph_Title" />
+
+            <TableLayout
+                android:id="@+id/tableTime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/timeGraph">
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="# of Most Popular Slide"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/mostPopularSlide"
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text=""
+                        android:textAlignment="center"
+                        tools:ignore="RtlCompat" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="# of Least Popular Slide"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/leastPopularSlide"
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text=""
+                        android:textAlignment="center"
+                        tools:ignore="RtlCompat" />
+                </TableRow>
+            </TableLayout>
+
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/time7Graph"
+                android:layout_width="match_parent"
+
+                android:layout_height="200dip"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tableTime" />
+
+            <TextView
+                android:id="@+id/videoMetrics"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@color/fui_bgAnonymous"
+                android:gravity="center_horizontal"
+                android:text="Video Metrics"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                app:layout_constraintTop_toBottomOf="@+id/time7Graph"/>
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/videoGraph"
+                android:layout_width="match_parent"
+
+                android:layout_height="200dip"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/videoMetrics" />
+
+
+            <TextView
+                android:id="@+id/soundMetrics"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@color/fui_bgAnonymous"
+                android:gravity="center_horizontal"
+                android:text="Sound Metrics"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/videoGraph" />
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/soundGraph"
+                android:layout_width="match_parent"
+                android:layout_height="200dip"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/soundMetrics" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </ScrollView>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
