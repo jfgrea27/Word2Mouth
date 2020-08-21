@@ -6,89 +6,13 @@
     android:layout_height="match_parent">
 
 
-    <TextView
-        android:id="@+id/course_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:background="?attr/colorPrimary"
-        android:backgroundTint="@color/fui_bgAnonymous"
-        android:gravity="center"
-        android:text="Lecture Summary"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:targetApi="lollipop">
-
-    </TextView>
-
-    <TextView
-        android:id="@+id/list_item_text"
-        android:layout_width="160dp"
-        android:layout_height="65dp"
-        android:layout_centerInParent="true"
-        android:layout_toStartOf="@+id/list_audio_button"
-        android:layout_toLeftOf="@+id/list_audio_button"
-        android:layout_toEndOf="@id/list_item_thumbnail"
-        android:layout_toRightOf="@id/list_item_thumbnail"
-        android:gravity="center_horizontal"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/course_name" />
-
-
-
-    <ImageButton
-        android:id="@+id/list_item_thumbnail"
-        android:layout_width="75dp"
-        android:layout_height="70dp"
-        android:layout_centerVertical="true"
-        android:layout_gravity="start"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/todo"
-        android:focusable="false"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="@+id/list_item_text"
-        app:layout_constraintEnd_toStartOf="@+id/list_item_text"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/course_name"
-        app:layout_constraintVertical_bias="0.0"
-        app:srcCompat="@drawable/ic_picture" />
-
-    <ImageButton
-        android:id="@+id/audio_button"
-        android:layout_width="70dp"
-        android:layout_height="70dp"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_centerVertical="true"
-        android:background="@android:color/transparent"
-        android:contentDescription="@string/todo"
-        android:focusable="false"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="@+id/list_item_text"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/list_item_text"
-        app:layout_constraintTop_toBottomOf="@+id/course_name"
-        app:srcCompat="@drawable/ic_speak" />
-
-
     <ScrollView
-        android:id="@+id/scrollView2"
         android:layout_width="match_parent"
-        android:layout_height="515dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/list_item_text">
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -97,10 +21,10 @@
             <TextView
                 android:id="@+id/data_title"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
+                android:layout_height="55dp"
                 android:background="@color/fui_bgAnonymous"
                 android:gravity="center_horizontal"
-                android:text="Lecture Data Summary"
+                android:text="@string/lecture_data_summary"
                 android:textAlignment="center"
                 android:textColor="@color/colorWhite"
                 android:textSize="25sp"
@@ -112,7 +36,7 @@
                 app:layout_constraintVertical_bias="0.0" />
 
             <TableLayout
-                android:id="@+id/tableLayout2"
+                android:id="@+id/tableLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:stretchColumns="1"
@@ -135,48 +59,12 @@
                         android:textAlignment="center"
                         tools:ignore="RtlCompat" />
                 </TableRow>
-            </TableLayout>
-
-
-            <TextView
-                android:id="@+id/time_graph_Title"
-                android:layout_width="match_parent"
-                android:layout_height="25dp"
-                android:background="@color/fui_bgAnonymous"
-                android:gravity="center_horizontal"
-                android:text="Time Metrics"
-                android:textAlignment="center"
-                android:textColor="@android:color/white"
-                android:textSize="20sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
-
-
-            <com.jjoe64.graphview.GraphView
-                android:id="@+id/timeGraph"
-                android:layout_width="match_parent"
-
-                android:layout_height="200dip"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/time_graph_Title" />
-
-            <TableLayout
-                android:id="@+id/tableTime"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:stretchColumns="1"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/timeGraph">
 
                 <TableRow>
 
                     <TextView
                         android:padding="3dip"
-                        android:text="# of Most Popular Slide"
+                        android:text="@string/most_viewed_slide"
                         android:textSize="15sp" />
 
                     <TextView
@@ -192,7 +80,7 @@
 
                     <TextView
                         android:padding="3dip"
-                        android:text="# of Least Popular Slide"
+                        android:text="@string/least_viewed_slide"
                         android:textSize="15sp" />
 
                     <TextView
@@ -203,7 +91,47 @@
                         android:textAlignment="center"
                         tools:ignore="RtlCompat" />
                 </TableRow>
+
             </TableLayout>
+
+            <ImageButton
+                android:id="@+id/speakStatistics"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@color/colorWhite"
+                android:scaleType="fitXY"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tableLayout"
+                app:srcCompat="@drawable/ic_speak">
+
+            </ImageButton>
+
+
+            <TextView
+                android:id="@+id/time_graph_Title"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@color/fui_bgAnonymous"
+                android:gravity="center_horizontal"
+                android:text="@string/TimeMetrics"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/speakStatistics" />
+
+
+            <com.jjoe64.graphview.GraphView
+                android:id="@+id/timeGraph"
+                android:layout_width="match_parent"
+
+                android:layout_height="200dip"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/time_graph_Title" />
 
 
             <com.jjoe64.graphview.GraphView
@@ -213,7 +141,7 @@
                 android:layout_height="200dip"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tableTime" />
+                app:layout_constraintTop_toBottomOf="@+id/timeGraph" />
 
             <TextView
                 android:id="@+id/videoMetrics"
@@ -221,11 +149,11 @@
                 android:layout_height="25dp"
                 android:background="@color/fui_bgAnonymous"
                 android:gravity="center_horizontal"
-                android:text="Video Metrics"
+                android:text="@string/videoMetrics"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
-                app:layout_constraintTop_toBottomOf="@+id/time7Graph"/>
+                app:layout_constraintTop_toBottomOf="@+id/time7Graph" />
 
             <com.jjoe64.graphview.GraphView
                 android:id="@+id/videoGraph"
@@ -243,7 +171,7 @@
                 android:layout_height="25dp"
                 android:background="@color/fui_bgAnonymous"
                 android:gravity="center_horizontal"
-                android:text="Sound Metrics"
+                android:text="@string/audioMetrics"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
@@ -258,6 +186,31 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/soundMetrics" />
+
+
+            <TextView
+                android:id="@+id/fakeDataButton"
+                android:layout_width="match_parent"
+                android:layout_height="25dp"
+                android:background="@color/fui_bgAnonymous"
+                android:gravity="center_horizontal"
+                android:text="Fake Data"
+                android:textAlignment="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/soundGraph" />
+
+            <Button
+                android:id="@+id/fakeButton"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@color/colorWhite"
+                android:text="Fake Data"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/fakeDataButton" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>

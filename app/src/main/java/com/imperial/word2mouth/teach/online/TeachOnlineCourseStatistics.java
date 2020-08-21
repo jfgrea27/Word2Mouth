@@ -6,8 +6,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
+import android.text.SpannableStringBuilder;
 import android.util.Pair;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -30,14 +38,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 
 public class TeachOnlineCourseStatistics extends AppCompatActivity {
 
+    private TableLayout legend;
     private TextView followersCounter;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private CourseItem courseItem;
     private ArrayList<Pair<String, Integer>> colors = new ArrayList<>();
+    private TextView leastPopularLecture;
+    private TextView mostPopularLecture;
+    private DataExtractor extractor;
+    private ImageButton speakStatitics;
+    private TextToSpeech textToSpeech;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +63,65 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
 
         configureTimeGraphView();
         configureFollowersCounter();
+        configurePopularityCounter();
+        configureTextToSpeech();
+        configureSpeakStatistics();
+        configureLegend();
+    }
+
+    private void configureLegend() {
+        legend = findViewById(R.id.legend);
+        TableRow bigRow = new TableRow(TeachOnlineCourseStatistics.this);
+        bigRow.setGravity(Gravity.CENTER);
+        TextView bigText = new TextView(TeachOnlineCourseStatistics.this);
+        bigText.setText(getString(R.string.legend));
+        bigText.setTextSize(20);
+        bigText.setTextColor(Color.BLACK);
+        bigRow.addView(bigText);
+        bigText.setGravity(Gravity.CENTER);
+        legend.addView(bigRow);
+        TableRow titleRow = new TableRow(TeachOnlineCourseStatistics.this);
+        TextView titleCol = new TextView(TeachOnlineCourseStatistics.this);
+        TextView titleLec = new TextView(TeachOnlineCourseStatistics.this);
+        titleCol.setText(getString(R.string.color));
+        titleCol.setTextSize(17);
+        titleLec.setTextSize(17);
+        titleCol.setTextColor(Color.BLACK);
+        titleLec.setTextColor(Color.BLACK);
+
+        titleLec.setText(getString(R.string.lectureName));
+        titleCol.setGravity(Gravity.CENTER);
+        titleLec.setGravity(Gravity.CENTER);
+        titleRow.addView(titleCol);
+        titleRow.addView(titleLec);
+        legend.addView(titleRow);
+    }
+
+    private void configureSpeakStatistics() {
+        speakStatitics = findViewById(R.id.speakStatistics);
+        speakStatitics.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String s = getString(R.string.numberFollowers) + ": " +  followersCounter.getText().toString() + ".";
+                s += getString(R.string.most_viewed_lecture) + ": " +  mostPopularLecture.getText().toString() + ".";
+                s += getString(R.string.least_viewed_lecture) + ": " +  leastPopularLecture.getText().toString() + ".";
+                speak(s);
+            }
+        });
+
+        speakStatitics.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.speakStatisticsInformationCourse));
+                return false;
+            }
+        });
+
+    }
+
+    private void configurePopularityCounter() {
+        leastPopularLecture = findViewById(R.id.leastPopularLecture);
+        mostPopularLecture = findViewById(R.id.mostPopularLecture);
     }
 
     private void configureTimeGraphView() {
@@ -57,6 +131,8 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
 
         // get the data
         db.collection("content").whereEqualTo("courseUID", courseItem.getCourseOnlineIdentification()).whereEqualTo("type", "Lecture").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+
+
             @RequiresApi(api = Build.VERSION_CODES.O)
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -74,16 +150,20 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
             @RequiresApi(api = Build.VERSION_CODES.O)
             private void configureTimeGraph(List<DocumentSnapshot> docs, CourseTrackingData courseTrackingData) {
                 // get the Time For each course
-                DataExtractor extractor = new DataExtractor(courseTrackingData);
+                extractor = new DataExtractor(courseTrackingData);
                 ArrayList<LineGraphSeries<DataPoint>> seriesSet = extractor.getCourseTotalTime();
 
+                leastPopularLecture.setText((String) docs.get(extractor.indexOfLeastPopularCourse()).get("lectureName"));
+                mostPopularLecture.setText((String) docs.get(extractor.indexOfMostPopularCourse()).get("lectureName")) ;
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
 
                 double maxX = 0;
                 int counter = 0;
 
+
                 for (LineGraphSeries<DataPoint> series : seriesSet) {
+
                     Random rand = new Random();
                     float r = rand.nextFloat();
                     float g = rand.nextFloat();
@@ -91,13 +171,37 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
                     colors.add(new Pair<String, Integer>((String) docs.get(counter).get("lectureName"), Color.rgb(r, g, b)));
                     series.setColor(Color.rgb(r, g, b));
                     series.setTitle((String) docs.get(counter).get("lectureName"));
+
+                    // Adding to Legend
+                    TableRow row = new TableRow(TeachOnlineCourseStatistics.this);
+                    TextView col = new TextView(TeachOnlineCourseStatistics.this);
+                    col.setTextColor(Color.rgb(r, g, b));
+                    TextView lec = new TextView(TeachOnlineCourseStatistics.this);
+                    lec.setText((String) docs.get(counter).get("lectureName"));
+                    col.setBackgroundColor(Color.rgb(r, g, b));
+                    col.setGravity(Gravity.CENTER);
+                    lec.setGravity(Gravity.CENTER);
+                    row.addView(col);
+                    row.addView(lec);
+
+                    legend.addView(row);
+
+
                     graphView.addSeries(series);
                     if (series.getHighestValueX() > maxX) {
                         maxX = series.getHighestValueX();
                     }
                     counter++;
                 }
-                graphView.setTitle("Total Time Spent on Course");
+
+                // creating space
+                TableRow r = new TableRow(TeachOnlineCourseStatistics.this);
+                TextView t = new TextView(TeachOnlineCourseStatistics.this);
+                t.setText(" ");
+                t.setTextSize(20);
+                legend.addView(t);
+
+                graphView.setTitle(getString(R.string.totalTimeGraphTitle));
 
                 GridLabelRenderer gridLabel = graphView.getGridLabelRenderer();
                 gridLabel.setLabelFormatter(new DefaultLabelFormatter() {
@@ -110,21 +214,19 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
                         }
                     }
                 });
-                gridLabel.setHorizontalAxisTitle("Time Instances of Checking");
-                gridLabel.setVerticalAxisTitle("Amount of Time spent in seconds");
+                gridLabel.setHorizontalAxisTitle(getString(R.string.instance));
+                gridLabel.setVerticalAxisTitle(getString(R.string.timeInSeconds));
 
-                gridLabel.setPadding(32);
+                gridLabel.setPadding(50);
                 graphView.getViewport().setMaxX(maxX);
-                graphView.getLegendRenderer().setVisible(true);
             }
             @RequiresApi(api = Build.VERSION_CODES.O)
             private void configure7DayAverage(List<DocumentSnapshot> docs, CourseTrackingData courseTrackingData) {
                 // get the Time For each course
-                DataExtractor extractor = new DataExtractor(courseTrackingData);
                 ArrayList<LineGraphSeries<DataPoint>> seriesSet = extractor.getCourseSevenRollingAverageTime();
 
 
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
 
                 double maxX = 0;
                 int counter = 0;
@@ -140,7 +242,7 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
                     }
                     counter++;
                 }
-                sevenGraphView.setTitle("7 Rolling Average For Time Spent on Course");
+                sevenGraphView.setTitle(getString(R.string.sevenRollingAverageTitle));
 
                 GridLabelRenderer gridLabel = sevenGraphView.getGridLabelRenderer();
                 gridLabel.setLabelFormatter(new DefaultLabelFormatter() {
@@ -153,12 +255,11 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
                         }
                     }
                 });
-                gridLabel.setHorizontalAxisTitle("Time Instances of Checking");
-                gridLabel.setVerticalAxisTitle("Amount of Time spent in seconds");
+                gridLabel.setHorizontalAxisTitle(getString(R.string.instance));
+                gridLabel.setVerticalAxisTitle(getString(R.string.last7Days));
 
-                gridLabel.setPadding(32);
+                gridLabel.setPadding(50);
                 sevenGraphView.getViewport().setMaxX(maxX);
-                sevenGraphView.getLegendRenderer().setVisible(true);
             }
         });
 
@@ -200,6 +301,34 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
         });
 
     }
+
+
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(TeachOnlineCourseStatistics.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(TeachOnlineCourseStatistics.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 
 
 }

@@ -33,7 +33,7 @@ import com.imperial.word2mouth.teach.offline.create.video.ImageDialog;
 import java.io.File;
 import java.util.Locale;
 
-public class TeachLectureCreationSlideActivity extends AppCompatActivity implements ImageDialog.OnInputListener {
+public class    TeachLectureCreationSlideActivity extends AppCompatActivity implements ImageDialog.OnInputListener {
 
     // Permissions
     private final int CAMERA_PERMISSION = 1;
@@ -554,7 +554,7 @@ public class TeachLectureCreationSlideActivity extends AppCompatActivity impleme
     }
 
     private void configureTextToSpeech() {
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {

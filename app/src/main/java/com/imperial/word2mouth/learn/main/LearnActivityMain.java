@@ -2,7 +2,9 @@ package com.imperial.word2mouth.learn.main;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -19,8 +21,10 @@ import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -32,6 +36,7 @@ import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.learn.main.ui.SectionsPagerAdapter;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.FileReaderHelper;
+import com.imperial.word2mouth.teach.SignInDialog;
 import com.imperial.word2mouth.teach.TeachActivityMain;
 
 import java.io.BufferedReader;
@@ -54,7 +59,10 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     private SectionsPagerAdapter sectionsPagerAdapter;
     private TextToSpeech textToSpeech;
     private TabLayout tabs;
+    private Toolbar toolbar;
+    private Menu menu;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,8 +80,56 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
 
 
         configureTabs(viewPager);
+
+        configureOnLongClicks();
+        configureCacheFolderSend();
+
     }
 
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        return cm.getActiveNetworkInfo() != null && cm.getActiveNetworkInfo().isConnected();
+    }
+
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void configureCacheFolderSend() {
+        if (isNetworkConnected()) {
+            uploadTrackingData();
+        }
+    }
+
+    private void configureOnLongClicks() {
+        toolbar.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.learner));
+                return true;
+            }
+        });
+
+        tabs.getTabAt(0).view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.onDevice));
+                return false;
+            }
+        });
+
+        tabs.getTabAt(1).view.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.onInternet));
+                return false;
+            }
+        });
+
+
+
+    }
 
     private void configureTabs(ViewPager viewPager) {
         tabs = findViewById(R.id.tabs);
@@ -129,9 +185,10 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
 
 
     private void setToolBar() {
-        androidx.appcompat.widget.Toolbar toolbar = (Toolbar) findViewById(R.id.learn_toolbar);
+        toolbar = (Toolbar) findViewById(R.id.learn_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle(getString(R.string.learn));
+        getSupportActionBar().setTitle(getString(R.string.learner));
+
     }
 
 
@@ -160,8 +217,28 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_learn, menu);
+        this.menu = menu;
+        inflater.inflate(R.menu.menu_learn, this.menu);
+//        configureMenuOnLongClicks();
         return true;
+    }
+
+    private void configureMenuOnLongClicks() {
+        menu.getItem(0).getActionView().setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.teacher));
+                return false;
+            }
+        });
+
+        menu.getItem(1).getActionView().setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.settings));
+                return false;
+            }
+        });
     }
 
     @Override
@@ -172,8 +249,6 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
                 Intent intent = new Intent(LearnActivityMain.this, TeachActivityMain.class);
                 startActivity(intent);
                 return true;
-            case R.id.setting:
-                Toast.makeText(this, "Setting - TO DO", Toast.LENGTH_SHORT).show();
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -187,7 +262,7 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     }
 
     private void configureTextToSpeech() {
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
@@ -228,7 +303,7 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
             newLectures.clear();
             onlineLectures.clear();
             downloadedLectures.clear();
-            Toast.makeText(LearnActivityMain.this, "Internet not Connected", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LearnActivityMain.this, getString(R.string.internetNotConnected), Toast.LENGTH_SHORT).show();
         }
     }
 

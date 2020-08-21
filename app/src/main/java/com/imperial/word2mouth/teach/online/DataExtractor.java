@@ -44,6 +44,25 @@ public class DataExtractor
     public LineGraphSeries<DataPoint> getTimeSeries() {
         ArrayList<DataPoint> data = new ArrayList<>();
 
+        ArrayList<TimeStampLectureData> dataTemp = ltd.getData();
+        ArrayList<TimeStampLectureData> increasingData = new ArrayList<>();
+
+        int sizeData = ltd.getData().size();
+        for (int i = 0; i < sizeData; i++) {
+            int index = i;
+            long minCurPos = Long.valueOf(dataTemp.get(i).getTimeStamp());
+            for (int j = i + 1; j < sizeData; j++) {
+                long temp = Long.valueOf(dataTemp.get(j).getTimeStamp());
+                if (minCurPos > temp ) {
+                    index = j;
+                    minCurPos = temp;
+                }
+            }
+            increasingData.add(dataTemp.get(index));
+        }
+
+        ltd.setData(increasingData);
+
         for (TimeStampLectureData stamp : ltd.getData()) {
 
             Date date=new Date(Long.parseLong(stamp.getTimeStamp()));
@@ -54,6 +73,7 @@ public class DataExtractor
             data.add(new DataPoint(date, totalTimeSpent));
         }
 
+        // Arrange in Increasing x Order
         DataPoint[] dp = new DataPoint[data.size()];
 
         int i = 0;
@@ -62,13 +82,36 @@ public class DataExtractor
             i++;
         }
 
+
+
+
         LineGraphSeries<DataPoint> result = new LineGraphSeries<DataPoint>(dp);
 
         return result;
     }
 
+
     public LineGraphSeries<DataPoint> getTimeSeries(LectureTrackingData t) {
         ArrayList<DataPoint> data = new ArrayList<>();
+
+        ArrayList<TimeStampLectureData> dataTemp = t.getData();
+        ArrayList<TimeStampLectureData> increasingData = new ArrayList<>();
+
+        int sizeData = t.getData().size();
+        for (int i = 0; i < sizeData; i++) {
+            int index = i;
+            long minCurPos = Long.valueOf(dataTemp.get(i).getTimeStamp());
+            for (int j = i + 1; j < sizeData; j++) {
+                long temp = Long.valueOf(dataTemp.get(j).getTimeStamp());
+                if (minCurPos > temp ) {
+                    index = j;
+                    minCurPos = temp;
+                }
+            }
+            increasingData.add(dataTemp.get(index));
+        }
+
+        t.setData(increasingData);
 
         for (TimeStampLectureData stamp : t.getData()) {
 
@@ -136,7 +179,7 @@ public class DataExtractor
         }
 
         LocalDate currentTime = LocalDate.now();
-
+        LocalDate nextTimeDay = currentTime.plusDays(1);
 
         for (int i = 0; i < 7; i++) {
             LocalDate sevenDayPrevious = currentTime.minusDays(7);
@@ -146,7 +189,7 @@ public class DataExtractor
                     Date date=new Date(Long.parseLong(stamp.getTimeStamp()));
                     long totalTimeSpent = totalTime(stamp.getTimeSpent());
 
-                    if (date.after(sevenDayPreviousDate)) {
+                    if (date.after(sevenDayPreviousDate) && date.before(Date.from(nextTimeDay.atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
                         data.get(i).add(new DataPoint(date, totalTimeSpent));
                     }
                 }
@@ -155,13 +198,14 @@ public class DataExtractor
                     Date date=new Date(Long.parseLong(stamp.getTimeStamp()));
                     long totalTimeSpent = totalTime(stamp.getTimeSpent());
 
-                    if (date.after(sevenDayPreviousDate) && date.before(Date.from(currentTime.atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
+                    if (date.after(sevenDayPreviousDate) && date.before(Date.from(nextTimeDay.atStartOfDay(ZoneId.systemDefault()).toInstant()))) {
                         data.get(i).add(new DataPoint(date, totalTimeSpent));
                     }
                 }
             }
 
             currentTime = currentTime.minusDays(1);
+            nextTimeDay = nextTimeDay.minusDays(1);
         }
 
         ArrayList<DataPoint> resultAverage = new ArrayList<>();
@@ -175,7 +219,7 @@ public class DataExtractor
                 timePerDay += d.getY();
             }
             if (numberElements > 0) {
-                resultAverage.add(new DataPoint(Date.from(tempTime.atStartOfDay(ZoneId.systemDefault()).toInstant()), (long) timePerDay/numberElements));
+                resultAverage.add(new DataPoint(Date.from(tempTime.atStartOfDay(ZoneId.systemDefault()).toInstant()),  (float) timePerDay / (float)numberElements));
 
             } else {
                 resultAverage.add(new DataPoint(Date.from(tempTime.atStartOfDay(ZoneId.systemDefault()).toInstant()), (long) 0));
@@ -316,6 +360,58 @@ public class DataExtractor
             data.add(get7DayRollingAverage(l));
         }
         return data;
+    }
+
+
+    public int indexOfMostPopularCourse() {
+
+        int counter = 0;
+        int maxCounter = 0;
+        long maxTimeSpent = 0;
+        for (LectureTrackingData l : ctd.getLectureGeneralData()) {
+            long tempTimeSpent = 0;
+            ArrayList<TimeStampLectureData> d = l.getData();
+            for (TimeStampLectureData t : d) {
+                for (Long lg : t.getTimeSpent()) {
+                    tempTimeSpent += lg;
+                }
+            }
+
+            if (maxTimeSpent < tempTimeSpent) {
+                maxCounter = counter;
+                maxTimeSpent = tempTimeSpent;
+            }
+            counter++;
+        }
+        return  maxCounter;
+    }
+
+    public int indexOfLeastPopularCourse() {
+        int counter = 0;
+        int minCounter = 0;
+        long minTimeSpent = 0;
+        for (LectureTrackingData l : ctd.getLectureGeneralData()) {
+            long tempTimeSpent = 0;
+            ArrayList<TimeStampLectureData> d = l.getData();
+            for (TimeStampLectureData t : d) {
+                for (Long lg : t.getTimeSpent()) {
+                    tempTimeSpent += lg;
+                }
+            }
+
+            if (counter == 0) {
+                minTimeSpent = tempTimeSpent;
+                minCounter = counter;
+            } else {
+                if (minTimeSpent > tempTimeSpent) {
+                    minCounter = counter;
+                    minTimeSpent = tempTimeSpent;
+                }
+            }
+
+            counter++;
+        }
+        return  minCounter;
     }
 
 }

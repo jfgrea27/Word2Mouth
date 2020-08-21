@@ -1,5 +1,6 @@
 package com.imperial.word2mouth.background;
 
+import android.app.Dialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,7 @@ import com.imperial.word2mouth.R;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 
 public class NewLecturesDialog extends DialogFragment {
 
@@ -48,6 +50,7 @@ public class NewLecturesDialog extends DialogFragment {
             }
         });
 
+
         checkOutNewContentButton = view.findViewById(R.id.getContent);
         checkOutNewContentButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -55,7 +58,7 @@ public class NewLecturesDialog extends DialogFragment {
                 Toast.makeText(view.getContext(),"Retrieving the new content from the Cloud", Toast.LENGTH_SHORT).show();
                 getDialog().dismiss();
 
-                FragmentManager manager = getActivity().getSupportFragmentManager();
+                FragmentManager manager = Objects.requireNonNull(getActivity()).getSupportFragmentManager();
                 LearnOnlineNewLecturesSelectionFragment frag;
                 ArrayList<ListNewLectures> temp = getParceableLectures(newLectures);
                 frag = LearnOnlineNewLecturesSelectionFragment.newInstance(temp);
@@ -66,6 +69,20 @@ public class NewLecturesDialog extends DialogFragment {
         return view;
 
     }
+
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+        Dialog dialog = getDialog();
+        if (dialog != null)
+        {
+            int width = ViewGroup.LayoutParams.MATCH_PARENT;
+            int height = ViewGroup.LayoutParams.MATCH_PARENT;
+            dialog.getWindow().setLayout(width, height);
+        }
+    }
+
 
     private ArrayList<ListNewLectures> getParceableLectures(Map<String, ArrayList<String>> newLectures) {
         ArrayList<ListNewLectures> temp = new ArrayList<>();

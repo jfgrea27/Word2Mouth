@@ -310,10 +310,10 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
             File[] slidesFiles = slideDirectory.listFiles();
             numberOfSlides = slidesFiles.length;
 
-            for (File f : slidesFiles) {
 
+            for (int i = 0; i < numberOfSlides; i++) {
                 String slideName;
-                slideName = FileReaderHelper.readTextFromFile(f.getPath()+ "/title.txt");
+                slideName = FileReaderHelper.readTextFromFile(slideDirectory.getPath() + "/" + i + "/title.txt");
 
                 slideNames.add(slideName);
             }
@@ -590,7 +590,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
     }
 
     private void configureTextToSpeech() {
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {

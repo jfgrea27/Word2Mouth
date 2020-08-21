@@ -1,13 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="login_failed">" échec de la connexion"</string>
-    <string name="invalid_password">" Le mot de passe doit contenir > 5 caractères"</string>
-    <string name="invalid_username">" Nom d'utilisateur invalide"</string>
-    <string name="action_sign_in_short">se connecté</string>
-    <string name="action_sign_in">"Connexion ou Inscription "</string>
-    <string name="welcome">"Bienvenu! "</string>
-    <string name="prompt_password">Mot de passe</string>
-    <string name="prompt_email">Email</string>
     <string name="teaching">Enseigner</string>
     <string name="login">Connexion</string>
     <string name="settings">Parametrage</string>
@@ -49,10 +41,54 @@
     <string name="editSlide">modifier la page sélectionné</string>
     <string name="logout">déconnexion</string>
     <string name="profilePicture">Ajoutez une photo de profil à votre compte.</string>
-    <string name="followers"># Suiveurs</string>
+    <string name="followers"># Abonnés</string>
     <string name="course_data_summary">Résumé des données du cours</string>
     <string name="downloads"># Téléchargements</string>
-    <string name="statistics" />
+    <string name="statistics" >statistiques</string>
+    <string name="learner">Étudiant(e)</string>
+    <string name="teacher">Professeur(e)</string>
+    <string name="onDevice">Sur cet appareil</string>
+    <string name="onInternet">Sur Internet</string>
+    <string name="totalTimeGraphTitle">Temps total passé sur le cours</string>
+    <string name="time">Temps (s)</string>
+    <string name="instance">Instances</string>
+    <string name="sevenRollingAverageTitle">Moyenne roulante de 7 jours pour Temps moyen passé sur le cours</string>
+    <string name="totalTimeGraphLectureTitle">Temps total passé sur la leçon</string>
+    <string name="last7Days">Derniers 7 jours</string>
+    <string name="sevenRollingAverageLectureTitle">Moyenne roulante de 7 jours sur le temps passé sur la leçon</string>
+    <string name="slideNumber">Numéro de diapositive</string>
+    <string name="clicksAudioTitleLecture">Compteur d\'écoute d\'audio par diapositive</string>
+    <string name="viewAudio">Écoutes Audio</string>
+    <string name="videoViewsTitleLecture">Compteur de vues vidéo par diapositive</string>
+    <string name="videoViews">Vues de vidéo </string>
+    <string name="most_viewed_slide">Diapositive le plus vue</string>
+    <string name="least_viewed_slide">Diapositive le moins vue</string>
+    <string name="lecture_data_summary">Résumé des données de la leçon</string>
+    <string name="TimeMetrics">Mesures de temps</string>
+    <string name="videoMetrics">Mesures de vidéos</string>
+    <string name="audioMetrics">Mesures d\'audio</string>
+    <string name="most_viewed_lecture">Leçon la plus regardée</string>
+    <string name="least_viewed_lecture">Leçon la moins regardée</string>
+    <string name="speakStatisticsInformation">Énoncer les statistiques de la leçon</string>
+    <string name="numberDownloads">Nombres de Téléchargements</string>
+    <string name="speakStatisticsInformationCourse">Énoncer les statistiques du cours</string>
+    <string name="numberFollowers">Nombre d\'abonnés</string>
+    <string name="pairedDevices">Appareils Bluetooth jumelés - L\'appareil apparaît ci-dessous si vous pouvez partager du contenu avec cet appareil</string>
+    <string name="profilePictureSelection">Sélection d\'image de profil</string>
+    <string name="thumbnailSelection">Sélection de vignettes</string>
+    <string name="videoSelection">Sélection vidéo</string>
+    <string name="welcome_back">Nous saluons le retour</string>
+    <string name="internetNotConnected">Non connecté à Internet</string>
+    <string name="new_course_notification">Notification de nouveau cours</string>
+    <string name="sign_in_dialog">Dialogue de connexion</string>
+    <string name="bluetoothSpeakInstructions">Instructions vocales pour partage Bluetooth</string>
+    <string name="discoverableDeviceSelect">Sélectionnez un appareil détectable. Ceux-ci sont répertoriés en violet en haut</string>
+    <string name="pairedDeviceSelect">Vous partagerez le contenu avec l\'appareil nommé</string>
+    <string name="timeInSeconds">Temps (s)</string>
+    <string name="color">Coleur</string>
+    <string name="lectureName">Nom de la Leçon</string>
+    <string name="legend">Légende</string>
+
 
 
 </resources>

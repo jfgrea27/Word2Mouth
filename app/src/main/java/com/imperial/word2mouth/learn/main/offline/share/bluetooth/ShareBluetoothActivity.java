@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
+import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -13,13 +15,18 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -46,9 +53,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 
 public class ShareBluetoothActivity extends AppCompatActivity {
 
+    private static final int BLUETOOTH_PERSMISSIONS = 1;
     private ImageButton share;
     private ListView listDiscoverableDevices;
     private ListView listPairedDevices;
@@ -83,11 +92,10 @@ public class ShareBluetoothActivity extends AppCompatActivity {
     private static final int STATE_CONTENT_SENT = 8;
 
 
+    private ImageButton speakBluetooth;
     // Send
     private String lecturePath;
     private String lectureName;
-    private String courseName;
-    private String coursePath;
     private String zipSendLectureZipPath = null;
 
     // Receive
@@ -96,9 +104,14 @@ public class ShareBluetoothActivity extends AppCompatActivity {
     private SendReceive sendReceive;
 
     private boolean selectedCourse = false;
+    private TextToSpeech textToSpeech;
 
+    private ImageView discoverableDevicesTitle;
+    private ImageView pairedDevicesTitle;
+    private boolean hasPermissions = false;
+    private int step = 0;
 
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -106,32 +119,129 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
         getIntents();
 
+        getPermissions();
 
-        // Section 0: General UI & Set Up
-        // Part 0: Set Up UI
-        findViewsByIds();
+        if (hasPermissions) {
+            // Section 0: General UI & Set Up
+            // Part 0: Set Up UI
+            findViewsByIds();
 
-        if (selectedCourse) {
-            createSendZipFile();
+            if (selectedCourse) {
+                createSendZipFile();
+            } else {
+                createReceiveZipFile();
+            }
+
+
+            configureUI();
+            configureTextToSpeech();
+
+            configureSpeakHelp();
+            configureOnLongClicks();
+            // Section 1: Connectivity
+            // Part 1: Connecting Bluetooth
+            setUpBluetooth();
+
+            // Part 2: Making Device Discoverable
+            makeThisDeviceDiscoverable();
+
+            // Part 3: Discovering nearby devices
+            discover();
+
+            // Part 4: Connecting Device To Paired Device
+            configureConnection();
+            configureConnectedDevices();
+
+            // Section 2: File Sharing
         } else {
-            createReceiveZipFile();
+            finish();
         }
 
-        // Section 1: Connectivity
-        // Part 1: Connecting Bluetooth
-        setUpBluetooth();
+    }
 
-        // Part 2: Making Device Discoverable
-        makeThisDeviceDiscoverable();
+    private void configureSpeakHelp() {
+        speakBluetooth = findViewById(R.id.speakBluetooth);
 
-        // Part 3: Discovering nearby devices
-        discover();
+        speakBluetooth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                switch (step) {
+                    case 0:
+                        speak(getString(R.string.discoverableDeviceSelect));
+                        break;
+                    case 1:
+                        speak(getString(R.string.pairedDeviceSelect) + selectedDevice.getName());
+                        break;
+                }
+            }
+        });
+    }
 
-        // Part 4: Connecting Device To Paired Device
-        configureConnection();
-        configureConnectedDevices();
 
-        // Section 2: File Sharing
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void getPermissions() {
+
+        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED )) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION}, BLUETOOTH_PERSMISSIONS);
+        } else {
+            hasPermissions = true;
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == BLUETOOTH_PERSMISSIONS) {
+            if(permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
+                    permissions[1].equals(Manifest.permission.READ_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                hasPermissions = true;
+            }
+        }
+    }
+
+
+
+    private void configureUI() {
+        discoverableDevicesTitle = findViewById(R.id.discoverableDevices);
+        pairedDevicesTitle = findViewById(R.id.pairedDevices);
+
+
+    }
+
+    private void configureOnLongClicks() {
+        share.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.share));
+                return false;
+            }
+        });
+
+        discoverableDevicesTitle.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                return false;
+            }
+        });
+
+        pairedDevicesTitle.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.pairedDevices));
+                return false;
+            }
+        });
+
+        speakBluetooth.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.bluetoothSpeakInstructions));
+                return false;
+            }
+        });
+
 
     }
 
@@ -215,6 +325,10 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         listDiscoverableDevices = findViewById(R.id.list_discoverable__devices);
         listPairedDevices = findViewById(R.id.list_paired_devices);
         share = findViewById(R.id.share);
+
+        share.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+
+
         progress = findViewById(R.id.progress_bar);
     }
 
@@ -265,7 +379,6 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
         discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
         startActivity(discoverableIntent);
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -348,6 +461,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                             if (listPairedDevices.getAdapter() == null) {
                                 listPairedDevices.setAdapter(pairedAdapter);
                             }
+                            step = 1;
                             pairedAdapter.notifyDataSetChanged();
                         }
                     }
@@ -399,6 +513,9 @@ public class ShareBluetoothActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 selectedDevice = nthElement(discoverableDevices, position);
+                share.setColorFilter(null);
+
+
                 Client client = new Client(selectedDevice);
                 client.start();
             }
@@ -421,6 +538,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
             }
         });
 
+
         if (!selectedCourse) {
             share.setVisibility(View.INVISIBLE);
         }
@@ -428,7 +546,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
 
 
-//    //////////////////// SERVER ////////////////////
+    //////////////////// SERVER ////////////////////
 
     private class Server extends Thread {
         private BluetoothServerSocket serverSocket;
@@ -472,14 +590,6 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                     sendReceive.start();
                     break;
                 }
-            }
-        }
-
-        // Closes the connect socket and causes the thread to finish.
-        public void cancel() {
-            try {
-                serverSocket.close();
-            } catch (IOException e) {
             }
         }
     }
@@ -795,4 +905,29 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         }
         return null;
     }
+
+
+
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(ShareBluetoothActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toast.makeText(ShareBluetoothActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
 }

@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".teach.online.TeachOnlineCourseStatistics">
 
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -20,7 +21,7 @@
             <TextView
                 android:id="@+id/data_title"
                 android:layout_width="match_parent"
-                android:layout_height="54dp"
+                android:layout_height="55dp"
                 android:background="@color/colorAccent"
                 android:gravity="center_horizontal"
                 android:text="@string/course_data_summary"
@@ -50,8 +51,53 @@
                         android:textAlignment="center"
                         tools:ignore="RtlCompat" />
                 </TableRow>
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="@string/most_viewed_lecture"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/mostPopularLecture"
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text=""
+                        android:textAlignment="center"
+                        tools:ignore="RtlCompat" />
+                </TableRow>
+
+                <TableRow>
+
+                    <TextView
+                        android:padding="3dip"
+                        android:text="@string/least_viewed_lecture"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/leastPopularLecture"
+                        android:gravity="right"
+                        android:padding="3dip"
+                        android:text=""
+                        android:textAlignment="center"
+                        tools:ignore="RtlCompat" />
+                </TableRow>
+
             </TableLayout>
 
+
+            <ImageButton
+                android:id="@+id/speakStatistics"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:scaleType="fitXY"
+                app:srcCompat="@drawable/ic_speak"
+                android:background="@color/colorWhite"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tableLayout" >
+
+            </ImageButton>
 
             <TextView
                 android:id="@+id/lectureTimeSection"
@@ -60,14 +106,24 @@
                 android:layout_centerHorizontal="true"
                 android:background="@color/colorAccent"
                 android:gravity="center"
-                android:text="Course Time Spent"
+                android:text="@string/TimeMetrics"
                 android:textAlignment="center"
                 android:textColor="@android:color/white"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
+                app:layout_constraintTop_toBottomOf="@+id/speakStatistics" />
 
+
+            <TableLayout
+                android:id="@+id/legend"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1"
+                app:layout_constraintTop_toBottomOf="@+id/lectureTimeSection">
+
+
+            </TableLayout>
 
             <com.jjoe64.graphview.GraphView
                 android:id="@+id/timeGraph"
@@ -76,7 +132,7 @@
                 android:layout_height="200dip"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/lectureTimeSection" />
+                app:layout_constraintTop_toBottomOf="@+id/legend" />
 
 
             <com.jjoe64.graphview.GraphView

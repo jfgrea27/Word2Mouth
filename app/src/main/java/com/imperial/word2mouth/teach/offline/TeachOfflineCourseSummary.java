@@ -829,7 +829,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     }
 
     private void configureTextToSpeech() {
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {

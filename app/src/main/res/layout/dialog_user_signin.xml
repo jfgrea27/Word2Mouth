@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
-        android:text="@string/new_course_notification"
+        android:text="@string/sign_in_dialog"
         android:textAlignment="center"
         android:textColor="@color/colorAccent"
         android:textSize="30sp"
@@ -20,7 +20,7 @@
         app:layout_constraintTop_toTopOf="parent"></TextView>
 
     <ImageButton
-        android:id="@+id/getContent"
+        android:id="@+id/signIn"
         android:layout_width="104dp"
         android:layout_height="92dp"
         android:layout_alignEnd="@id/dismiss"
@@ -36,7 +36,7 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/dismiss"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/receive">
+        app:srcCompat="@drawable/ic_account_black">
 
     </ImageButton>
 
@@ -52,7 +52,7 @@
         android:text="@string/gallery"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/getContent"
+        app:layout_constraintEnd_toStartOf="@+id/signIn"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

@@ -109,19 +109,9 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     private ArrayAdapterLectureOnline adapter;
     private boolean selectedLecture = false;
 
-
-    /////// Delete Button
-    // View
-    private ImageButton deleteButton;
-    // Model
-    private int numberLectures = 0;
-    // Controller
-
     /////// Learn Button
-    // View
-    private ImageButton learnButton;
+
     // Model
-    private String lectureName;
     private ArrayList<LectureItem> lectures;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private LectureItem lecture;
@@ -507,7 +497,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     }
 
     private void configureTextToSpeech() {
-        textToSpeech = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {

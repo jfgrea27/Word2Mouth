@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class TimeStampLectureData {
 
     private final String timeStamp;
+    private int numberSlides;
 
     public String getTimeStamp() {
         return timeStamp;
@@ -37,12 +38,16 @@ public class TimeStampLectureData {
 
     private ArrayList<Long> addFromString(String string) {
         String str[] = string.split(",");
-
+        numberSlides = str.length;
         ArrayList<Long> result = new ArrayList<>();
         for (String s : str) {
             result.add(Long.parseLong(s));
         }
         return result;
+    }
+
+    public int numberSlides() {
+        return numberSlides;
     }
 
     public int size() {

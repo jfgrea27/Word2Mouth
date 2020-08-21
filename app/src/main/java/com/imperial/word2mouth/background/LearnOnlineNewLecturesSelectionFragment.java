@@ -50,11 +50,6 @@ public class LearnOnlineNewLecturesSelectionFragment extends Fragment {
 
     }
 
-//    public LearnOnlineNewLecturesSelectionFragment(Map<String, ArrayList<String>> newLectures) {
-//        this.newLectures = newLectures;
-//
-//    }
-
 
     private static final String ARG_PARAM1 = "param1";
 

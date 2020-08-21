@@ -6,7 +6,7 @@
     android:layout_height="match_parent">
 
     <ImageView
-        android:id="@+id/imageView3"
+        android:id="@+id/discoverableDevices"
         android:layout_width="52dp"
         android:layout_height="58dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -17,7 +17,7 @@
     </ImageView>
 
     <ImageView
-        android:id="@+id/imageView2"
+        android:id="@+id/pairedDevices"
         android:layout_width="52dp"
         android:layout_height="58dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -48,7 +48,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
+        app:layout_constraintTop_toBottomOf="@+id/discoverableDevices" />
 
     <ListView
         android:id="@+id/list_paired_devices"
@@ -57,7 +57,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.575"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView2">
+        app:layout_constraintTop_toBottomOf="@+id/pairedDevices">
 
     </ListView>
 
@@ -65,15 +65,27 @@
         android:id="@+id/share"
         android:layout_width="109dp"
         android:layout_height="79dp"
-        android:layout_marginBottom="16dp"
+        android:backgroundTint="@android:color/transparent"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/speakBluetooth"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_share">
+
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/speakBluetooth"
+        android:layout_width="109dp"
+        android:layout_height="79dp"
         android:backgroundTint="@android:color/transparent"
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/list_paired_devices"
-        app:layout_constraintVertical_bias="1.0"
-        app:srcCompat="@drawable/ic_share">
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/share"
+        app:srcCompat="@drawable/ic_speak">
 
     </ImageButton>
 

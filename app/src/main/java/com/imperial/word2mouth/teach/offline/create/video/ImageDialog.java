@@ -53,13 +53,13 @@ public class ImageDialog extends DialogFragment {
         title = view.findViewById(R.id.title);
         switch (code) {
             case PROFILE:
-                title.setText("Profile Picture Selection");
+                title.setText(getString(R.string.profilePictureSelection));
                 break;
             case THUMBNAIL:
-                title.setText("Thumbnail Selection");
+                title.setText(R.string.thumbnailSelection);
                 break;
             case SLIDE:
-                title.setText("Video/Photo Selection");
+                title.setText(R.string.videoSelection);
                 break;
         }
 

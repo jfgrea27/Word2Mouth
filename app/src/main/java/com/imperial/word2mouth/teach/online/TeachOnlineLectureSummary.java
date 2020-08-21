@@ -3,13 +3,16 @@ package com.imperial.word2mouth.teach.online;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -24,9 +27,11 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.learn.main.LearnActivityMain;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
 import com.imperial.word2mouth.shared.LectureItem;
+import com.imperial.word2mouth.teach.online.fakeDataProducer.FakeDataProducer;
 import com.imperial.word2mouth.teach.online.lectureData.LectureTrackingData;
 import com.jjoe64.graphview.DefaultLabelFormatter;
 import com.jjoe64.graphview.GraphView;
@@ -42,31 +47,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import static com.imperial.word2mouth.teach.online.DataExtractor.LEAST;
 import static com.imperial.word2mouth.teach.online.DataExtractor.MOST;
 
 public class TeachOnlineLectureSummary extends AppCompatActivity {
 
-    private ImageView thumbnail;
-    private ImageButton sound;
-    private TextView lectureName;
-    private ListView slidesView;
 
     private TextView downloadCounter;
     private TextView mostPopularSlide;
     private TextView leastPopularSlide;
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private FirebaseUser user;
-    private Uri audioUri;
-    private MediaPlayer player;
+
     private LectureItem lecture;
-    private FirebaseStorage storage = FirebaseStorage.getInstance();
 
     private String lectureVersion = null;
     private LectureTrackingData ltd;
     private DataExtractor extractor;
+    private ImageButton speakStatistics;
+    private Button fakeButton;
+    private TextToSpeech textToSpeech;
 
 
     @Override
@@ -78,20 +80,37 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
 
         setUpUI();
 
-        configureAudio();
 
+
+        configureSpeakStatistics();
+        configureTextToSpeech();
         retrieveMetrics();
+        configureFakeDataButton();
+    }
+
+    private void configureFakeDataButton() {
+        fakeButton = findViewById(R.id.fakeButton);
+
+        fakeButton.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onClick(View v) {
+                FakeDataProducer fdp = new FakeDataProducer(TeachOnlineLectureSummary.this, ltd.getNumberSlides());
+
+                fdp.addDataToFile(lectureVersion);
+            }
+        });
     }
 
     private void configureTimeGraph() {
-        GraphView graphView = (GraphView) findViewById(R.id.timeGraph);
+        GraphView graphView = findViewById(R.id.timeGraph);
 
         extractor = new DataExtractor(ltd);
 
         LineGraphSeries<DataPoint> timeSeries = extractor.getTimeSeries();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
         graphView.addSeries(timeSeries);
-        graphView.setTitle("Total Time Spent on Lecture");
+        graphView.setTitle(getString(R.string.totalTimeGraphLectureTitle));
 
         GridLabelRenderer gridLabel = graphView.getGridLabelRenderer();
         gridLabel.setLabelFormatter(new DefaultLabelFormatter() {
@@ -105,10 +124,10 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
             }
         });
 
-        gridLabel.setPadding(32);
+        gridLabel.setPadding(50);
         graphView.getViewport().setMaxX(timeSeries.getHighestValueX());
-        gridLabel.setHorizontalAxisTitle("Time Instances of Checking");
-        gridLabel.setVerticalAxisTitle("Amount of Time spent in seconds");
+        gridLabel.setHorizontalAxisTitle(getString(R.string.instance));
+        gridLabel.setVerticalAxisTitle(getString(R.string.time));
 
     }
 
@@ -119,13 +138,13 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         BarGraphSeries<DataPoint> audioSeries = extractor.getAudioSeries();
 
         graphView.addSeries(audioSeries);
-        graphView.setTitle("Counter of Audio Clicks Per Slide on Lecture");
+        graphView.setTitle(getString(R.string.clicksAudioTitleLecture));
         GridLabelRenderer gridLabel = graphView.getGridLabelRenderer();
-        gridLabel.setPadding(32);
+        gridLabel.setPadding(50);
         graphView.getViewport().setMaxX(audioSeries.getHighestValueX());
 
-        gridLabel.setHorizontalAxisTitle("Slide Number");
-        gridLabel.setVerticalAxisTitle("Amount of Audio Clicks");
+        gridLabel.setHorizontalAxisTitle(getString(R.string.slideNumber));
+        gridLabel.setVerticalAxisTitle(getString(R.string.viewAudio));
 
 
 
@@ -137,13 +156,13 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         BarGraphSeries<DataPoint> videoSeries = extractor.getVideoSeries();
 
         graphView.addSeries(videoSeries);
-        graphView.setTitle("Counter of Video Clicks Per Slide on Lecture");
+        graphView.setTitle(getString(R.string.videoViewsTitleLecture));
         GridLabelRenderer gridLabel = graphView.getGridLabelRenderer();
-        gridLabel.setPadding(32);
+        gridLabel.setPadding(50);
         graphView.getViewport().setMaxX(videoSeries.getHighestValueX());
 
-        gridLabel.setHorizontalAxisTitle("Slide Number");
-        gridLabel.setVerticalAxisTitle("Amount of Video Clicks");
+        gridLabel.setHorizontalAxisTitle(getString(R.string.slideNumber));
+        gridLabel.setVerticalAxisTitle(getString(R.string.videoViews));
     }
 
 
@@ -235,9 +254,9 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         GraphView sevenGraphView = (GraphView) findViewById(R.id.time7Graph);
 
         LineGraphSeries<DataPoint> timeSeries = extractor.get7DayRollingAverage(null);
-        SimpleDateFormat sdf = new SimpleDateFormat("dd MMMM");
+        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf = new SimpleDateFormat("dd/MM");
         sevenGraphView.addSeries(timeSeries);
-        sevenGraphView.setTitle("7 Day Rolling Average on Time Spent on Lecture");
+        sevenGraphView.setTitle(getString(R.string.sevenRollingAverageLectureTitle));
 
         GridLabelRenderer gridLabel = sevenGraphView.getGridLabelRenderer();
         gridLabel.setLabelFormatter(new DefaultLabelFormatter() {
@@ -251,10 +270,13 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
             }
         });
 
-        gridLabel.setPadding(32);
+        sevenGraphView.getViewport().setMinX(timeSeries.getLowestValueX());
+
+        gridLabel.setPadding(50);
+        sevenGraphView.getViewport().setMinX(timeSeries.getLowestValueX());
         sevenGraphView.getViewport().setMaxX(timeSeries.getHighestValueX());
-        gridLabel.setHorizontalAxisTitle("Last 7 Days");
-        gridLabel.setVerticalAxisTitle("Amount of Time spent in seconds");
+        gridLabel.setHorizontalAxisTitle(getString(R.string.last7Days));
+        gridLabel.setVerticalAxisTitle(getString(R.string.time));
 
     }
 
@@ -264,31 +286,8 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
     }
 
     private void setUpUI() {
-        // Thumbnail
-        thumbnail= findViewById(R.id.list_item_thumbnail);
-        // Sound
-        sound = findViewById(R.id.audio_button);
-
-        sound.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (audioUri != null) {
-                    player = MediaPlayer.create(TeachOnlineLectureSummary.this, audioUri);
-                    player.start();
-                }
-            }
-        });
-
-
-        fetchThumbnailCourse();
-
-
-        // Title Course
-        lectureName = findViewById(R.id.list_item_text);
-        lectureName.setText(lecture.getLectureName());
-
         downloadCounter = findViewById(R.id.number_downloads);
-
+        speakStatistics = findViewById(R.id.speakStatistics);
 
         setUpData();
     }
@@ -304,51 +303,50 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         });
     }
 
-    private void fetchThumbnailCourse() {
-        StorageReference soundRef = storage.getReference().child("content").child(lecture.getLectureIdentification()).child("Sound Thumbnail");
 
-        soundRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+    private void configureSpeakStatistics() {
+        speakStatistics.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onSuccess(Uri uri) {
-                audioUri  = uri;
+            public boolean onLongClick(View v) {
+                speak(getString(R.string.speakStatisticsInformation));
+                return false;
             }
         });
 
-
-        StorageReference imageRef = storage.getReference().child("content").child(lecture.getLectureIdentification()).child("Photo Thumbnail");
-
-        imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        speakStatistics.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onSuccess(Uri uri) {
-                thumbnail.setImageURI(uri);
+            public void onClick(View v) {
+                String s = getString(R.string.numberDownloads) + ": " +  downloadCounter.getText().toString() + ".";
+                s += getString(R.string.most_viewed_slide) + ": " +  mostPopularSlide.getText().toString() + ".";
+                s += getString(R.string.least_viewed_slide) + ": " +  leastPopularSlide.getText().toString() + ".";
+                speak(s);
             }
         });
+
 
     }
 
 
 
+    /////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void configureAudio() {
-        sound.setOnClickListener(new View.OnClickListener() {
+    public void speak(String string) {
+        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
+    private void configureTextToSpeech() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
-            public void onClick(View v) {
-                if (audioUri != null) {
-                    sound.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                    player = MediaPlayer.create(TeachOnlineLectureSummary.this, audioUri);
-                    if (player != null) {
-                        player.start();
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = textToSpeech.setLanguage(Locale.getDefault());
 
-                        player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                sound.setColorFilter(null);
-                            }
-                        });
-                    } else {
-                        Toast.makeText(TeachOnlineLectureSummary.this, "No audio File", Toast.LENGTH_SHORT).show();
+                    if (result == TextToSpeech.LANG_MISSING_DATA
+                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        Toast.makeText(TeachOnlineLectureSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
                     }
-
+                } else {
+                    Toast.makeText(TeachOnlineLectureSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });
