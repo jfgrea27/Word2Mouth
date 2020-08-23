@@ -31,16 +31,6 @@ public class ConnectivityReceiver extends BroadcastReceiver {
     }
 
 
-    public static boolean isConnected() {
-        ConnectivityManager
-                cm = (ConnectivityManager) Word2Mouth.getInstance().getApplicationContext()
-                .getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-        return activeNetwork != null
-                && activeNetwork.isConnectedOrConnecting();
-    }
-
-
     public interface ConnectivityReceiverListener {
         void onNetworkConnectionChanged(boolean isConnected);
     }

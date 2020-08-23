@@ -250,9 +250,11 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         try{
             if(discoverReceiver !=null)
                 unregisterReceiver(discoverReceiver);
+
         }catch(Exception e)
         {
         }
+        
         super.onDestroy();
     }
 

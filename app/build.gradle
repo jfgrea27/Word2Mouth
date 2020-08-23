@@ -39,7 +39,6 @@ android {
 
 dependencies {
     implementation 'commons-io:commons-io:2.6'
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.4'
     implementation 'com.google.firebase:firebase-firestore:21.4.3'
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'

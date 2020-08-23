@@ -2,6 +2,7 @@ package com.imperial.word2mouth.learn.main.offline;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
@@ -257,6 +258,12 @@ public class LearnOfflineCourseFragment extends Fragment {
                         sharingIntent.putExtra(IntentNames.COURSE_PATH, courseItem.getCoursePath());
                         sharingIntent.putExtra(IntentNames.COURSE_NAME, courseName);
                     }
+
+                    BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+                    if (!mBluetoothAdapter.isEnabled()) {
+                        mBluetoothAdapter.enable();
+                    }
+
                     startActivity(sharingIntent);
                 } else {
                     Toast.makeText(getView().getContext(), "Need Storage Permission For Share Button", Toast.LENGTH_SHORT).show();

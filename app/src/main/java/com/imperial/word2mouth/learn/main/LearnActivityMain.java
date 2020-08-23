@@ -145,6 +145,7 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
             textToSpeech.stop();
             textToSpeech.shutdown();
         }
+
         super.onDestroy();
     }
 
