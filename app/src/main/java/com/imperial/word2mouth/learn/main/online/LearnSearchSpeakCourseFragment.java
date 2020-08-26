@@ -226,7 +226,7 @@ public class LearnSearchSpeakCourseFragment extends Fragment {
             startActivityForResult(intent, RECORD_QUERY);
 
         } else {
-            Toast.makeText(getView().getContext(), "Your device does not support speech input", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.deviceSupportSpeechInput, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -260,10 +260,10 @@ public class LearnSearchSpeakCourseFragment extends Fragment {
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(getView().getContext(), "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getView().getContext(), R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(getView().getContext(), "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getView().getContext(), R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

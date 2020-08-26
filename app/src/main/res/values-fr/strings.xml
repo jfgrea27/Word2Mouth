@@ -88,7 +88,50 @@
     <string name="color">Coleur</string>
     <string name="lectureName">Nom de la Leçon</string>
     <string name="legend">Légende</string>
-
+    <string name="noAudioFile">Pas de fichiers audio</string>
+    <string name="downloadCompleted">Téléchargement terminé</string>
+    <string name="dimissingNotification">Ignorer la notification</string>
+    <string name="retrieveContentFirebase">Récupération du nouveau contenu de Firebas</string>
+    <string name="deviceNotBluetoothSuported">L\'appareil ne fonctionne pas avec Bluetooth</string>
+    <string name="onBluetooth">Activer Bluetooth</string>
+    <string name="btON">Bluetooth Actif</string>
+    <string name="needBTOn">L\'appareil doit activer Bluetooth pour envoyer des fichiers.</string>
+    <string name="listeningBT">Écouter</string>
+    <string name="connectedBT">Blutooth connecté</string>
+    <string name="connectionFailBT">La connexion a échoué</string>
+    <string name="contentSentBT">Contenu envoyé</string>
+    <string name="checkOffline">vérifier Offline!</string>
+    <string name="notreceivedproperly">Fichier mal reçu</string>
+    <string name="languageNotSupported">Langue non installée</string>
+    <string name="initializationFailedSST">Echec d\'initialisation</string>
+    <string name="accessStorage">Veuillez autoriser l\'accès au stockage</string>
+    <string name="storagePermissionSharingButton">Besoin d\'une autorisation de stockage pour le bouton Partager</string>
+    <string name="permissStorageLearnButton">Besoin d\'une autorisation de stockage pour le bouton d\'Apprentissage</string>
+    <string name="permissionDeleteButton">Besoin d\'une autorisation de stockage pour le bouton de Suppression</string>
+    <string name="firstSlide">Première diapositive</string>
+    <string name="endslideShow">Fin du diaporama</string>
+    <string name="retrievingNextSlide">La diapositive suivante</string>
+    <string name="allowInternetAccess">Veuillez autoriser l\'accès Internet</string>
+    <string name="notRetrieveTeacher">Impossible de récupérer les enseignants</string>
+    <string name="notretrieveQuery">Impossible de récupérer la requête</string>
+    <string name="downloadingLecture">Téléchargement de la leçon</string>
+    <string name="deviceSupportSpeechInput">Votre appareil ne prend pas en charge la saisie vocale</string>
+    <string name="fetchingGallery">Récupération de la galerie</string>
+    <string name="fetchingCameraRoll">Récupération de la pellicule</string>
+    <string name="accesAudio">Veuillez autoriser l\'accès à l\'audio</string>
+    <string name="accessCamera">Veuillez autoriser l\'accès à la caméra</string>
+    <string name="retrievingPreviousSlide">Récupérer la diapositive précédente</string>
+    <string name="createNewSlide">Créer une nouvelle diapositive</string>
+    <string name="startRecording">Démarrer l\'enregistrement</string>
+    <string name="stopRecording">Démarrer l\'enregistrement</string>
+    <string name="uploadOtherTeacherContent">Ce n\'est pas votre contenu</string>
+    <string name="TeacherLoginToUpload">L\'enseignant doit se connecter pour mettre du contenu sur Firebase</string>
+    <string name="mustCreateAccount">Doit créer un compte</string>
+    <string name="creatingTeacherOnly">L\'enseignant créateur doit se connecter pour mettre du contenu sure Firebase</string>
+    <string name="uploadSuccessful">Sur Firebase</string>
+    <string name="detailSaved">Détails enregistrés</string>
+    <string name="detailsNotSaved">Détails pas enregistrés</string>
+    <string name="couldNotRetrieveCourse">\"Impossible de récupérer les cours pour \"</string>
 
 
 </resources>

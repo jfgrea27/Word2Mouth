@@ -45,7 +45,7 @@ public class NewLecturesDialog extends DialogFragment {
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(),"Dismissing Notification", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), getString(R.string.dimissingNotification), Toast.LENGTH_SHORT).show();
                 getDialog().dismiss();
             }
         });
@@ -55,7 +55,7 @@ public class NewLecturesDialog extends DialogFragment {
         checkOutNewContentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(),"Retrieving the new content from the Cloud", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), getString(R.string.retrieveContentFirebase), Toast.LENGTH_SHORT).show();
                 getDialog().dismiss();
 
                 FragmentManager manager = Objects.requireNonNull(getActivity()).getSupportFragmentManager();

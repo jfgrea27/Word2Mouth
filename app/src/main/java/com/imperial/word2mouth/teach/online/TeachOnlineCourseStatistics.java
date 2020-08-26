@@ -320,10 +320,10 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(TeachOnlineCourseStatistics.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachOnlineCourseStatistics.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(TeachOnlineCourseStatistics.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachOnlineCourseStatistics.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

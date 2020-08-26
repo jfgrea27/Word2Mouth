@@ -146,7 +146,7 @@ public class TeachOfflineMainFragment extends Fragment {
 
         if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
-            Toast.makeText(getView().getContext(), "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.accessStorage, Toast.LENGTH_SHORT).show();
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
         } else {
             hasReadWriteStorageAccess = true;
@@ -396,6 +396,7 @@ public class TeachOfflineMainFragment extends Fragment {
         upload = getView().findViewById(R.id.upload_button);
         uploadProgress = getView().findViewById(R.id.progress_upload);
 
+        uploadProgress.bringToFront();
         if (upload!= null) {
             upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
         }
@@ -412,11 +413,11 @@ public class TeachOfflineMainFragment extends Fragment {
                             localCourses.get(courseNumber).setAuthorID(authorCourse);
                             uploadCourse();
                         } else {
-                            Toast.makeText(getView().getContext(), "Creating teacher must login to upload content", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getView().getContext(), R.string.creatingTeacherOnly, Toast.LENGTH_SHORT).show();
                         }
 
                     } else {
-                        Toast.makeText(getView().getContext(), "Must Login", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getView().getContext(), R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
 
                     }
                 }
@@ -427,6 +428,7 @@ public class TeachOfflineMainFragment extends Fragment {
 
     private void  uploadCourse() {
             uploadProgress.setVisibility(View.VISIBLE);
+            uploadProgress.bringToFront();
             localCourses.get(courseNumber).setCourseBluetooth(FileReaderHelper.readTextFromFile(localCourses.get(courseNumber).getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
             UploadProcedure uploadProcedure = new UploadProcedure(localCourses.get(courseNumber), getActivity());
 
@@ -506,7 +508,7 @@ public class TeachOfflineMainFragment extends Fragment {
     private void uploadSuccessful() {
         if (completedDatabase && completedStorage) {
             uploadProgress.setVisibility(View.GONE);
-            Toast.makeText(getView().getContext(), "Upload Successful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.uploadSuccessful, Toast.LENGTH_SHORT).show();
             upload.setVisibility(View.VISIBLE);
             uploadProgress.setVisibility(View.INVISIBLE);
             enableDisableViewGroup((ViewGroup) getView().getParent(), true);

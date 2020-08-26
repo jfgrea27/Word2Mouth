@@ -211,7 +211,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
     // Permissions
     private void getPermissions() {
         if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED)) {
-            Toast.makeText(getView().getContext(), "Please allow access to Internet Access", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.allowInternetAccess, Toast.LENGTH_SHORT).show();
             requestPermissions(new String[]{Manifest.permission.INTERNET}, INTERNET_PERMISSION);
         } else {
             hasInternetAccess = true;
@@ -219,7 +219,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
         if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
-            Toast.makeText(getView().getContext(), "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.accessStorage, Toast.LENGTH_SHORT).show();
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
         } else {
             hasReadWriteStorageAccess = true;
@@ -326,7 +326,7 @@ public class CourseOnlineSelectionFragment extends Fragment {
        }).addOnFailureListener(new OnFailureListener() {
            @Override
            public void onFailure(@NonNull Exception e) {
-               Toast.makeText(getView().getContext(), "Could not retrieve the query", Toast.LENGTH_SHORT).show();
+               Toast.makeText(getView().getContext(), R.string.notretrieveQuery, Toast.LENGTH_SHORT).show();
 
            }
        });

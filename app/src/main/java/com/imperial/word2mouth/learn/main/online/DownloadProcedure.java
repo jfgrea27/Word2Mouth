@@ -17,6 +17,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.background.LearnOnlineNewCourseSummary;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
@@ -173,7 +174,7 @@ public class DownloadProcedure {
                 @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                    Toast.makeText(context, "Downloading the Lecture", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, R.string.downloadingLecture, Toast.LENGTH_SHORT).show();
                     moveZipCourse(lectureFile.getPath(), localCoursePath + DirectoryConstants.lectures);
 
                     createACacheForNewVersion(localCoursePath + DirectoryConstants.lectures + "/" + lectureItem.getLectureName());

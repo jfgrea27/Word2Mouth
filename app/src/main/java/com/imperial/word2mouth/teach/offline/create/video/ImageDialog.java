@@ -68,7 +68,7 @@ public class ImageDialog extends DialogFragment {
             @Override
             public void onClick(View v) {
 
-                Toast.makeText(view.getContext(), "Fetching from the gallery", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), R.string.fetchingGallery, Toast.LENGTH_SHORT).show();
 
                 onInputListener.sendInput(GALLERY_SELECTION);
                 getDialog().dismiss();
@@ -79,7 +79,7 @@ public class ImageDialog extends DialogFragment {
         roll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(view.getContext(),"Fetching from the camera roll", Toast.LENGTH_SHORT).show();
+                Toast.makeText(view.getContext(), R.string.fetchingCameraRoll, Toast.LENGTH_SHORT).show();
 
                 onInputListener.sendInput(CAMERA_ROLL_SELECTION);
                 getDialog().dismiss();

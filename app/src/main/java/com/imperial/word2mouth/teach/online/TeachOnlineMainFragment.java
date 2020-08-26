@@ -139,7 +139,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
             configureLongClicks();
         } else {
-            Toast.makeText(getView().getContext(), "Need to log in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -272,7 +272,7 @@ public class TeachOnlineMainFragment extends Fragment {
     // Permissions
     private void getPermissions() {
         if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.INTERNET) == PackageManager.PERMISSION_GRANTED)){
-            Toast.makeText(getView().getContext(), "Please allow access to Internet Access", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.allowInternetAccess, Toast.LENGTH_SHORT).show();
             requestPermissions(new String[]{Manifest.permission.INTERNET}, INTERNET_PERMISSION);
         } else {
             hasInternetAccess = true;
@@ -280,7 +280,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
         if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
         ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
-            Toast.makeText(getView().getContext(), "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.accessStorage, Toast.LENGTH_SHORT).show();
             requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
         } else {
             hasReadWriteStorageAccess = true;
@@ -377,12 +377,12 @@ public class TeachOnlineMainFragment extends Fragment {
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(getView().getContext(), "Could not retrieve courses for " +  user.getEmail(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(getView().getContext(), getString(R.string.couldNotRetrieveCourse) +  user.getEmail(), Toast.LENGTH_LONG).show();
                 }
             });
 
         } else {
-            Toast.makeText(getView().getContext(), "Teacher must sign-in to retrieve their courses", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
         }
     }
 

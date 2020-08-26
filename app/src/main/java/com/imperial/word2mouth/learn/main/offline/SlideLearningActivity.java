@@ -166,10 +166,10 @@ public class SlideLearningActivity extends AppCompatActivity {
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(SlideLearningActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(SlideLearningActivity.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(SlideLearningActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SlideLearningActivity.this, R.string.initializationFailedSST , Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -215,7 +215,7 @@ public class SlideLearningActivity extends AppCompatActivity {
                 slideCounter--;
                 // reach first slide
                 if(slideCounter < 0) {
-                    Toast.makeText(SlideLearningActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SlideLearningActivity.this, R.string.firstSlide, Toast.LENGTH_SHORT).show();
                     slideCounter++;
                 }
                 // retrieve previous slide
@@ -250,12 +250,12 @@ public class SlideLearningActivity extends AppCompatActivity {
                 slideCounter++;
                 // creating a new Slide
                 if(totalNumberSlides <= slideCounter) {
-                    Toast.makeText(SlideLearningActivity.this, "End Of Slide Show", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SlideLearningActivity.this, R.string.endslideShow, Toast.LENGTH_SHORT).show();
                     slideCounter--;
                 }
                 // retrieve previously saved file data
                 else {
-                    Toast.makeText(SlideLearningActivity.this, "Retrieve Next Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SlideLearningActivity.this, R.string.retrievingNextSlide, Toast.LENGTH_SHORT).show();
                     retrieveSlide();
                     updateCurrentView();
                 }

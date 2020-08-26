@@ -16,7 +16,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-import com.imperial.word2mouth.learn.main.offline.tracker.LectureTracker;
+import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.shared.CourseItem;
 import com.imperial.word2mouth.shared.DirectoryConstants;
 import com.imperial.word2mouth.shared.FileHandler;
@@ -84,7 +84,7 @@ public class UploadProcedure {
                 uploadCourseToDataBase();
             } else {
                 if (!user.getUid().equals(courseItem.getAuthorID())) {
-                    Toast.makeText(activity.getApplicationContext(), "Cannot upload a different Teacher's content", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity.getApplicationContext(), R.string.uploadOtherTeacherContent, Toast.LENGTH_SHORT).show();
                 } else {
                     courseItem.setAuthorID(user.getUid());
                     lectureItem.setAuthorID(user.getUid());
@@ -94,7 +94,7 @@ public class UploadProcedure {
                 }
             }
         }  else {
-            Toast.makeText(activity.getApplicationContext(), "Teacher must login to upload content", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity.getApplicationContext(), R.string.TeacherLoginToUpload, Toast.LENGTH_SHORT).show();
 
         }
 
@@ -208,7 +208,6 @@ public class UploadProcedure {
                 photoCourseThumbnail.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(activity.getApplicationContext(), "Uploaded Thumbnail", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -224,7 +223,6 @@ public class UploadProcedure {
                 soundCourseThumbnail.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(activity.getApplicationContext(), "Uploaded Sound" , Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -242,7 +240,7 @@ public class UploadProcedure {
             }
 
         } else {
-            Toast.makeText(activity, "Must create an Account", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -338,7 +336,6 @@ public class UploadProcedure {
                 photoCourseThumbnail.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(activity.getApplicationContext(), "Uploaded Thumbnail", Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -354,7 +351,6 @@ public class UploadProcedure {
                 soundCourseThumbnail.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        Toast.makeText(activity.getApplicationContext(), "Uploaded Sound" , Toast.LENGTH_SHORT).show();
                     }
                 });
 
@@ -366,7 +362,7 @@ public class UploadProcedure {
             }
 
         } else {
-            Toast.makeText(activity, "Must create an Account", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -415,7 +411,7 @@ public class UploadProcedure {
                 uploadCourseToDataBase();
             } else {
                 if (!user.getUid().equals(courseItem.getAuthorID())) {
-                    Toast.makeText(activity, "Cannot upload a different Teacher's content", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, R.string.uploadOtherTeacherContent, Toast.LENGTH_SHORT).show();
                 } else {
                     courseItem.setAuthorID(user.getUid());
                     addAllNecessaryFilesToCourse();
@@ -423,7 +419,7 @@ public class UploadProcedure {
                 }
             }
         } else {
-            Toast.makeText(activity, "Teacher must login to upload content", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
 
         }
 
@@ -561,7 +557,6 @@ public class UploadProcedure {
                     photoCourseThumbnail.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Toast.makeText(activity.getApplicationContext(), "Uploaded Thumbnail", Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -577,7 +572,6 @@ public class UploadProcedure {
                     soundCourseThumbnail.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                         @Override
                         public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                            Toast.makeText(activity.getApplicationContext(), "Uploaded Sound" , Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -610,7 +604,7 @@ public class UploadProcedure {
 
 
         } else {
-            Toast.makeText(activity, "Must create an Account", Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
 
         }
 

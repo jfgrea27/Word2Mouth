@@ -209,14 +209,14 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
     private void getPermissions() {
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
-            Toast.makeText(this, "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accessStorage, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
         } else{
             hasReadWriteStorageAccess = true;
         }
 
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
-            Toast.makeText(this, "Please allow access to Camera", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
         } else{
             hasCameraPermission = true;
@@ -224,7 +224,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
 
 
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)){
-            Toast.makeText(this, "Please allow access to Audio", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_RECORDING_PERMISSION);
         } else{
             hasAudioRecordingPermission = true;
@@ -338,12 +338,12 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
             public void onClick(View v) {
                 if (hasAudioRecordingPermission) {
                     if (!recording) {
-                        Toast.makeText(TeachLectureCreationSummaryActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachLectureCreationSummaryActivity.this, R.string.startRecording, Toast.LENGTH_SHORT).show();
                         audioButton.setColorFilter(Color.RED);
                         recorder.startRecording(audioFile.getPath());
                         recording = true;
                     } else {
-                        Toast.makeText(TeachLectureCreationSummaryActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachLectureCreationSummaryActivity.this,  R.string.stopRecording, Toast.LENGTH_SHORT).show();
                         recorder.stopRecording();
                         audioButton.setColorFilter(Color.BLACK);
                         audioUri = Uri.fromFile(audioFile);
@@ -351,7 +351,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
                         recording = false;
                     }
                 } else {
-                    Toast.makeText(TeachLectureCreationSummaryActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSummaryActivity.this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -389,7 +389,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
                     ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL);
                     imageDialog.show(getSupportFragmentManager(), "Video Dialog");
                 } else {
-                    Toast.makeText(TeachLectureCreationSummaryActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSummaryActivity.this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -441,7 +441,6 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
     public void sendInput(int choice) {
         switch (choice) {
             case GALLERY_SELECTION: {
-                Toast.makeText(this, "Opening Galleries", Toast.LENGTH_SHORT).show();
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
@@ -449,7 +448,6 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
                 break;
             }
             case CAMERA_ROLL_SELECTION: {
-                Toast.makeText(this, "Opening Camera Roll", Toast.LENGTH_SHORT).show();
                 Intent rollIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(rollIntent, CAMERA_ROLL_SELECTION);
                 break;

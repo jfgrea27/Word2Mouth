@@ -160,7 +160,7 @@ public class ArrayAdapterCourseOnline extends ArrayAdapter<CourseItem> {
                     }
 
                 } else {
-                    Toast.makeText(getContext(), "No audio File", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), R.string.noAudioFile, Toast.LENGTH_SHORT).show();
                 }
 
             }

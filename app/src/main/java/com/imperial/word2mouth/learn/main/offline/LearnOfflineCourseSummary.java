@@ -176,10 +176,10 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(LearnOfflineCourseSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LearnOfflineCourseSummary.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(LearnOfflineCourseSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LearnOfflineCourseSummary.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -242,7 +242,7 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
                             }
                         });
                     } else {
-                        Toast.makeText(LearnOfflineCourseSummary.this, "No audio File", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LearnOfflineCourseSummary.this, R.string.noAudioFile, Toast.LENGTH_SHORT).show();
                     }
 
                 }

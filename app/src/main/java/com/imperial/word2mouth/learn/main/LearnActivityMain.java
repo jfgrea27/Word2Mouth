@@ -271,10 +271,10 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(LearnActivityMain.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LearnActivityMain.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(LearnActivityMain.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LearnActivityMain.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -142,7 +142,7 @@ public class LearnOfflineCourseFragment extends Fragment {
     private void getPermissions() {
         if (!(ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED)) {
-            Toast.makeText(getView().getContext(), "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getView().getContext(), getString(R.string.accessStorage), Toast.LENGTH_SHORT).show();
             int permissionCheck = 0;
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
@@ -266,7 +266,7 @@ public class LearnOfflineCourseFragment extends Fragment {
 
                     startActivity(sharingIntent);
                 } else {
-                    Toast.makeText(getView().getContext(), "Need Storage Permission For Share Button", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getView().getContext(), R.string.storagePermissionSharingButton, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -301,7 +301,7 @@ public class LearnOfflineCourseFragment extends Fragment {
                         }
                     }
                 } else {
-                    Toast.makeText(getView().getContext(), "Need Storage Permission For Learn Button", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getView().getContext(), R.string.permissStorageLearnButton, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -359,7 +359,7 @@ public class LearnOfflineCourseFragment extends Fragment {
                             delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
 
                         } else {
-                            Toast.makeText(getView().getContext(), "Need Storage Permission For Learn Button", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getView().getContext(), R.string.permissionDeleteButton, Toast.LENGTH_SHORT).show();
 
                         }
                     }

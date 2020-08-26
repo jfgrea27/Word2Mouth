@@ -149,21 +149,21 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
     private void getPermissions() {
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
-            Toast.makeText(this, "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accessStorage, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
         } else{
             hasReadWriteStorageAccess = true;
         }
 
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)) {
-            Toast.makeText(this, "Please allow access to Audio", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_RECORDING_PERMISSION);
         } else{
             hasAudioRecordingPermission = true;
         }
 
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) ){
-            Toast.makeText(this, "Please allow access to Camera", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
         } else{
             hasCameraPermission = true;
@@ -207,12 +207,12 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
             slideCounter--;
             // reach first slide
             if (slideCounter < 0) {
-                Toast.makeText(TeachLectureCreationSlideActivity.this, "First Slide", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.firstSlide, Toast.LENGTH_SHORT).show();
                 slideCounter++;
             }
             // retrieve previously saved file data
             else {
-                Toast.makeText(TeachLectureCreationSlideActivity.this, "Retrieve Previous Slide", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.retrievingPreviousSlide, Toast.LENGTH_SHORT).show();
                 retrieveSavedSlide();
                 updateCurrentView();
             }
@@ -230,12 +230,12 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
                 slideCounter++;
                 // creating a new Slide
                 if(totalNumberSlides <= slideCounter) {
-                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Create New Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.createNewSlide, Toast.LENGTH_SHORT).show();
                     createBlankSlide();
                 }
                 // retrieve previously saved file data
                 else {
-                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Retrieve Next Slide", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.retrievingNextSlide, Toast.LENGTH_SHORT).show();
                     retrieveSavedSlide();
                     updateCurrentView();
                 }
@@ -372,11 +372,11 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
                 if (hasAudioRecordingPermission) {
                     if (!recording) {
                         recordAudioButton.setColorFilter(Color.RED);
-                        Toast.makeText(TeachLectureCreationSlideActivity.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.startRecording, Toast.LENGTH_SHORT).show();
                         recorder.startRecording(audioFile.getPath());
                         recording = true;
                     } else {
-                        Toast.makeText(TeachLectureCreationSlideActivity.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.stopRecording, Toast.LENGTH_SHORT).show();
                         recorder.stopRecording();
                         recordAudioButton.setColorFilter(null);
 
@@ -385,7 +385,7 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
                         recording = false;
                     }
                 } else {
-                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -416,7 +416,7 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
                     ImageDialog imageDialog = new ImageDialog(ImageDialog.SLIDE);
                     imageDialog.show(getSupportFragmentManager(), "Video Dialog");
                 } else {
-                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
 
                 }
 
@@ -458,7 +458,6 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
             switch (requestCode) {
                 case GALLERY_SELECTION:
                 case CAMERA_ROLL_SELECTION: {
-                    Toast.makeText(this, "Video Returned ", Toast.LENGTH_LONG).show();
                     video = data.getData();
                     videoView.setVideoURI(video);
                     setPreviewButton();
@@ -477,7 +476,6 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
     public void sendInput(int choice) {
         switch (choice) {
             case GALLERY_SELECTION: {
-                Toast.makeText(this, "Opening Galleries", Toast.LENGTH_SHORT).show();
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("video/*");
                 galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
@@ -486,8 +484,6 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
                 break;
             }
             case CAMERA_ROLL_SELECTION: {
-                Toast.makeText(this, "Opening Camera Roll", Toast.LENGTH_SHORT).show();
-
                 Intent rollIntent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
                 rollIntent.putExtra(MediaStore.EXTRA_DURATION_LIMIT, MAX_DURATION_VIDEO);
                 startActivityForResult(rollIntent, CAMERA_ROLL_SELECTION);
@@ -562,10 +558,10 @@ public class    TeachLectureCreationSlideActivity extends AppCompatActivity impl
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(TeachLectureCreationSlideActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(TeachLectureCreationSlideActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLectureCreationSlideActivity.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

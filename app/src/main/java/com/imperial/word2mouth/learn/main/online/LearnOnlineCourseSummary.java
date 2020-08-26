@@ -281,8 +281,9 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
 
     private void configureProgressBar() {
         progress = findViewById(R.id.progress_download);
-        progress.bringToFront();
         progress.setVisibility(View.INVISIBLE);
+        progress.bringToFront();
+
     }
 
 
@@ -298,6 +299,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
                     DownloadProcedure downloadProcedure = new DownloadProcedure(course, lectures.get(lectureNumber), LearnOnlineCourseSummary.this, LearnOnlineCourseSummary.this, DownloadProcedure.ELSE);
                     downloadProcedure.download();
                     progress.setVisibility(View.VISIBLE);
+                    progress.bringToFront();
                 }
 
             }
@@ -468,6 +470,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
 
 
         progress.setVisibility(View.INVISIBLE);
+
         lecture = null;
         downloadButton.setVisibility(View.INVISIBLE);
     }
@@ -505,10 +508,10 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(LearnOnlineCourseSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LearnOnlineCourseSummary.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(LearnOnlineCourseSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LearnOnlineCourseSummary.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

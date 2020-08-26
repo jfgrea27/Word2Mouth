@@ -210,10 +210,10 @@ public class TeachActivityMain extends AppCompatActivity implements Connectivity
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(TeachActivityMain.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachActivityMain.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(TeachActivityMain.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachActivityMain.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -240,7 +240,8 @@ public class TeachActivityMain extends AppCompatActivity implements Connectivity
                 signInDialog.show(getSupportFragmentManager(), "signInDialog");
             }
         } else {
-            Toast.makeText(TeachActivityMain.this, getString(R.string.internetNotConnected), Toast.LENGTH_SHORT).show();
+            Toast.makeText(TeachActivityMain.this,
+                    getString(R.string.internetNotConnected), Toast.LENGTH_SHORT).show();
         }
     }
 

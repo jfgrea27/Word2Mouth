@@ -123,8 +123,6 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     /////// Delete Button
     // View
     private ImageButton delete;
-    // Model
-    private int numberLectures = 0;
     // Controller
 
     /////// Create Button
@@ -206,6 +204,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
         upload = findViewById(R.id.upload_button);
 
         uploadProgress = findViewById(R.id.progress_upload);
+        uploadProgress.bringToFront();
 
         upload.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -218,10 +217,10 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
                         if (user.getUid().equals(authorID) || authorID == "") {
                             uploadCourse();
                         } else {
-                                Toast.makeText(TeachOfflineCourseSummary.this, "Creating teacher must login to upload content", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(TeachOfflineCourseSummary.this, R.string.creatingTeacherOnly, Toast.LENGTH_SHORT).show();
                         }
                     } else {
-                        Toast.makeText(TeachOfflineCourseSummary.this, "Must Login", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachOfflineCourseSummary.this, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
                     }
                 }
             }
@@ -233,6 +232,8 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
     private void uploadCourse() {
         uploadProgress.setVisibility(View.VISIBLE);
+        uploadProgress.bringToFront();
+
         setCourseAuthorIdentification();
         localLectures.get(lectureNumber).setLanguage(courseItem.getLanguage());
         localLectures.get(lectureNumber).setCategory(courseItem.getCategory());
@@ -473,7 +474,6 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
                     adapter.notifyDataSetInvalidated();
                     adapter.notifyDataSetChanged();
                     lectureNumber = -1;
-                    numberLectures--;
                 }
             }
         });
@@ -520,21 +520,21 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     private void getPermissions() {
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
-            Toast.makeText(this, "Please allow access to Storage", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accessStorage, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
         } else{
             hasReadWriteStorageAccess = true;
         }
 
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)){
-            Toast.makeText(this, "Please allow access to Audio", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_RECORDING_PERMISSION);
         } else{
             hasAudioRecordingPermission = true;
         }
 
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
-            Toast.makeText(this, "Please allow access to Camera", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this,R.string.accesAudio , Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
         } else{
             hasCameraPermission = true;
@@ -625,7 +625,6 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
         File[] lectureItemsFiles = lecturesDirectory.listFiles();
         if (lectureItemsFiles != null) {
-            numberLectures = lectureItemsFiles.length;
 
             for (File f : lectureItemsFiles) {
 
@@ -659,7 +658,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
                     ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL);
                     imageDialog.show(getSupportFragmentManager(), "Video Dialog");
                 } else {
-                    Toast.makeText(TeachOfflineCourseSummary.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachOfflineCourseSummary.this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -711,7 +710,6 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     public void sendInput(int choice) {
         switch (choice) {
             case GALLERY_SELECTION: {
-                Toast.makeText(this, "Opening Galleries", Toast.LENGTH_SHORT).show();
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
@@ -719,7 +717,6 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
                 break;
             }
             case CAMERA_ROLL_SELECTION: {
-                Toast.makeText(this, "Opening Camera Roll", Toast.LENGTH_SHORT).show();
                 Intent rollIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 startActivityForResult(rollIntent, CAMERA_ROLL_SELECTION);
                 break;
@@ -740,12 +737,12 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
             public void onClick(View v) {
                 if (hasAudioRecordingPermission) {
                     if (!recording) {
-                        Toast.makeText(TeachOfflineCourseSummary.this, "Start Recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachOfflineCourseSummary.this, R.string.startRecording, Toast.LENGTH_SHORT).show();
                         audioButton.setColorFilter(Color.RED);
                         recorder.startRecording(audioFile.getPath());
                         recording = true;
                     } else {
-                        Toast.makeText(TeachOfflineCourseSummary.this, "Stop Recording", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachOfflineCourseSummary.this, R.string.stopRecording, Toast.LENGTH_SHORT).show();
                         recorder.stopRecording();
                         audioButton.setColorFilter(Color.BLACK);
                         audioUri = Uri.fromFile(audioFile);
@@ -753,7 +750,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
                         recording = false;
                     }
                 } else {
-                    Toast.makeText(TeachOfflineCourseSummary.this, "Need the Microphone Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachOfflineCourseSummary.this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -804,7 +801,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     private void uploadSuccessful() {
         if (completedDatabase && completedStorage) {
             uploadProgress.setVisibility(View.GONE);
-            Toast.makeText(TeachOfflineCourseSummary.this, "Upload Successful", Toast.LENGTH_SHORT).show();
+            Toast.makeText(TeachOfflineCourseSummary.this, R.string.uploadSuccessful, Toast.LENGTH_SHORT).show();
             upload.setEnabled(true);
 
         }
@@ -837,10 +834,10 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(TeachOfflineCourseSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachOfflineCourseSummary.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(TeachOfflineCourseSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachOfflineCourseSummary.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

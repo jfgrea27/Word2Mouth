@@ -125,7 +125,9 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         });
 
         gridLabel.setPadding(50);
+        graphView.getViewport().setXAxisBoundsManual(true);
         graphView.getViewport().setMaxX(timeSeries.getHighestValueX());
+
         gridLabel.setHorizontalAxisTitle(getString(R.string.instance));
         gridLabel.setVerticalAxisTitle(getString(R.string.time));
 
@@ -141,7 +143,10 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         graphView.setTitle(getString(R.string.clicksAudioTitleLecture));
         GridLabelRenderer gridLabel = graphView.getGridLabelRenderer();
         gridLabel.setPadding(50);
-        graphView.getViewport().setMaxX(audioSeries.getHighestValueX());
+
+        graphView.getViewport().setMinX(audioSeries.getLowestValueX() - 1);
+        graphView.getViewport().setMaxX(audioSeries.getHighestValueX() + 1);
+        graphView.getViewport().setXAxisBoundsManual(true);
 
         gridLabel.setHorizontalAxisTitle(getString(R.string.slideNumber));
         gridLabel.setVerticalAxisTitle(getString(R.string.viewAudio));
@@ -159,8 +164,9 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         graphView.setTitle(getString(R.string.videoViewsTitleLecture));
         GridLabelRenderer gridLabel = graphView.getGridLabelRenderer();
         gridLabel.setPadding(50);
-        graphView.getViewport().setMaxX(videoSeries.getHighestValueX());
-
+        graphView.getViewport().setMinX(videoSeries.getLowestValueX() - 1);
+        graphView.getViewport().setMaxX(videoSeries.getHighestValueX() + 1);
+        graphView.getViewport().setXAxisBoundsManual(true);
         gridLabel.setHorizontalAxisTitle(getString(R.string.slideNumber));
         gridLabel.setVerticalAxisTitle(getString(R.string.videoViews));
     }
@@ -275,6 +281,7 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
         gridLabel.setPadding(50);
         sevenGraphView.getViewport().setMinX(timeSeries.getLowestValueX());
         sevenGraphView.getViewport().setMaxX(timeSeries.getHighestValueX());
+        sevenGraphView.getViewport().setXAxisBoundsManual(true);
         gridLabel.setHorizontalAxisTitle(getString(R.string.last7Days));
         gridLabel.setVerticalAxisTitle(getString(R.string.time));
 
@@ -343,10 +350,10 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(TeachOnlineLectureSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachOnlineLectureSummary.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(TeachOnlineLectureSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachOnlineLectureSummary.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

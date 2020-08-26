@@ -110,7 +110,7 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
 
     private void getPermissions() {
         if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
-            Toast.makeText(this, "Please allow access to Camera", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
         } else{
             hasCameraPermission = true;
@@ -243,13 +243,13 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
             db.collection("users").document(user.getUid()).set(teacher).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
-                    Toast.makeText(TeachLoginActivity.this, "Details saved", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLoginActivity.this, R.string.detailSaved, Toast.LENGTH_SHORT).show();
 
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception e) {
-                    Toast.makeText(TeachLoginActivity.this, "Details not saved", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLoginActivity.this, R.string.detailsNotSaved, Toast.LENGTH_SHORT).show();
 
                 }
             });
@@ -269,11 +269,11 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
                         ImageDialog imageDialog = new ImageDialog(ImageDialog.PROFILE);
                         imageDialog.show(getSupportFragmentManager(), "Profile Picture Selection");
                     } else {
-                        Toast.makeText(TeachLoginActivity.this, "Need to be signed in", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachLoginActivity.this, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
                     }
 
                 } else {
-                    Toast.makeText(TeachLoginActivity.this, "Need the Camera Permission", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLoginActivity.this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -284,7 +284,6 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
     public void sendInput(int choice) {
         switch (choice) {
             case GALLERY_SELECTION: {
-                Toast.makeText(this, "Opening Galleries", Toast.LENGTH_SHORT).show();
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
@@ -292,7 +291,6 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
                 break;
             }
             case CAMERA_ROLL_SELECTION: {
-                Toast.makeText(this, "Opening Camera Roll", Toast.LENGTH_SHORT).show();
                 Intent rollIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 rollIntent.putExtra("android.intent.extra.USE_FRONT_CAMERA", true);
                 rollIntent.putExtra("android.intent.extras.LENS_FACING_FRONT", 1);
@@ -432,10 +430,10 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(TeachLoginActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachLoginActivity.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(TeachLoginActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachLoginActivity.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

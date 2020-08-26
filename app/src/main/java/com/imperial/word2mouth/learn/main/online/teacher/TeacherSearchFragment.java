@@ -111,7 +111,7 @@ public class TeacherSearchFragment extends Fragment  {
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(getView().getContext(), "Could not retrieve the teachers", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getView().getContext(), R.string.notRetrieveTeacher, Toast.LENGTH_SHORT).show();
 
             }
         });

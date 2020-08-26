@@ -271,7 +271,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
             });
 
         } else {
-            Toast.makeText(TeachOnlineCourseSummary.this, "Teacher must sign-in to retrieve their courses", Toast.LENGTH_SHORT).show();
+            Toast.makeText(TeachOnlineCourseSummary.this, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -362,10 +362,10 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(TeachOnlineCourseSummary.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(TeachOnlineCourseSummary.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(TeachOnlineCourseSummary.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(TeachOnlineCourseSummary.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
                 }
             }
         });

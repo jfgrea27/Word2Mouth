@@ -342,11 +342,11 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if (mBluetoothAdapter == null) {
-            Toast.makeText(ShareBluetoothActivity.this, "Device does not support Bluetooth", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ShareBluetoothActivity.this, getString(R.string.deviceNotBluetoothSuported), Toast.LENGTH_SHORT).show();
             finish();
         } else {
             if (!mBluetoothAdapter.isEnabled()) {
-                Toast.makeText(ShareBluetoothActivity.this, "Turning on Bluetooth", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ShareBluetoothActivity.this, getString(R.string.onBluetooth), Toast.LENGTH_SHORT).show();
 
                 Intent enableBluetoothIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableBluetoothIntent, REQUEST_ENABLE_BT);
@@ -360,12 +360,12 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_ENABLE_BT) {
             if (resultCode == RESULT_OK) {
-                Toast.makeText(ShareBluetoothActivity.this, "Bluetooth ON.",
+                Toast.makeText(ShareBluetoothActivity.this, getString(R.string.btON),
                         Toast.LENGTH_SHORT).show();
 
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(ShareBluetoothActivity.this,
-                        "Device needs Bluetooth ON to send Files.", Toast.LENGTH_SHORT).show();
+                        getString(R.string.needBTOn), Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
@@ -447,10 +447,10 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
             switch (msg.what) {
                 case STATE_LISTENING:
-                    Toast.makeText(getBaseContext(), "Listening", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getString(R.string.listeningBT), Toast.LENGTH_SHORT).show();
                     break;
                 case STATE_CONNECTED:
-                    Toast.makeText(getBaseContext(), "Connected", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(),getString(R.string.connectedBT), Toast.LENGTH_SHORT).show();
                     mBluetoothAdapter.cancelDiscovery();
                     if (selectedDevice != null) {
 
@@ -469,7 +469,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                     }
                     break;
                 case STATE_CONNECTION_FAILED:
-                    Toast.makeText(getBaseContext(), "Connection Failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getString(R.string.connectionFailBT), Toast.LENGTH_SHORT).show();
                     break;
                 case STATE_CONTENT_RECEIVED:
                     if (progress.getVisibility() == View.VISIBLE) {
@@ -502,7 +502,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                         progress.setVisibility(View.INVISIBLE);
                     }
                     tidyZippedFile();
-                    Toast.makeText(getBaseContext(), "Content Sent", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getBaseContext(), getString(R.string.contentSentBT), Toast.LENGTH_SHORT).show();
                     break;
             }
             return false;
@@ -814,7 +814,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
                 removeZipFile(path);
             }
 
-            Toast.makeText(ShareBluetoothActivity.this, "Check Offline!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ShareBluetoothActivity.this, getString(R.string.checkOffline), Toast.LENGTH_SHORT).show();
         }
 
 
@@ -842,7 +842,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
             FileHandler.copyDirectoryOneLocationToAnotherLocation(file, new File(getApplicationContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName));
         } catch (IOException e) {
             e.printStackTrace();
-            Toast.makeText(ShareBluetoothActivity.this, "File not received properly", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ShareBluetoothActivity.this, getString(R.string.notreceivedproperly), Toast.LENGTH_SHORT).show();
         }
 
     }
@@ -923,10 +923,10 @@ public class ShareBluetoothActivity extends AppCompatActivity {
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(ShareBluetoothActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ShareBluetoothActivity.this, getString(R.string.languageNotSupported), Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(ShareBluetoothActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ShareBluetoothActivity.this, getString(R.string.initializationFailedSST), Toast.LENGTH_SHORT).show();
                 }
             }
         });

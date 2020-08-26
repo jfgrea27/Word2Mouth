@@ -250,7 +250,7 @@ public class LearnOnlineNewCourseSummary extends AppCompatActivity {
                             }
                         });
                     } else {
-                        Toast.makeText(LearnOnlineNewCourseSummary.this, "No audio File", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LearnOnlineNewCourseSummary.this, getString(R.string.noAudioFile), Toast.LENGTH_SHORT).show();
                     }
 
                 }
@@ -297,7 +297,7 @@ public class LearnOnlineNewCourseSummary extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void signalCompleteDownload(String lectureIdentification) {
-        Toast.makeText(LearnOnlineNewCourseSummary.this, "Download Completed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(LearnOnlineNewCourseSummary.this, getString(R.string.downloadCompleted), Toast.LENGTH_SHORT).show();
 
         updateFollowing(lectureIdentification);
         progress.setVisibility(View.INVISIBLE);
