@@ -1,4 +1,4 @@
-# Word2Mouth - An Android-based eLearning App catered for developing countries
+# Word2Mouth - An Android-based eLearning platform catered for developing countries
 
 
 <p align="center">
