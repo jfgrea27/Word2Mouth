@@ -33,11 +33,9 @@ This project has been designed to meet this humanitarian need. More specifically
 - An online OER store that uses Google's Firebase Services for Learners/Teachers to download/upload educational content from anywhere with Internet, accessible using Google's Text-To-Speech API.
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/59763234/94921611-f1134e80-04b8-11eb-832b-6cdfc5a507a4.jpg" width="200" />
-  <img src="https://user-images.githubusercontent.com/59763234/94921613-f1abe500-04b8-11eb-942e-36788cdda0ab.jpg" width="200" /> 
-  <img src="https://user-images.githubusercontent.com/59763234/94921614-f2447b80-04b8-11eb-82b7-a065781628f9.jpg" width="200" />
+  <img src="https://user-images.githubusercontent.com/59763234/94922889-45b7c900-04bb-11eb-8b70-dd1274d5a20b.png" width="200" />
+  <img src="https://user-images.githubusercontent.com/59763234/94922888-451f3280-04bb-11eb-912d-2c141f30cc25.jpg" width="200" /> 
 </p>
-
 
 - Indispensable metrics for Teachers to track the current popularity of their uploaded OER from within Word2Mouth.
 
