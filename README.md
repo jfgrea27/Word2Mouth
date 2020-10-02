@@ -1,6 +1,10 @@
 # Word2Mouth - an Android-based eLearning App catered for developing countries
 
-![](/AndroidStudioProjects/Word2Mouthv2/app/src/main/res/drawable/logo.png)
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/59763234/94911839-04b5b980-04a7-11eb-85b1-08beddcaef82.png" width="200" />
+</p>
+
 
 Although the practicality and potential of these new eLearning platforms have been much praised by 
 developed countries, the unforeseen differences in technological and educational background between Learners from High Income and 
