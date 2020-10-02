@@ -52,8 +52,15 @@ This project has been designed to meet this humanitarian need. More specifically
 
 ## Tech/framework used
 
-Word2Mouth makes use of the following frameworks:
+Word2Mouth was written in Java and makes use of the following frameworks:
 
-- Offline: Devi
+### Offline
+- Multi-threaded Bluetooth functionality - including 3 threads (Client/Server for connection and SendReceive for sending OER between devices)
+- Persistent storage of both meta and media files on the device.
+- Speech-To-Text/Text-To-Speech technology, using Google's APi - implemented in French and English. More langages to be added.
 
-- Online: Google Firebase with 
+### Online
+- Authentication of Teachers via comparison between Google Firebase's data and data stored on ownership file in device.
+- Complex interaction between Google Firebase and Google Firebase Storage for linking meta and media files betwen NOSQL databases
+- Novel Semi-offline to track Learners' usage for OER retention
+- Interrupt handler that retries a specific upload/download of OER from the Firebase when Internet connection is regained.
