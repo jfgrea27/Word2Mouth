@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:backgroundTint="@color/colorAccent"
-    tools:context=".learn.main.LearnActivityMain" tools:targetApi="lollipop">
+    tools:context=".previous.main.LearnActivityMain" tools:targetApi="lollipop">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"

@@ -32,7 +32,10 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AccountActivity"></activity>
+        <activity android:name=".share.ShareMenuActivity"></activity>
+        <activity android:name=".watch.WatchContentActivity" />
+        <activity android:name=".create.CreateContentActivity" />
+        <activity android:name=".account.AccountActivity" />
         <activity android:name=".MainMenuActivity" />
         <activity android:name=".SplashScreenActivity">
             <intent-filter>
@@ -44,44 +47,44 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".learn.main.LearnActivityMain"
+            android:name=".previous.main.LearnActivityMain"
             android:exported="true"
             android:label="Word2Mouth"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".teach.online.TeachOnlineCourseStatistics" />
-        <activity android:name=".teach.online.TeachOnlineLectureSummary" />
-        <activity android:name=".background.LearnOnlineNewCourseSummary" />
+        <activity android:name=".previous.teach.online.TeachOnlineCourseStatistics" />
+        <activity android:name=".previous.teach.online.TeachOnlineLectureSummary" />
+        <activity android:name=".previous.background.LearnOnlineNewCourseSummary" />
 
         <receiver
-            android:name=".background.ConnectivityReceiver"
+            android:name=".previous.background.ConnectivityReceiver"
             android:enabled="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
         </receiver>
 
-        <activity android:name=".teach.online.TeachOnlineCourseSummary" />
-        <activity android:name=".learn.main.offline.LearnOfflineCourseSummary" />
-        <activity android:name=".teach.offline.TeachOfflineCourseSummary" />
-        <activity android:name=".teach.online.account.TeachLoginActivity" />
-        <activity android:name=".learn.main.offline.share.bluetooth.ShareBluetoothActivity" />
+        <activity android:name=".previous.teach.online.TeachOnlineCourseSummary" />
+        <activity android:name=".previous.main.offline.LearnOfflineCourseSummary" />
+        <activity android:name=".previous.teach.offline.TeachOfflineCourseSummary" />
+        <activity android:name=".previous.teach.online.account.TeachLoginActivity" />
+        <activity android:name=".previous.main.offline.share.bluetooth.ShareBluetoothActivity" />
         <activity
-            android:name=".teach.offline.create.TeachLectureCreationSummaryActivity"
+            android:name=".previous.teach.offline.create.TeachLectureCreationSummaryActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".learn.main.offline.SlideLearningActivity"
+            android:name=".previous.main.offline.SlideLearningActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".learn.main.online.LearnOnlineCourseSummary"
+            android:name=".previous.main.online.LearnOnlineCourseSummary"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".teach.TeachActivityMain"
+            android:name=".previous.teach.TeachActivityMain"
             android:label="@string/title_activity_teach_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".teach.offline.create.TeachLectureCreationSlideActivity"
+            android:name=".previous.teach.offline.create.TeachLectureCreationSlideActivity"
             android:screenOrientation="portrait" />
     </application>
 

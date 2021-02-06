@@ -14,7 +14,7 @@
         app:layout_constraintBottom_toTopOf="@+id/create_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintTop_toBottomOf="@+id/title_menu"
         app:srcCompat="@drawable/ic_account_black" />
 
     <ImageButton
@@ -22,8 +22,8 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginBottom="92dp"
-        android:scaleType="fitCenter"
         android:backgroundTint="@color/colorWhite"
+        android:scaleType="fitCenter"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -60,19 +60,62 @@
         app:srcCompat="@drawable/ic_teach_black" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/title_menu"
         android:layout_width="match_parent"
-        android:layout_height="53dp"
+        android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
-        android:gravity="center_horizontal"
-        android:text="Word2Mouth"
-        android:textAlignment="center"
+        android:text="@string/w2m"
         android:textColor="@color/colorWhite"
         android:textSize="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/text_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/login"
+        app:layout_constraintEnd_toEndOf="@+id/login_button"
+        app:layout_constraintStart_toStartOf="@+id/login_button"
+        app:layout_constraintTop_toBottomOf="@+id/login_button" />
+
+    <TextView
+        android:id="@+id/text_create_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="102dp"
+        android:text="@string/create"
+        app:layout_constraintEnd_toEndOf="@+id/create_button"
+        app:layout_constraintStart_toStartOf="@+id/create_button"
+        app:layout_constraintTop_toTopOf="@+id/create_button" />
+
+    <TextView
+        android:id="@+id/text_share_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/share"
+        app:layout_constraintEnd_toEndOf="@+id/share_button"
+        app:layout_constraintStart_toStartOf="@+id/share_button"
+        app:layout_constraintTop_toBottomOf="@+id/share_button" />
+
+    <TextView
+        android:id="@+id/text_watch_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/watch"
+        app:layout_constraintEnd_toEndOf="@+id/watch_button"
+        app:layout_constraintStart_toStartOf="@+id/watch_button"
+        app:layout_constraintTop_toBottomOf="@+id/watch_button" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/logo" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

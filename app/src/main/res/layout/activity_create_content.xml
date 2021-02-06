@@ -1,39 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <HorizontalScrollView
-        android:layout_width="410dp"
-        android:layout_height="469dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+
+
+    <ImageButton
+        android:id="@+id/delete_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:backgroundTint="@color/colorWhite"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/text_delete_button"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/create_button"
+        app:srcCompat="@drawable/ic_delete"
+        tools:targetApi="lollipop"
+        tools:ignore="ContentDescription" />
+
+    <ImageButton
+        android:id="@+id/create_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:backgroundTint="@color/colorWhite"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/text_create_button"
+        app:layout_constraintEnd_toStartOf="@+id/delete_button"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical" />
-    </HorizontalScrollView>
-
-    <ImageButton
-        android:id="@+id/imageButton2"
-        android:layout_width="98dp"
-        android:layout_height="105dp"
         app:srcCompat="@drawable/ic_teach_black"
-        tools:layout_editor_absoluteX="78dp"
-        tools:layout_editor_absoluteY="626dp" />
+        tools:targetApi="lollipop"
+        tools:ignore="ContentDescription" />
 
-    <ImageButton
-        android:id="@+id/imageButton3"
+    <TextView
+        android:id="@+id/text_create_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_delete"
-        tools:layout_editor_absoluteX="256dp"
-        tools:layout_editor_absoluteY="635dp" />
+        android:text="@string/create"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/create_button"
+        app:layout_constraintStart_toStartOf="@+id/create_button" />
+
+    <TextView
+        android:id="@+id/text_delete_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/delete_button"
+        app:layout_constraintStart_toStartOf="@+id/delete_button" />
+
+    <TextView
+        android:id="@+id/create_menu"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorAccent"
+        android:textColor="@color/colorWhite"
+        android:text="@string/create"
+        android:textSize="40dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SpUsage" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="550dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_menu" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@color/colorWhite"
+        app:layout_constraintBottom_toBottomOf="@+id/create_menu"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/create_menu"
+        app:srcCompat="@drawable/ic_teach_black" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

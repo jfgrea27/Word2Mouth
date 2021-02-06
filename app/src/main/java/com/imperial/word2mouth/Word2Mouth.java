@@ -1,15 +1,13 @@
 package com.imperial.word2mouth;
 
 import android.app.Application;
-import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.Build;
-import android.telecom.ConnectionService;
 
 import androidx.annotation.RequiresApi;
 
-import com.imperial.word2mouth.background.ConnectivityReceiver;
+import com.imperial.word2mouth.previous.background.ConnectivityReceiver;
 
 public class Word2Mouth extends Application {
 

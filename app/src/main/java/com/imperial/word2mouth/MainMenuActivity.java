@@ -9,7 +9,9 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.imperial.word2mouth.learn.main.offline.LearnOfflineCourseSummary;
+import com.imperial.word2mouth.account.AccountActivity;
+import com.imperial.word2mouth.create.CreateContentActivity;
+import com.imperial.word2mouth.watch.WatchContentActivity;
 
 import java.util.Locale;
 
@@ -21,7 +23,7 @@ public class MainMenuActivity extends AppCompatActivity {
     private ImageButton shareButton;
     private ImageButton watchButton;
 
-    /////////////////////// TTTS //////////////////////
+    /////////////////////// TTS //////////////////////
     private TextToSpeech textToSpeech;
 
 
@@ -31,9 +33,7 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
        configureUI();
-
        configureTTS();
-
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,28 +51,36 @@ public class MainMenuActivity extends AppCompatActivity {
         this.loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentAccountInformation = new Intent(MainMenuActivity.this, AccountActivity.class);
+                Intent intentAccountInformation = new Intent(
+                        MainMenuActivity.this,
+                        AccountActivity.class);
                 startActivity(intentAccountInformation);
             }
         });
         this.createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentCreateContent = new Intent(MainMenuActivity.this, AccountActivity.class);
+                Intent intentCreateContent = new Intent(
+                        MainMenuActivity.this,
+                        CreateContentActivity.class);
                 startActivity(intentCreateContent);
             }
         });
         this.shareButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentShareContent = new Intent(MainMenuActivity.this, AccountActivity.class);
+                Intent intentShareContent = new Intent(
+                        MainMenuActivity.this,
+                        AccountActivity.class);
                 startActivity(intentShareContent);
             }
         });
         this.watchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentWatchContent = new Intent(MainMenuActivity.this, AccountActivity.class);
+                Intent intentWatchContent = new Intent(
+                        MainMenuActivity.this,
+                        WatchContentActivity.class);
                 startActivity(intentWatchContent);
             }
         });
