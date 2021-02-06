@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.viewpager.widget.ViewPager;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.imperial.word2mouth.SplashScreenActivity;
 import com.imperial.word2mouth.Word2Mouth;
 import com.imperial.word2mouth.background.ConnectivityReceiver;
 import com.imperial.word2mouth.background.NewLecturesDialog;
@@ -54,6 +56,7 @@ import java.util.Scanner;
 
 public class LearnActivityMain extends AppCompatActivity implements ConnectivityReceiver.ConnectivityReceiverListener {
 
+
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private SectionsPagerAdapter sectionsPagerAdapter;
@@ -67,6 +70,8 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_main_tabbed);
+        
+
         sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);

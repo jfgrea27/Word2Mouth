@@ -32,7 +32,23 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".teach.online.TeachOnlineCourseStatistics"></activity>
+        <activity android:name=".SplashScreenActivity">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.LAUNCHER" />
+
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".learn.main.LearnActivityMain"
+            android:exported="true"
+            android:label="Word2Mouth"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".teach.online.TeachOnlineCourseStatistics" />
         <activity android:name=".teach.online.TeachOnlineLectureSummary" />
         <activity android:name=".background.LearnOnlineNewCourseSummary" />
 
@@ -63,20 +79,7 @@
             android:label="@string/title_activity_teach_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity
-            android:name=".learn.main.LearnActivityMain"
-            android:exported="true"
-            android:label="Word2Mouth"
-            android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-            <intent-filter>
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.LAUNCHER" />
 
-                <action android:name="android.intent.action.MAIN" />
-            </intent-filter>
-        </activity>
         <activity
             android:name=".teach.offline.create.TeachLectureCreationSlideActivity"
             android:screenOrientation="portrait" />
