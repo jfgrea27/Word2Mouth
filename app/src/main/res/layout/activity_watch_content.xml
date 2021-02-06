@@ -59,7 +59,7 @@
         android:layout_height="wrap_content"
         android:background="@color/colorAccent"
         android:textColor="@color/colorWhite"
-        android:text="@string/create"
+        android:text="@string/watch"
         android:textSize="40dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

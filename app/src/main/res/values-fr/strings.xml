@@ -3,7 +3,7 @@
     <string name="teaching">Enseigner</string>
     <string name="login">Connexion</string>
     <string name="settings">Parametrage</string>
-    <string name="bluetooth">Partage sans Internet via Bluetooth</string>
+    <string name="bluetooth_explain">Partage sans Internet via Bluetooth</string>
     <string name="learn">Apprendre</string>
     <string name="delete">Suprimé contenu</string>
     <string name="gallery">"photo de la galerie "</string>
@@ -132,6 +132,8 @@
     <string name="detailSaved">Détails enregistrés</string>
     <string name="detailsNotSaved">Détails pas enregistrés</string>
     <string name="couldNotRetrieveCourse">\"Impossible de récupérer les cours pour \"</string>
+    <string name="internet">Internet</string>
+    <string name="bluetooth">Bluetooth</string>
 
 
 </resources>

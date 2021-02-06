@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.imperial.word2mouth.account.AccountActivity;
 import com.imperial.word2mouth.create.CreateContentActivity;
+import com.imperial.word2mouth.share.ShareMenuActivity;
 import com.imperial.word2mouth.watch.WatchContentActivity;
 
 import java.util.Locale;
@@ -71,7 +72,7 @@ public class MainMenuActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intentShareContent = new Intent(
                         MainMenuActivity.this,
-                        AccountActivity.class);
+                        ShareMenuActivity.class);
                 startActivity(intentShareContent);
             }
         });
@@ -84,22 +85,6 @@ public class MainMenuActivity extends AppCompatActivity {
                 startActivity(intentWatchContent);
             }
         });
-
-//        this.Button.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                Intent login = new Intent(MainMenuActivity.this, AccountActivity.class);
-//                startActivity(login);
-//            }
-//        });
-//        this.loginButton.setOnLongClickListener(new View.OnLongClickListener() {
-//            @Override
-//            public boolean onLongClick(View v) {
-//                Intent login = new Intent(MainMenuActivity.this, AccountActivity.class);
-//                startActivity(login);
-//            }
-//        });
-        // TODO complete this. Should bring users to different Activities
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

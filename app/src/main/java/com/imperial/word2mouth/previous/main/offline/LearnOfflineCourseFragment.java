@@ -274,7 +274,7 @@ public class LearnOfflineCourseFragment extends Fragment {
             @Override
             public boolean onLongClick(View v) {
                 LearnActivityMain act = (LearnActivityMain) getActivity();
-                act.speak(getString(R.string.bluetooth));
+                act.speak(getString(R.string.bluetooth_explain));
                 return true;
             }
         });

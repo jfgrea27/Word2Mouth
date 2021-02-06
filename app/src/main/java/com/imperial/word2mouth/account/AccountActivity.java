@@ -11,6 +11,8 @@ public class AccountActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // TODO improve this layout so more consistent with other layouts
         setContentView(R.layout.activity_account);
     }
 }

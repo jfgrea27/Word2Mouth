@@ -10,6 +10,9 @@
     <string name="create">Create</string>
     <string name="share">Share</string>
     <string name="delete">Delete</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="search">Search</string>
+
 
     <string name="app_name" translatable="false">SlidePasserTrial</string>
     <string name="online">Online</string>
@@ -27,7 +30,7 @@
 
     <string name="learn">Learn</string>
 
-    <string name="bluetooth">Share offline via bluetooth</string>
+    <string name="bluetooth_explain">Share offline via bluetooth</string>
     <string name="offline">On Device</string>
     <string name="query">Search Method</string>
     <string name="speakSearch">Speak Search</string>
@@ -35,7 +38,6 @@
     <string name="searchProfile">Search by Profile</string>
     <string name="searchCategory">Search by Category</string>
     <string name="searchLanguage">search by Language</string>
-    <string name="search">search</string>
     <string name="listenSearch">Listen to Search</string>
     <string name="recordSearch">Record Speach Search</string>
     <string name="unfollowCourse">Unfollow Course. You will not be notified when a new Lecture has been made available online.</string>
@@ -148,6 +150,9 @@
     <string name="detailSaved">Details saved</string>
     <string name="detailsNotSaved">Details not saved</string>
     <string name="couldNotRetrieveCourse">\"Could not retrieve courses for \"</string>
+    <string name="upload">Upload</string>
+    <string name="download">Download</string>
+    <string name="internet">Internet</string>
 
 
 </resources>
