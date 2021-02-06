@@ -70,7 +70,7 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_learn_main_tabbed);
-        
+
 
         sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);

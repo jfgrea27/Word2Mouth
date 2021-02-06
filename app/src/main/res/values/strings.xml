@@ -1,8 +1,17 @@
 <resources>
+
+    <string name="login">Login</string>
+    <string name="login_button">Create or login into your Word2Mouth account to upload your content online.</string>
+    <string name="create_button">Create your own content</string>
+    <string name="share_button">Share or receive your own content</string>
+    <string name="watch_button">Watch your own content</string>
+
+
     <string name="app_name" translatable="false">SlidePasserTrial</string>
     <string name="online">Online</string>
     <string name="teaching">Teaching</string>
-    <string name="login">Login</string>
+
+
     <string name="settings">Settings</string>
     <string name="share">share</string>
     <string name="title_activity_teach_main" translatable="false">TeachActivityMain</string>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageButton
+        android:id="@+id/login_button"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
+        android:backgroundTint="@color/colorWhite"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/create_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:srcCompat="@drawable/ic_account_black" />
+
+    <ImageButton
+        android:id="@+id/watch_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="92dp"
+        android:scaleType="fitCenter"
+        android:backgroundTint="@color/colorWhite"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.468"
+        app:layout_constraintStart_toStartOf="parent"
+        app:srcCompat="@drawable/ic_watch_black" />
+
+    <ImageButton
+        android:id="@+id/share_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:backgroundTint="@color/colorWhite"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="@+id/create_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.678"
+        app:layout_constraintStart_toEndOf="@+id/create_button"
+        app:layout_constraintTop_toTopOf="@+id/create_button"
+        app:layout_constraintVertical_bias="1.0"
+        app:srcCompat="@drawable/upload" />
+
+    <ImageButton
+        android:id="@+id/create_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:backgroundTint="@color/colorWhite"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@+id/watch_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.138"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/login_button"
+        app:layout_constraintVertical_bias="0.886"
+        app:srcCompat="@drawable/ic_teach_black" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="53dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center_horizontal"
+        android:text="Word2Mouth"
+        android:textAlignment="center"
+        android:textColor="@color/colorWhite"
+        android:textSize="40dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

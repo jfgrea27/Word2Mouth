@@ -10,7 +10,7 @@ import com.imperial.word2mouth.learn.main.LearnActivityMain;
 
 public class SplashScreenActivity extends AppCompatActivity {
 
-    private static int SPLASH_TIME_OUT = 4000;
+    private static int SPLASH_TIME_OUT = 400;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,7 +19,7 @@ public class SplashScreenActivity extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent homeIntent = new Intent(SplashScreenActivity.this, LearnActivityMain.class);
+                Intent homeIntent = new Intent(SplashScreenActivity.this, MainMenuActivity.class);
                 startActivity(homeIntent);
                 finish();
             }

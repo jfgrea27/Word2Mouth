@@ -32,6 +32,8 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".AccountActivity"></activity>
+        <activity android:name=".MainMenuActivity" />
         <activity android:name=".SplashScreenActivity">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
@@ -46,8 +48,7 @@
             android:exported="true"
             android:label="Word2Mouth"
             android:screenOrientation="portrait"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".teach.online.TeachOnlineCourseStatistics" />
         <activity android:name=".teach.online.TeachOnlineLectureSummary" />
         <activity android:name=".background.LearnOnlineNewCourseSummary" />
@@ -79,7 +80,6 @@
             android:label="@string/title_activity_teach_main"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".teach.offline.create.TeachLectureCreationSlideActivity"
             android:screenOrientation="portrait" />
