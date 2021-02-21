@@ -1,6 +1,6 @@
 package com.imperial.word2mouth.previous.teach.offline.upload.database;
 
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 
 public class LectureTransferObject {
 
@@ -37,16 +37,16 @@ public class LectureTransferObject {
     private String courseUID = "";
 
 
-    public LectureTransferObject(LectureItem lectureItem) {
-        this.authorUID = lectureItem.getAuthorUID();
-        this.courseName = lectureItem.getCourseName();
-        this.language = lectureItem.getLanguage();
-        this.category = lectureItem.getCategory();
-        this.lectureName = lectureItem.getLectureName();
-        this.lectureUID = lectureItem.getLectureIdentification();
-        this.courseUID = lectureItem.getCourseIdentification();
-        bluetoothCourse = lectureItem.getBluetoothCourse();
-        bluetoothLecture = lectureItem.getBluetoothLecture();
+    public LectureTransferObject(PrevLectureItem prevLectureItem) {
+        this.authorUID = prevLectureItem.getAuthorUID();
+        this.courseName = prevLectureItem.getCourseName();
+        this.language = prevLectureItem.getLanguage();
+        this.category = prevLectureItem.getCategory();
+        this.lectureName = prevLectureItem.getLectureName();
+        this.lectureUID = prevLectureItem.getLectureIdentification();
+        this.courseUID = prevLectureItem.getCourseIdentification();
+        bluetoothCourse = prevLectureItem.getBluetoothCourse();
+        bluetoothLecture = prevLectureItem.getBluetoothLecture();
 
     }
 

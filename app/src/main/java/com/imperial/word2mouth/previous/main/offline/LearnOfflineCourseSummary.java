@@ -18,13 +18,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.previous.shared.IntentNames;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterLectureOffline;
-import com.imperial.word2mouth.previous.teach.offline.create.audio.AudioRecorder;
+import com.imperial.word2mouth.create.AudioRecorder;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
     // View
     private ListView lecturesView;
     // Model
-    private ArrayList<LectureItem> localLectures;
+    private ArrayList<PrevLectureItem> localLectures;
     private int lectureNumber = -1;
 
     // Controller
@@ -205,11 +205,11 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
 
     private void fetchAndCreateInformationAboutCourse() {
         // File
-        metaDirectory = new File(coursePath + DirectoryConstants.meta);
+        metaDirectory = new File(coursePath + FileSystemConstants.meta);
 
-        lecturesDirectory = new File(coursePath + DirectoryConstants.lectures);
+        lecturesDirectory = new File(coursePath + FileSystemConstants.lectures);
 //        // Creating audioFile
-        audioFile = new File(metaDirectory.getPath() + "/" + DirectoryConstants.soundThumbnail);
+        audioFile = new File(metaDirectory.getPath() + "/" + FileSystemConstants.audioThumbnail);
 
 
     }
@@ -275,8 +275,8 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
 
                 if (selectedLecture) {
                     if (lectureNumber > -1) {
-                        String version = FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
-                        File f = new File(getExternalFilesDir(null) + DirectoryConstants.cache + version + ".txt");
+                        String version = FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + FileSystemConstants.meta + FileSystemConstants.versionLecture);
+                        File f = new File(getExternalFilesDir(null) + FileSystemConstants.cache + version + ".txt");
                         if (f.exists()) {
                             f.delete();
                         }
@@ -308,7 +308,7 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
             public void onClick(View v) {
                 if (lectureNumber > -1) {
                     Intent learnIntent = new Intent(LearnOfflineCourseSummary.this, SlideLearningActivity.class);
-                    learnIntent.putExtra(IntentNames.LECTURE_PATH,  coursePath + DirectoryConstants.lectures + localLectures.get(lectureNumber).getLectureName());
+                    learnIntent.putExtra(IntentNames.LECTURE_PATH,  coursePath + FileSystemConstants.lectures + localLectures.get(lectureNumber).getLectureName());
                     learnIntent.putExtra(IntentNames.LECTURE_NAME, localLectures.get(lectureNumber).getLectureName());
                     startActivity(learnIntent);
                 }
@@ -371,9 +371,9 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
 
     }
 
-    private ArrayList<LectureItem> retrieveLocalLectures() {
+    private ArrayList<PrevLectureItem> retrieveLocalLectures() {
 
-        ArrayList<LectureItem> lectureItems = new ArrayList<>();
+        ArrayList<PrevLectureItem> prevLectureItems = new ArrayList<>();
 
         File[] lectureItemsFiles = lecturesDirectory.listFiles();
 
@@ -386,14 +386,14 @@ public class LearnOfflineCourseSummary extends AppCompatActivity {
 
 
                 // Title
-                lectureName = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.title);
-                LectureItem item = new LectureItem(courseName, lectureName);
+                lectureName = FileReaderHelper.readTextFromFile(f.getPath()+ FileSystemConstants.meta + FileSystemConstants.title);
+                PrevLectureItem item = new PrevLectureItem(courseName, lectureName);
                 item.setLecturePath(f.getPath());
-                lectureItems.add(item);
+                prevLectureItems.add(item);
             }
         }
 
-        return lectureItems;
+        return prevLectureItems;
     }
 
 

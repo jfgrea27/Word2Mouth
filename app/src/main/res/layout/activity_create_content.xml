@@ -66,6 +66,7 @@
         tools:ignore="SpUsage" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycleCourseView"
         android:layout_width="match_parent"
         android:layout_height="550dp"
         app:layout_constraintEnd_toEndOf="parent"

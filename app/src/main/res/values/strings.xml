@@ -153,6 +153,14 @@
     <string name="upload">Upload</string>
     <string name="download">Download</string>
     <string name="internet">Internet</string>
+    <string name="course_name">Course Name</string>
+    <string name="type_course_name">Type course name</string>
+    <string name="language_selection">Language Selection</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="category_selection">Category Selection</string>
+    <string name="lecture_name">Lecture Name</string>
+    <string name="thumbnail_selection">Thumbnail Selection</string>
 
 
 </resources>

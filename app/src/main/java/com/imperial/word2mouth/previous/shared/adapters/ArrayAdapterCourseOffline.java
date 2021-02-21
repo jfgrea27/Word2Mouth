@@ -20,18 +20,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.CourseItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
-public class ArrayAdapterCourseOffline extends ArrayAdapter<CourseItem> {
+public class ArrayAdapterCourseOffline extends ArrayAdapter<TopicItem> {
 
     public static final int OFFLINE_MAIN = 0;
 
-    private static ArrayList<CourseItem> courseItems;
+    private static ArrayList<TopicItem> topicItems;
 
     private int layout;
     private Context context;
@@ -41,11 +41,11 @@ public class ArrayAdapterCourseOffline extends ArrayAdapter<CourseItem> {
     private Categories categories = new Categories();
     private Languages languages = new Languages();
 
-    public ArrayAdapterCourseOffline(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
+    public ArrayAdapterCourseOffline(@NonNull Context context, int resource, @NonNull ArrayList<TopicItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
-        courseItems = objects;
+        topicItems = objects;
         this.context = context;
     }
 
@@ -72,33 +72,33 @@ public class ArrayAdapterCourseOffline extends ArrayAdapter<CourseItem> {
 
 
         File thumbnailFile;
-        final File audioFile = new File(courseItems.get(position).getAudio().getPath());
+        final File audioFile = new File(topicItems.get(position).getAudio().getPath());
         Uri audioUri = null;
 
 
-        thumbnailFile = new File(courseItems.get(position).getThumbnail().getPath());
+        thumbnailFile = new File(topicItems.get(position).getThumbnail().getPath());
         if (thumbnailFile.exists()) {
             holder.thumbnail.setImageURI(Uri.parse(thumbnailFile.getPath()));
         }
 
 
         // Title Course
-        holder.title.setText(courseItems.get(position).getCourseName());
+        holder.title.setText(topicItems.get(position).getCourseName());
 
        // audio
         if (audioFile.exists()) {
-            audioUri =  Uri.parse(courseItems.get(position).getAudio().getPath());
+            audioUri =  Uri.parse(topicItems.get(position).getAudio().getPath());
         }
 
 
         final Uri finalAudioUri = audioUri;
 
-        if (courseItems.get(position).getCategory() != null && courseItems.get(position).getCategory() != "") {
-            holder.category.setImageResource(categories.categoryIconMap.get(courseItems.get(position).getCategory()));
+        if (topicItems.get(position).getCategory() != null && topicItems.get(position).getCategory() != "") {
+            holder.category.setImageResource(categories.categoryIconMap.get(topicItems.get(position).getCategory()));
         }
 
-        if (courseItems.get(position).getLanguage() != null && courseItems.get(position).getLanguage() != "") {
-            holder.language.setImageResource(languages.languageIconMap.get(courseItems.get(position).getLanguage()));
+        if (topicItems.get(position).getLanguage() != null && topicItems.get(position).getLanguage() != "") {
+            holder.language.setImageResource(languages.languageIconMap.get(topicItems.get(position).getLanguage()));
         }
 
 

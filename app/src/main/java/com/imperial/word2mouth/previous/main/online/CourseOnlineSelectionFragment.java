@@ -31,10 +31,10 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.main.LearnActivityMain;
 import com.imperial.word2mouth.previous.main.online.teacher.Teacher;
-import com.imperial.word2mouth.previous.shared.IntentNames;
+import com.imperial.word2mouth.IntentNames;
 import com.imperial.word2mouth.previous.shared.StringEditor;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOnline;
-import com.imperial.word2mouth.previous.shared.CourseItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,8 +88,8 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
 
     // Model
-    private ArrayList<CourseItem> onlineCourses;
-    private CourseItem courseItem = null;
+    private ArrayList<TopicItem> onlineCourses;
+    private TopicItem topicItem = null;
 
 
 
@@ -269,8 +269,8 @@ public class CourseOnlineSelectionFragment extends Fragment {
                 updateListView();
             }
 
-            private ArrayList<CourseItem> retrieveCoursesMatchPattern(List<DocumentSnapshot> documents) {
-                ArrayList<CourseItem> courseItems = new ArrayList<>();
+            private ArrayList<TopicItem> retrieveCoursesMatchPattern(List<DocumentSnapshot> documents) {
+                ArrayList<TopicItem> topicItems = new ArrayList<>();
 
                 String[] speakQueryWords = StringEditor.splitString(speakQuery);
 
@@ -278,17 +278,16 @@ public class CourseOnlineSelectionFragment extends Fragment {
 
                 for (DocumentSnapshot doc : documents) {
                     if (titleContainsSpeakSearch(lowerCase, (String) doc.get("courseName"))) {
-                        CourseItem courseItem = new CourseItem((String) doc.get("courseName"), (String) doc.get("courseUID"), true);
-                        courseItem.setAuthorID((String) doc.get("authorUID"));
-                        courseItem.setLanguage((String) doc.get("language"));
-                        courseItem.setCategory((String) doc.get("category"));
-                        courseItem.setCourseBluetooth((String) doc.get("bluetoothCourse"));
-                        courseItems.add(courseItem);
+                        TopicItem topicItem = new TopicItem((String) doc.get("courseName"), (String) doc.get("courseUID"), true);
+                        topicItem.setAuthorID((String) doc.get("authorUID"));
+                        topicItem.setLanguage((String) doc.get("language"));
+                        topicItem.setCategory((String) doc.get("category"));
+                        topicItems.add(topicItem);
                     }
 
                 }
 
-                return courseItems;
+                return topicItems;
             }
 
             private boolean titleContainsSpeakSearch(String[] speakQueryWords, String courseName) {
@@ -369,18 +368,17 @@ public class CourseOnlineSelectionFragment extends Fragment {
         }
     }
 
-    private ArrayList<CourseItem> getCourses(List<DocumentSnapshot> courses) {
-        ArrayList<CourseItem> courseItems = new ArrayList<>();
+    private ArrayList<TopicItem> getCourses(List<DocumentSnapshot> courses) {
+        ArrayList<TopicItem> topicItems = new ArrayList<>();
 
         for (DocumentSnapshot course: courses) {
-            CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("courseUID"), true);
-            courseItem.setAuthorID((String) course.get("authorUID"));
-            courseItem.setLanguage((String) course.get("language"));
-            courseItem.setCategory((String) course.get("category"));
-            courseItem.setCourseBluetooth((String) course.get("bluetoothCourse"));
-            courseItems.add(courseItem);
+            TopicItem topicItem = new TopicItem((String) course.get("courseName"), (String) course.get("courseUID"), true);
+            topicItem.setAuthorID((String) course.get("authorUID"));
+            topicItem.setLanguage((String) course.get("language"));
+            topicItem.setCategory((String) course.get("category"));
+            topicItems.add(topicItem);
         }
-        return courseItems;
+        return topicItems;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

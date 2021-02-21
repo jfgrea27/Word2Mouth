@@ -1,6 +1,6 @@
 package com.imperial.word2mouth.previous.teach.offline.upload.database;
 
-import com.imperial.word2mouth.previous.shared.CourseItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 
 public class CourseTransferObject {
 
@@ -22,12 +22,11 @@ public class CourseTransferObject {
     public String low_Category;
     public String low_CourseName;
 
-    public CourseTransferObject(CourseItem courseItem) {
-        this.authorUID = courseItem.getAuthorID();
-        this.language = courseItem.getLanguage();
-        this.category = courseItem.getCategory();
-        this.courseName = courseItem.getCourseName();
-        this.bluetoothCourse = courseItem.getBluetoothCourse();
+    public CourseTransferObject(TopicItem topicItem) {
+        this.authorUID = topicItem.getAuthorID();
+        this.language = topicItem.getLanguage();
+        this.category = topicItem.getCategory();
+        this.courseName = topicItem.getCourseName();
     }
 
     public String getAuthorUID() {

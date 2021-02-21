@@ -3,7 +3,9 @@
     package="com.imperial.word2mouth">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:required="true"/>
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -35,6 +37,8 @@
         <activity android:name=".share.ShareMenuActivity"></activity>
         <activity android:name=".watch.WatchContentActivity" />
         <activity android:name=".create.CreateContentActivity" />
+        <activity android:name=".create.CourseSummaryCreateActivity"/>
+        <activity android:name=".create.LectureSummaryCreateActivity"/>
         <activity android:name=".account.AccountActivity" />
         <activity android:name=".MainMenuActivity" />
         <activity android:name=".SplashScreenActivity">
@@ -52,6 +56,13 @@
             android:label="Word2Mouth"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
+
+
+
+
+
+
+
         <activity android:name=".previous.teach.online.TeachOnlineCourseStatistics" />
         <activity android:name=".previous.teach.online.TeachOnlineLectureSummary" />
         <activity android:name=".previous.background.LearnOnlineNewCourseSummary" />

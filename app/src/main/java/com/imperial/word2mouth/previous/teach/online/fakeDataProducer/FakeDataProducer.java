@@ -5,7 +5,7 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -56,7 +56,7 @@ public class FakeDataProducer {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void addDataToFile(String version) {
-        File f = new File(activity.getExternalFilesDir(null) + DirectoryConstants.lecturerTracking + version + ".txt");
+        File f = new File(activity.getExternalFilesDir(null) + FileSystemConstants.lecturerTracking + version + ".txt");
 
         if (f.exists()) {
             // Populate

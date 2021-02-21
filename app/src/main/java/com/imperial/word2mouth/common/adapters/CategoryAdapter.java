@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.previous.shared.adapters;
+package com.imperial.word2mouth.common.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,18 +11,19 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.Categories;
+import com.imperial.word2mouth.common.Categories;
 
 import java.util.ArrayList;
 
-public class ArrayAdapterCategories extends ArrayAdapter<String> {
+public class CategoryAdapter extends ArrayAdapter<String> {
     private static ArrayList<String> categories;
     private ViewHolder holder = null;
     private int layout;
     private Context context;
 
-    public ArrayAdapterCategories(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
+    public CategoryAdapter(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
         super(context, resource, objects);
 
         layout = resource;
@@ -34,7 +35,7 @@ public class ArrayAdapterCategories extends ArrayAdapter<String> {
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull final ViewGroup parent) {
-        ArrayAdapterLanguage.ViewHolder mainViewHolder = null;
+        LanguageAdapter.ViewHolder mainViewHolder = null;
 
         if(convertView == null) {
             LayoutInflater inflater = LayoutInflater.from(getContext());
@@ -50,9 +51,9 @@ public class ArrayAdapterCategories extends ArrayAdapter<String> {
         } else {
             holder = (ViewHolder) convertView.getTag();
         }
-
+        ArrayList<String> categories = Lists.newArrayList(Categories.categoryIconMap.keySet());
         holder.category.setText(categories.get(position));
-        holder.categoryThumbnail.setImageResource(Categories.categoryIconMap.get(Categories.get(position)));
+        holder.categoryThumbnail.setImageResource(Categories.getCategory(categories.get(position)));
         return convertView;
     }
 

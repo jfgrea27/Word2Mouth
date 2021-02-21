@@ -17,11 +17,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.background.LearnOnlineNewCourseSummary;
-import com.imperial.word2mouth.previous.shared.CourseItem;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.previous.shared.TopicItem;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.shared.UnzipFile;
 
 import java.io.File;
@@ -33,19 +33,19 @@ public class DownloadProcedure {
 
     private final int type;
 
-    private LectureItem lectureItem;
+    private PrevLectureItem prevLectureItem;
     private final Context context;
     private final Activity activity;
-    private CourseItem courseItem;
+    private TopicItem topicItem;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private Uri courseImageUri;
     private Uri courseSoundUri;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
 
-    public DownloadProcedure(CourseItem courseItem, LectureItem lectureItem, Context context, Activity activity, int type) {
-        this.courseItem = courseItem;
-        this.lectureItem = lectureItem;
+    public DownloadProcedure(TopicItem topicItem, PrevLectureItem prevLectureItem, Context context, Activity activity, int type) {
+        this.topicItem = topicItem;
+        this.prevLectureItem = prevLectureItem;
         this.context = context;
         this.activity = activity;
         this.type = type;
@@ -66,10 +66,10 @@ public class DownloadProcedure {
     }
 
     private void downloadCourse() {
-        File courseFile = FileHandler.createDirectoryForCourseAndReturnIt(courseItem.getCourseName(), context);
+        File courseFile = FileHandler.createDirectoryForCourseAndReturnIt(topicItem.getCourseName(), context);
 
         // Retrieve Course Name
-        db.collection("content").document(courseItem.getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        db.collection("content").document(topicItem.getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {
                 retrieveCourseCredentials(documentSnapshot);
@@ -84,26 +84,26 @@ public class DownloadProcedure {
 
     private void fetchThumbnailCourse(String path) {
 
-        StorageReference soundRef = storage.getReference().child("content").child(courseItem.getCourseOnlineIdentification()).child("Sound Thumbnail");
+        StorageReference soundRef = storage.getReference().child("content").child(topicItem.getCourseOnlineIdentification()).child("Sound Thumbnail");
 
-        File sound = new File(context.getExternalFilesDir(null) + DirectoryConstants.zip + "sound.3gp");
+        File sound = new File(context.getExternalFilesDir(null) + FileSystemConstants.zip + "sound.3gp");
 
         soundRef.getFile(sound).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                FileHandler.saveUriFileToDestination(Uri.fromFile(sound),path + DirectoryConstants.meta + DirectoryConstants.soundThumbnail );
+                FileHandler.saveUriFileToDestination(Uri.fromFile(sound),path + FileSystemConstants.meta + FileSystemConstants.audioThumbnail);
 
             }
         });
 
 
-        StorageReference imageRef = storage.getReference().child("/content/").child(courseItem.getCourseOnlineIdentification()).child("Photo Thumbnail");
+        StorageReference imageRef = storage.getReference().child("/content/").child(topicItem.getCourseOnlineIdentification()).child("Photo Thumbnail");
 
-        File thumbnail = new File(context.getExternalFilesDir(null) + DirectoryConstants.zip + "thumbnail.jpg");
+        File thumbnail = new File(context.getExternalFilesDir(null) + FileSystemConstants.zip + "thumbnail.jpg");
         imageRef.getFile(thumbnail).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                FileHandler.saveUriFileToDestination(Uri.fromFile(thumbnail),path + DirectoryConstants.meta + DirectoryConstants.photoThumbnail );
+                FileHandler.saveUriFileToDestination(Uri.fromFile(thumbnail),path + FileSystemConstants.meta + FileSystemConstants.photoThumbnail );
 
             }
         });
@@ -113,12 +113,11 @@ public class DownloadProcedure {
     private void insertCourseMetaFiles(String path) {
         // Identification
         FileHandler.createDirectoryAndReturnIt(path, FileHandler.META);
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getCourseName(), FileHandler.TITLE);
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getCourseOnlineIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
-        FileHandler.createFileForSlideContentAndReturnIt( path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getCategory(), FileHandler.CATEGORY_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getAuthorID(), FileHandler.AUTHOR);
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, context.getContentResolver(), courseItem.getBluetoothCourse(), FileHandler.BLUETOOTH_UUID_COURSE);
+        FileHandler.createFileForSlideContentAndReturnIt(path + FileSystemConstants.meta, null, context.getContentResolver(), topicItem.getCourseName(), FileHandler.TITLE);
+        FileHandler.createFileForSlideContentAndReturnIt(path + FileSystemConstants.meta, null, context.getContentResolver(), topicItem.getCourseOnlineIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
+        FileHandler.createFileForSlideContentAndReturnIt( path + FileSystemConstants.meta, null, context.getContentResolver(), topicItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(path + FileSystemConstants.meta, null, context.getContentResolver(), topicItem.getCategory(), FileHandler.CATEGORY_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(path + FileSystemConstants.meta, null, context.getContentResolver(), topicItem.getAuthorID(), FileHandler.AUTHOR);
 
 
         FileHandler.createDirectoryAndReturnIt(path, FileHandler.LECTURES_DIRECTORY);
@@ -128,7 +127,7 @@ public class DownloadProcedure {
     private void retrieveCourseCredentials(DocumentSnapshot documentSnapshot) {
 
 
-       FirebaseStorage.getInstance().getReference().child("content").child(courseItem.getCourseName() + courseItem.getCourseOnlineIdentification())
+       FirebaseStorage.getInstance().getReference().child("content").child(topicItem.getCourseName() + topicItem.getCourseOnlineIdentification())
                 .child("Photo Thumbnail").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -136,7 +135,7 @@ public class DownloadProcedure {
             }
         });
 
-        FirebaseStorage.getInstance().getReference().child("content").child(courseItem.getCourseName() + courseItem.getCourseOnlineIdentification())
+        FirebaseStorage.getInstance().getReference().child("content").child(topicItem.getCourseName() + topicItem.getCourseOnlineIdentification())
                 .child("Sound Thumbnail").getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
@@ -151,13 +150,13 @@ public class DownloadProcedure {
     private void downloadLecture(String localCoursePath) {
 
         // Retrieve Previous Version And Delete From the  cache Folder
-        String version = FileReaderHelper.readTextFromFile(localCoursePath + DirectoryConstants.meta + DirectoryConstants.versionLecture);
-        File f = new File(activity.getExternalFilesDir(null) + DirectoryConstants.cache + version + ".txt");
+        String version = FileReaderHelper.readTextFromFile(localCoursePath + FileSystemConstants.meta + FileSystemConstants.versionLecture);
+        File f = new File(activity.getExternalFilesDir(null) + FileSystemConstants.cache + version + ".txt");
         if (f.exists()) {
             f.delete();
         }
 
-        File lectureFile = new File(context.getExternalFilesDir(null).getPath() + DirectoryConstants.zip + lectureItem.getLectureName() + ".zip");
+        File lectureFile = new File(context.getExternalFilesDir(null).getPath() + FileSystemConstants.zip + prevLectureItem.getLectureName() + ".zip");
         if (!lectureFile.exists()) {
             try {
                 lectureFile.createNewFile();
@@ -166,36 +165,36 @@ public class DownloadProcedure {
                 e.printStackTrace();
             }
 
-            StorageReference lectureRef = FirebaseStorage.getInstance().getReference().child("content").child(lectureItem.getLectureIdentification()).child("Lecture.zip");
+            StorageReference lectureRef = FirebaseStorage.getInstance().getReference().child("content").child(prevLectureItem.getLectureIdentification()).child("Lecture.zip");
 
             lectureRef.getFile(lectureFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
                 @RequiresApi(api = Build.VERSION_CODES.O)
                 @Override
                 public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
                     Toast.makeText(context, R.string.downloadingLecture, Toast.LENGTH_SHORT).show();
-                    moveZipCourse(lectureFile.getPath(), localCoursePath + DirectoryConstants.lectures);
+                    moveZipCourse(lectureFile.getPath(), localCoursePath + FileSystemConstants.lectures);
 
-                    createACacheForNewVersion(localCoursePath + DirectoryConstants.lectures + "/" + lectureItem.getLectureName());
+                    createACacheForNewVersion(localCoursePath + FileSystemConstants.lectures + "/" + prevLectureItem.getLectureName());
                     tidyZipFolder();
 
                     switch (type) {
                         case NEW:
                             LearnOnlineNewCourseSummary temp = (LearnOnlineNewCourseSummary) activity;
-                            temp.signalCompleteDownload(lectureItem.getLectureIdentification());
+                            temp.signalCompleteDownload(prevLectureItem.getLectureIdentification());
                             break;
                         case ELSE:
                             LearnOnlineCourseSummary temp2 = (LearnOnlineCourseSummary) activity;
-                            temp2.signalCompleteDownload(lectureItem.getLectureIdentification());
+                            temp2.signalCompleteDownload(prevLectureItem.getLectureIdentification());
 
                             break;
                     }
                     // Update Downloads Counter of the lecture
-                    db.collection("content").document(lectureItem.getLectureIdentification()).update("downloadCounter", FieldValue.increment(1));
+                    db.collection("content").document(prevLectureItem.getLectureIdentification()).update("downloadCounter", FieldValue.increment(1));
                 }
 
                 private void createACacheForNewVersion(String lecturePath) {
-                    String version = FileReaderHelper.readTextFromFile(lecturePath + DirectoryConstants.meta + DirectoryConstants.versionLecture);
-                    File f = new File(localCoursePath + DirectoryConstants.lectures + lectureItem.getLectureName() + DirectoryConstants.slides);
+                    String version = FileReaderHelper.readTextFromFile(lecturePath + FileSystemConstants.meta + FileSystemConstants.versionLecture);
+                    File f = new File(localCoursePath + FileSystemConstants.lectures + prevLectureItem.getLectureName() + FileSystemConstants.slides);
                     int numberSlides = f.listFiles().length;
                     FileHandler.createFileForLectureTracking(version, numberSlides, activity);
                 }
@@ -204,7 +203,7 @@ public class DownloadProcedure {
     }
 
     private void tidyZipFolder() {
-        File f = new File(        context.getExternalFilesDir(null) + DirectoryConstants.zip);
+        File f = new File(        context.getExternalFilesDir(null) + FileSystemConstants.zip);
 
         File[] files = f.listFiles();
 
@@ -218,15 +217,15 @@ public class DownloadProcedure {
     }
 
     private String checkCourseExistOnDevice() {
-        File f = new File(context.getExternalFilesDir(null) + DirectoryConstants.offline);
+        File f = new File(context.getExternalFilesDir(null) + FileSystemConstants.offline);
 
         File[] courses = f.listFiles();
 
         for (File course : courses) {
 
-            String identification = FileReaderHelper.readTextFromFile(course.getPath() + DirectoryConstants.meta + DirectoryConstants.identification);
+            String identification = FileReaderHelper.readTextFromFile(course.getPath() + FileSystemConstants.meta + FileSystemConstants.identification);
 
-            if (identification.equals(courseItem.getCourseOnlineIdentification())) {
+            if (identification.equals(topicItem.getCourseOnlineIdentification())) {
                 return course.getPath();
             }
         }

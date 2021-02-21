@@ -14,8 +14,8 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.imperial.word2mouth.previous.main.offline.tracker.LectureTracker;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
-import com.imperial.word2mouth.previous.shared.IntentNames;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+import com.imperial.word2mouth.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
 import com.imperial.word2mouth.previous.shared.FileHandler;
@@ -81,7 +81,7 @@ public class SlideLearningActivity extends AppCompatActivity {
 
         lecturePath = (String) getIntent().getExtras().get(IntentNames.LECTURE_PATH);
 
-        slidesFolder = new File(lecturePath + DirectoryConstants.slides);
+        slidesFolder = new File(lecturePath + FileSystemConstants.slides);
 
         // meta
         if (!slidesFolder.exists()) {
@@ -122,7 +122,7 @@ public class SlideLearningActivity extends AppCompatActivity {
     }
 
     private void configureInitialSlideTracker() {
-        versionUID = FileReaderHelper.readTextFromFile(lecturePath + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+        versionUID = FileReaderHelper.readTextFromFile(lecturePath + FileSystemConstants.meta + FileSystemConstants.versionLecture);
 
         lectureTracker = new LectureTracker(versionUID, totalNumberSlides);
     }

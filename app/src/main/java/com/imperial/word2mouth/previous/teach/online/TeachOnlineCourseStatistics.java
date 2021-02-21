@@ -21,9 +21,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.CourseItem;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
-import com.imperial.word2mouth.previous.shared.IntentNames;
+import com.imperial.word2mouth.previous.shared.TopicItem;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+import com.imperial.word2mouth.IntentNames;
 import com.imperial.word2mouth.previous.teach.online.courseData.CourseTrackingData;
 import com.imperial.word2mouth.previous.teach.online.lectureData.LectureTrackingData;
 import com.jjoe64.graphview.DefaultLabelFormatter;
@@ -45,7 +45,7 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
     private TableLayout legend;
     private TextView followersCounter;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private CourseItem courseItem;
+    private TopicItem topicItem;
     private ArrayList<Pair<String, Integer>> colors = new ArrayList<>();
     private TextView leastPopularLecture;
     private TextView mostPopularLecture;
@@ -129,7 +129,7 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
 
 
         // get the data
-        db.collection("content").whereEqualTo("courseUID", courseItem.getCourseOnlineIdentification()).whereEqualTo("type", "Lecture").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        db.collection("content").whereEqualTo("courseUID", topicItem.getCourseOnlineIdentification()).whereEqualTo("type", "Lecture").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
 
 
             @RequiresApi(api = Build.VERSION_CODES.O)
@@ -269,7 +269,7 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
         // Get all the data from the current lecture tracking
         CourseTrackingData courseTrackingData = new CourseTrackingData();
         for (String v : versionLectures) {
-            File f = new File(getExternalFilesDir(null) + DirectoryConstants.lecturerTracking + v + ".txt");
+            File f = new File(getExternalFilesDir(null) + FileSystemConstants.lecturerTracking + v + ".txt");
             if (f.exists()) {
                 courseTrackingData.getLectureGeneralData().add(new LectureTrackingData(f));
             }
@@ -281,7 +281,7 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
 
 
     private void getExtras() {
-        courseItem = (CourseItem) getIntent().getExtras().get(IntentNames.COURSE);
+        topicItem = (TopicItem) getIntent().getExtras().get(IntentNames.COURSE);
 
     }
 
@@ -289,7 +289,7 @@ public class TeachOnlineCourseStatistics extends AppCompatActivity {
     private void configureFollowersCounter() {
         followersCounter = findViewById(R.id.number_followers);
 
-        db.collection("content").document(courseItem.getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+        db.collection("content").document(topicItem.getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @RequiresApi(api = Build.VERSION_CODES.N)
             @Override
             public void onSuccess(DocumentSnapshot documentSnapshot) {

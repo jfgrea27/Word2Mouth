@@ -3,18 +3,19 @@ package com.imperial.word2mouth.previous.shared;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+
 import java.io.File;
 
 
-public class CourseItem implements Parcelable {
+public class TopicItem implements Parcelable {
 
-    private String courseBluetooth;
 
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
 
-    private String courseName = null;
+    private String courseName;
     private File thumbnail = null;
     private File audio = null;
 
@@ -29,7 +30,7 @@ public class CourseItem implements Parcelable {
     private String courseOnlineIdentification = null;
 
     // For offline purposes
-    public CourseItem(String courseName, String path) {
+    public TopicItem(String courseName, String path) {
         this.courseName = courseName;
         this.coursePath = path;
 
@@ -37,13 +38,13 @@ public class CourseItem implements Parcelable {
 
         audio = new File(path + "/meta" + "/audio.3gp");
 
-        language = FileReaderHelper.readTextFromFile(path + DirectoryConstants.meta + DirectoryConstants.language);
-        category = FileReaderHelper.readTextFromFile(path + DirectoryConstants.meta + DirectoryConstants.category);
+        language = FileReaderHelper.readTextFromFile(path + FileSystemConstants.meta + FileSystemConstants.language);
+        category = FileReaderHelper.readTextFromFile(path + FileSystemConstants.meta + FileSystemConstants.category);
 
     }
 
     // For online purposes
-    public CourseItem(String courseName, String id, boolean online) {
+    public TopicItem(String courseName, String id, boolean online) {
         this.courseName = courseName;
         this.courseOnlineIdentification = id;
     }
@@ -103,13 +104,8 @@ public class CourseItem implements Parcelable {
     }
 
 
-    public String getBluetoothCourse() {
-        return courseBluetooth;
-    }
 
-    public void setCourseBluetooth(String courseBluetooth) {
-        this.courseBluetooth = courseBluetooth;
-    }
+
 
     @Override
     public int describeContents() {
@@ -118,7 +114,6 @@ public class CourseItem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.courseBluetooth);
         dest.writeString(this.courseName);
         dest.writeSerializable(this.thumbnail);
         dest.writeSerializable(this.audio);
@@ -129,8 +124,7 @@ public class CourseItem implements Parcelable {
         dest.writeString(this.courseOnlineIdentification);
     }
 
-    protected CourseItem(Parcel in) {
-        this.courseBluetooth = in.readString();
+    protected TopicItem(Parcel in) {
         this.courseName = in.readString();
         this.thumbnail = (File) in.readSerializable();
         this.audio = (File) in.readSerializable();
@@ -141,15 +135,15 @@ public class CourseItem implements Parcelable {
         this.courseOnlineIdentification = in.readString();
     }
 
-    public static final Parcelable.Creator<CourseItem> CREATOR = new Parcelable.Creator<CourseItem>() {
+    public static final Parcelable.Creator<TopicItem> CREATOR = new Parcelable.Creator<TopicItem>() {
         @Override
-        public CourseItem createFromParcel(Parcel source) {
-            return new CourseItem(source);
+        public TopicItem createFromParcel(Parcel source) {
+            return new TopicItem(source);
         }
 
         @Override
-        public CourseItem[] newArray(int size) {
-            return new CourseItem[size];
+        public TopicItem[] newArray(int size) {
+            return new TopicItem[size];
         }
     };
 }

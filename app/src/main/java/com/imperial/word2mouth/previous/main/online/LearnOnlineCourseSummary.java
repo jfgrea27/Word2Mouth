@@ -27,12 +27,12 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.CourseItem;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
-import com.imperial.word2mouth.previous.shared.IntentNames;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterLectureOnline;
-import com.imperial.word2mouth.previous.teach.offline.create.audio.AudioRecorder;
+import com.imperial.word2mouth.create.AudioRecorder;
 
 import java.io.File;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     //////////////////////////////////////////////////////////////////////////////////////////////
 
     // Intents
-    private CourseItem course;
+    private TopicItem course;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -89,7 +89,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     // View
     private ListView lecturesView;
     // Model
-    private ArrayList<LectureItem> onlineLectures;
+    private ArrayList<PrevLectureItem> onlineLectures;
     private int lectureNumber = -1;
 
     // Controller
@@ -99,9 +99,9 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     /////// Learn Button
 
     // Model
-    private ArrayList<LectureItem> lectures;
+    private ArrayList<PrevLectureItem> lectures;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private LectureItem lecture;
+    private PrevLectureItem lecture;
     private ImageButton downloadButton;
     private ProgressBar progress;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
@@ -151,7 +151,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     }
 
     private void checkIfCourseIsFollowed() {
-        File f = new File (getExternalFilesDir(null) + DirectoryConstants.followFoder);
+        File f = new File (getExternalFilesDir(null) + FileSystemConstants.followFoder);
         File[] following = f.listFiles();
 
         for (File follow : following) {
@@ -221,7 +221,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (isFollowing) {
-                    File f = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
+                    File f = new File(getExternalFilesDir(null) + FileSystemConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
                     if (f.exists()) {
                         f.delete();
                     }
@@ -246,7 +246,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (!isFollowing) {
-                    File f = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
+                    File f = new File(getExternalFilesDir(null) + FileSystemConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
                     if (!f.exists()) {
                         try {
                             f.createNewFile();
@@ -295,7 +295,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
 
 
     private void getIntents() {
-        course= (CourseItem) getIntent().getExtras().get(IntentNames.COURSE);
+        course= (TopicItem) getIntent().getExtras().get(IntentNames.COURSE);
     }
 
 
@@ -397,11 +397,11 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
 
 
 
-    private ArrayList<LectureItem> retrieveCourses(List<DocumentSnapshot> documents) {
-        ArrayList<LectureItem> items = new ArrayList<>();
+    private ArrayList<PrevLectureItem> retrieveCourses(List<DocumentSnapshot> documents) {
+        ArrayList<PrevLectureItem> items = new ArrayList<>();
 
         for (DocumentSnapshot doc : documents) {
-            LectureItem lecture = new LectureItem((String) doc.get("lectureName"), (String) doc.get("lectureUID"), true);
+            PrevLectureItem lecture = new PrevLectureItem((String) doc.get("lectureName"), (String) doc.get("lectureUID"), true);
             lecture.setCourseIdentification(course.getCourseOnlineIdentification());
             lecture.setLanguage(course.getLanguage());
             lecture.setCategory(course.getCategory());
@@ -466,7 +466,7 @@ public class LearnOnlineCourseSummary extends AppCompatActivity {
     private void updateFollowing(String lectureIdentification) {
         // Adding to following if follow
         if (isFollowing) {
-            File f = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
+            File f = new File(getExternalFilesDir(null) + FileSystemConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
 
             try {
                 Files.write(Paths.get(String.valueOf(f)), lectureIdentification.getBytes(), StandardOpenOption.APPEND);

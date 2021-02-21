@@ -3,7 +3,7 @@ package com.imperial.word2mouth.previous.teach.offline.upload.storage;
 import android.content.Context;
 
 import com.imperial.word2mouth.previous.main.offline.share.bluetooth.FileZip;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,7 +19,7 @@ public class StorageUploadPreparation {
     public StorageUploadPreparation(String coursePath, Context context) {
         this.coursePath = coursePath;
         this.context = context;
-        zipCoursePath = context.getExternalFilesDir(null).getPath() + DirectoryConstants.zip + "zipLecture.zip";
+        zipCoursePath = context.getExternalFilesDir(null).getPath() + FileSystemConstants.zip + "zipLecture.zip";
 
         File f = new File(zipCoursePath);
 

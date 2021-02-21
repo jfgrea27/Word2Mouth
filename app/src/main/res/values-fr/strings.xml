@@ -134,6 +134,7 @@
     <string name="couldNotRetrieveCourse">\"Impossible de récupérer les cours pour \"</string>
     <string name="internet">Internet</string>
     <string name="bluetooth">Bluetooth</string>
+    <string name="ok">OK</string>
 
 
 </resources>

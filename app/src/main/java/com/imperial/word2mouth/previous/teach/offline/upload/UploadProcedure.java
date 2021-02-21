@@ -17,11 +17,11 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.CourseItem;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.previous.shared.TopicItem;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.teach.offline.upload.database.CourseTransferObject;
 import com.imperial.word2mouth.previous.teach.offline.upload.database.LectureTrackerObject;
 import com.imperial.word2mouth.previous.teach.offline.upload.database.LectureTransferObject;
@@ -49,21 +49,21 @@ public class UploadProcedure {
 
 
     // Intents
-    private LectureItem lectureItem;
-    private CourseItem courseItem;
+    private PrevLectureItem prevLectureItem;
+    private TopicItem topicItem;
 
     private UploadListener listener;
     private boolean uploadEntireCourse = false;
-    private HashMap<LectureTransferObject, LectureItem> mapLTOItem = new HashMap<>();
+    private HashMap<LectureTransferObject, PrevLectureItem> mapLTOItem = new HashMap<>();
     private String previousVersion = null;
     private int numberSlidesPerLecture;
 
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public UploadProcedure(CourseItem courseItem, LectureItem lectureItem, Activity activity) {
-        this.courseItem = courseItem;
-        this.lectureItem = lectureItem;
+    public UploadProcedure(TopicItem topicItem, PrevLectureItem prevLectureItem, Activity activity) {
+        this.topicItem = topicItem;
+        this.prevLectureItem = prevLectureItem;
         this.activity = activity;
     }
 
@@ -76,18 +76,18 @@ public class UploadProcedure {
 
 
         if (user != null) {
-            if (courseItem.getAuthorID().isEmpty()) {
-                courseItem.setAuthorID(user.getUid());
-                lectureItem.setAuthorID(user.getUid());
+            if (topicItem.getAuthorID().isEmpty()) {
+                topicItem.setAuthorID(user.getUid());
+                prevLectureItem.setAuthorID(user.getUid());
                 addAllNecessaryFilesToCourse();
                 addAllNecessaryFilesToLecture();
                 uploadCourseToDataBase();
             } else {
-                if (!user.getUid().equals(courseItem.getAuthorID())) {
+                if (!user.getUid().equals(topicItem.getAuthorID())) {
                     Toast.makeText(activity.getApplicationContext(), R.string.uploadOtherTeacherContent, Toast.LENGTH_SHORT).show();
                 } else {
-                    courseItem.setAuthorID(user.getUid());
-                    lectureItem.setAuthorID(user.getUid());
+                    topicItem.setAuthorID(user.getUid());
+                    prevLectureItem.setAuthorID(user.getUid());
                     addAllNecessaryFilesToCourse();
                     addAllNecessaryFilesToLecture();
                     uploadCourseToDataBase();
@@ -102,51 +102,51 @@ public class UploadProcedure {
     }
 
     private void addAllNecessaryFilesToLecture() {
-        FileHandler.createFileForSlideContentAndReturnIt( lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getCategory(), FileHandler.CATEGORY_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getAuthorUID(), FileHandler.AUTHOR);
+        FileHandler.createFileForSlideContentAndReturnIt( prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getCategory(), FileHandler.CATEGORY_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getAuthorUID(), FileHandler.AUTHOR);
 
-        previousVersion = FileReaderHelper.readTextFromFile(lectureItem.getLecturePath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+        previousVersion = FileReaderHelper.readTextFromFile(prevLectureItem.getLecturePath() + FileSystemConstants.meta + FileSystemConstants.versionLecture);
 
-        lectureItem.setVersion(UUID.randomUUID().toString());
+        prevLectureItem.setVersion(UUID.randomUUID().toString());
 
-        numberSlidesPerLecture = new File(lectureItem.getLecturePath() + DirectoryConstants.slides).listFiles().length;
-        FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getVersion(), FileHandler.VERSION);
-        FileHandler.createFileForLectureTracking(lectureItem, activity);
+        numberSlidesPerLecture = new File(prevLectureItem.getLecturePath() + FileSystemConstants.slides).listFiles().length;
+        FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getVersion(), FileHandler.VERSION);
+        FileHandler.createFileForLectureTracking(prevLectureItem, activity);
 
     }
 
     private void addAllNecessaryFilesToCourse() {
-        FileHandler.createFileForSlideContentAndReturnIt( courseItem.getCoursePath() + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(courseItem.getCoursePath() + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getCategory(), FileHandler.CATEGORY_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(courseItem.getCoursePath() + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getAuthorID(), FileHandler.AUTHOR);
+        FileHandler.createFileForSlideContentAndReturnIt( topicItem.getCoursePath() + FileSystemConstants.meta, null, activity.getContentResolver(), topicItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(topicItem.getCoursePath() + FileSystemConstants.meta, null, activity.getContentResolver(), topicItem.getCategory(), FileHandler.CATEGORY_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(topicItem.getCoursePath() + FileSystemConstants.meta, null, activity.getContentResolver(), topicItem.getAuthorID(), FileHandler.AUTHOR);
     }
 
 
     // Step 1 Upload Course to Firebase
     private void uploadCourseToDataBase() {
         if (user != null) {
-            dto = new CourseTransferObject(courseItem);
+            dto = new CourseTransferObject(topicItem);
             contentRef = database.getReference("/content/");
 
             // Allow Speak Search
             dto.setLowerCapital();
 
-            if (courseItem.getCourseOnlineIdentification() == null || courseItem.getCourseOnlineIdentification().isEmpty()) {
+            if (topicItem.getCourseOnlineIdentification() == null || topicItem.getCourseOnlineIdentification().isEmpty()) {
 
                 db.collection("content").add(dto).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         dto.setCourseUID(documentReference.getId());
                         if (!uploadEntireCourse) {
-                            lectureItem.setCourseIdentification(dto.getCourseUID());
-                            FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
+                            prevLectureItem.setCourseIdentification(dto.getCourseUID());
+                            FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
 
                         }
-                        courseItem.setCourseOnlineIdentification(dto.getCourseUID());
+                        topicItem.setCourseOnlineIdentification(dto.getCourseUID());
 
                         // Update
-                        FileHandler.createFileForSlideContentAndReturnIt(courseItem.getCoursePath() + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getCourseOnlineIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
+                        FileHandler.createFileForSlideContentAndReturnIt(topicItem.getCoursePath() + FileSystemConstants.meta, null, activity.getContentResolver(), topicItem.getCourseOnlineIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
 
 
                         db.collection("content").document(dto.getCourseUID()).update("courseUID", dto.getCourseUID()).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -164,16 +164,16 @@ public class UploadProcedure {
             } else {
 
                 // retrieve key
-                dto.setCourseUID(courseItem.getCourseOnlineIdentification());
+                dto.setCourseUID(topicItem.getCourseOnlineIdentification());
                 if (!uploadEntireCourse) {
-                    lectureItem.setCourseIdentification(courseItem.getCourseOnlineIdentification());
-                    FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
+                    prevLectureItem.setCourseIdentification(topicItem.getCourseOnlineIdentification());
+                    FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
 
                 }
 
-                FileHandler.createFileForSlideContentAndReturnIt(courseItem.getCoursePath() + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getCourseOnlineIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
+                FileHandler.createFileForSlideContentAndReturnIt(topicItem.getCoursePath() + FileSystemConstants.meta, null, activity.getContentResolver(), topicItem.getCourseOnlineIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
 
-                db.collection("content").document(courseItem.getCourseOnlineIdentification()).set(dto).addOnSuccessListener(new OnSuccessListener<Void>() {
+                db.collection("content").document(topicItem.getCourseOnlineIdentification()).set(dto).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         listener.onDataLoadedInDatabase();
@@ -200,7 +200,7 @@ public class UploadProcedure {
 
 
             // Photo
-            File photo = new File(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.photoThumbnail);
+            File photo = new File(topicItem.getCoursePath() + FileSystemConstants.meta + FileSystemConstants.photoThumbnail);
             UploadTask photoCourseThumbnail = null;
             if (photo.exists()) {
                 photoCourseThumbnail = courseThumbnail.putFile(Uri.fromFile(photo));
@@ -214,7 +214,7 @@ public class UploadProcedure {
             }
 
             // Sound
-            File sound  = new File(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.soundThumbnail);
+            File sound  = new File(topicItem.getCoursePath() + FileSystemConstants.meta + FileSystemConstants.audioThumbnail);
             UploadTask soundCourseThumbnail = null;
 
             if (sound.exists()) {
@@ -248,9 +248,9 @@ public class UploadProcedure {
     // Step 3 Upload Lecture to Firebase
     private void uploadLectureDataBase() {
 
-        lto = new LectureTransferObject(lectureItem);
+        lto = new LectureTransferObject(prevLectureItem);
 
-        lto.versionUID = lectureItem.getVersion();
+        lto.versionUID = prevLectureItem.getVersion();
 
         // delete current version
         if (!previousVersion.isEmpty() && previousVersion != null) {
@@ -266,7 +266,7 @@ public class UploadProcedure {
             });
 
             // delete file from tracker
-            File trackingData = new File(activity.getExternalFilesDir(null) + DirectoryConstants.lecturerTracking +  previousVersion + ".txt");
+            File trackingData = new File(activity.getExternalFilesDir(null) + FileSystemConstants.lecturerTracking +  previousVersion + ".txt");
             if (trackingData.exists()) {
                 trackingData.delete();
             }
@@ -281,18 +281,18 @@ public class UploadProcedure {
             }
         });
 
-        if (lectureItem.getLectureIdentification().isEmpty()) {
+        if (prevLectureItem.getLectureIdentification().isEmpty()) {
 
 
             db.collection("content").add(lto).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                 @Override
                 public void onSuccess(DocumentReference documentReference) {
-                    lectureItem.setLectureIdentification(documentReference.getId());
-                    lto.setLectureUID(lectureItem.getLectureIdentification());
+                    prevLectureItem.setLectureIdentification(documentReference.getId());
+                    lto.setLectureUID(prevLectureItem.getLectureIdentification());
 
-                    FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getLectureIdentification(), FileHandler.ONLINE_LECTURE_IDENTIFICATION);
+                    FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getLectureIdentification(), FileHandler.ONLINE_LECTURE_IDENTIFICATION);
 
-                    db.collection("content").document(lectureItem.getLectureIdentification()).update("lectureUID", lectureItem.getLectureIdentification()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    db.collection("content").document(prevLectureItem.getLectureIdentification()).update("lectureUID", prevLectureItem.getLectureIdentification()).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void aVoid) {
                             listener.onDataLoadedInDatabase();
@@ -305,8 +305,8 @@ public class UploadProcedure {
         } else {
 
             // retrieve key
-            lto.setLectureUID(lectureItem.getLectureIdentification());
-            FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getLectureIdentification(), FileHandler.ONLINE_LECTURE_IDENTIFICATION);
+            lto.setLectureUID(prevLectureItem.getLectureIdentification());
+            FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getLectureIdentification(), FileHandler.ONLINE_LECTURE_IDENTIFICATION);
 
             db.collection("content").document(lto.getLectureUID()).set(lto).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
@@ -320,7 +320,7 @@ public class UploadProcedure {
     // Step 4 Upload Lecture Data To Storage
     private void uploadThumbnailLecture() {
         if (user != null) {
-            StorageReference lectureRef = storage.getReference("/content/").child(lectureItem.getLectureIdentification());
+            StorageReference lectureRef = storage.getReference("/content/").child(prevLectureItem.getLectureIdentification());
 
 
             StorageReference lecturePhoto = lectureRef.child("Photo Thumbnail");
@@ -328,7 +328,7 @@ public class UploadProcedure {
 
 
             // Photo
-            File photo = new File(lectureItem.getLecturePath() + DirectoryConstants.meta + DirectoryConstants.photoThumbnail);
+            File photo = new File(prevLectureItem.getLecturePath() + FileSystemConstants.meta + FileSystemConstants.photoThumbnail);
             UploadTask photoCourseThumbnail = null;
             if (photo.exists()) {
                 photoCourseThumbnail = lecturePhoto.putFile(Uri.fromFile(photo));
@@ -342,7 +342,7 @@ public class UploadProcedure {
             }
 
             // Sound
-            File sound  = new File( lectureItem.getLecturePath() + DirectoryConstants.meta + DirectoryConstants.soundThumbnail);
+            File sound  = new File( prevLectureItem.getLecturePath() + FileSystemConstants.meta + FileSystemConstants.audioThumbnail);
             UploadTask soundCourseThumbnail = null;
 
             if (sound.exists()) {
@@ -370,7 +370,7 @@ public class UploadProcedure {
     // Step 5 Upload Zip File To Storage
     private void uploadLectureToStorage() {
 
-        StorageUploadPreparation prep = new StorageUploadPreparation(lectureItem.getLecturePath(), activity.getApplicationContext());
+        StorageUploadPreparation prep = new StorageUploadPreparation(prevLectureItem.getLecturePath(), activity.getApplicationContext());
         byte[] slideData = prep.getZippedCourse();
 
         StorageReference lectureZip = storage.getReference("/content/").child(lto.getLectureUID()).child("Lecture.zip");
@@ -391,8 +391,8 @@ public class UploadProcedure {
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    public UploadProcedure(CourseItem courseItem, Activity activity) {
-        this.courseItem = courseItem;
+    public UploadProcedure(TopicItem topicItem, Activity activity) {
+        this.topicItem = topicItem;
         this.activity = activity;
     }
 
@@ -405,15 +405,15 @@ public class UploadProcedure {
 
 
         if (user != null) {
-            if (courseItem.getAuthorID().isEmpty()) {
-                courseItem.setAuthorID(user.getUid());
+            if (topicItem.getAuthorID().isEmpty()) {
+                topicItem.setAuthorID(user.getUid());
                 addAllNecessaryFilesToCourse();
                 uploadCourseToDataBase();
             } else {
-                if (!user.getUid().equals(courseItem.getAuthorID())) {
+                if (!user.getUid().equals(topicItem.getAuthorID())) {
                     Toast.makeText(activity, R.string.uploadOtherTeacherContent, Toast.LENGTH_SHORT).show();
                 } else {
-                    courseItem.setAuthorID(user.getUid());
+                    topicItem.setAuthorID(user.getUid());
                     addAllNecessaryFilesToCourse();
                     uploadCourseToDataBase();
                 }
@@ -430,7 +430,7 @@ public class UploadProcedure {
 
     // Step 3b
     private void uploadAllLecturesToDatabase() {
-        File f = new File(courseItem.getCoursePath() + DirectoryConstants.lectures);
+        File f = new File(topicItem.getCoursePath() + FileSystemConstants.lectures);
 
         File[] lectures = f.listFiles();
         final int[] counter = {0};
@@ -455,17 +455,17 @@ public class UploadProcedure {
             }
 
             // delete file from tracker
-            File trackingData = new File(activity.getExternalFilesDir(null) + DirectoryConstants.lecturerTracking +  version + ".txt");
+            File trackingData = new File(activity.getExternalFilesDir(null) + FileSystemConstants.lecturerTracking +  version + ".txt");
             if (trackingData.exists()) {
                 trackingData.delete();
             }
 
 
-            LectureItem temp = retrieveLectureContent(lecture);
+            PrevLectureItem temp = retrieveLectureContent(lecture);
             lto = new LectureTransferObject(temp);
             lto.versionUID = temp.getVersion();
             // Upload the version of the lecture
-            FileHandler.createFileForSlideContentAndReturnIt(lecture.getPath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getVersion(), FileHandler.VERSION);
+            FileHandler.createFileForSlideContentAndReturnIt(lecture.getPath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getVersion(), FileHandler.VERSION);
 
             LectureTrackerObject lTrackO = new LectureTrackerObject(lto.versionUID, collectNumberSlides(lecture));
 
@@ -475,21 +475,21 @@ public class UploadProcedure {
 
                 }
             });
-            lto.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getAbsolutePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
+            lto.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getAbsolutePath() + FileSystemConstants.meta + FileSystemConstants.lectureBluetooth));
             // never uploaded to online before
             if (lto.lectureUID.isEmpty()) {
                 db.collection("content").add(lto).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        lectureItem.setLectureIdentification(documentReference.getId());
-                        lto.setLectureUID(lectureItem.getLectureIdentification());
-                        lectureItem.setPath(lecture.getPath());
-                        mapLTOItem.put(lto, lectureItem);
+                        prevLectureItem.setLectureIdentification(documentReference.getId());
+                        lto.setLectureUID(prevLectureItem.getLectureIdentification());
+                        prevLectureItem.setPath(lecture.getPath());
+                        mapLTOItem.put(lto, prevLectureItem);
 
-                        FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
+                        FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
 
 
-                        db.collection("content").document(lectureItem.getLectureIdentification()).update("lectureUID", lectureItem.getLectureIdentification()).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        db.collection("content").document(prevLectureItem.getLectureIdentification()).update("lectureUID", prevLectureItem.getLectureIdentification()).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 counter[0]++;
@@ -505,16 +505,16 @@ public class UploadProcedure {
 
             } else {
                 // retrieve key
-                dto.setCourseUID(courseItem.getCourseOnlineIdentification());
-                lectureItem.setCourseIdentification(courseItem.getCourseOnlineIdentification());
-                lectureItem.setPath(lecture.getPath());
-                lto.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getAbsolutePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
+                dto.setCourseUID(topicItem.getCourseOnlineIdentification());
+                prevLectureItem.setCourseIdentification(topicItem.getCourseOnlineIdentification());
+                prevLectureItem.setPath(lecture.getPath());
+                lto.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getAbsolutePath() + FileSystemConstants.meta + FileSystemConstants.lectureBluetooth));
 
-                FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta, null, activity.getContentResolver(), lectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
+                FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta, null, activity.getContentResolver(), prevLectureItem.getCourseIdentification(), FileHandler.ONLINE_COURSE_IDENTIFICATION);
 
 
-                mapLTOItem.put(lto, lectureItem);
-                db.collection("content").document(lectureItem.getLectureIdentification()).set(lto).addOnSuccessListener(new OnSuccessListener<Void>() {
+                mapLTOItem.put(lto, prevLectureItem);
+                db.collection("content").document(prevLectureItem.getLectureIdentification()).set(lto).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         listener.onDataLoadedInDatabase();
@@ -531,7 +531,7 @@ public class UploadProcedure {
     }
 
     private String getCurrentVersion(File lecture) {
-        File f = new File(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
+        File f = new File(lecture.getPath() + FileSystemConstants.meta + FileSystemConstants.versionLecture);
         return FileReaderHelper.readTextFromFile(f.getPath());
     }
 
@@ -549,7 +549,7 @@ public class UploadProcedure {
 
 
                 // Photo
-                File photo = new File(((LectureItem) pair.getValue()).getLecturePath() + DirectoryConstants.meta + DirectoryConstants.photoThumbnail);
+                File photo = new File(((PrevLectureItem) pair.getValue()).getLecturePath() + FileSystemConstants.meta + FileSystemConstants.photoThumbnail);
                 UploadTask photoCourseThumbnail = null;
                 if (photo.exists()) {
                     photoCourseThumbnail = lecturePhoto.putFile(Uri.fromFile(photo));
@@ -563,7 +563,7 @@ public class UploadProcedure {
                 }
 
                 // Sound
-                File sound  = new File( ((LectureItem) pair.getValue()).getLecturePath()  + DirectoryConstants.meta + DirectoryConstants.soundThumbnail);
+                File sound  = new File( ((PrevLectureItem) pair.getValue()).getLecturePath()  + FileSystemConstants.meta + FileSystemConstants.audioThumbnail);
                 UploadTask soundCourseThumbnail = null;
 
                 if (sound.exists()) {
@@ -577,7 +577,7 @@ public class UploadProcedure {
 
                 }
 
-                StorageUploadPreparation prep = new StorageUploadPreparation(((LectureItem) pair.getValue()).getLecturePath(), activity.getApplicationContext());
+                StorageUploadPreparation prep = new StorageUploadPreparation(((PrevLectureItem) pair.getValue()).getLecturePath(), activity.getApplicationContext());
                 byte[] slideData = prep.getZippedCourse();
 
                 StorageReference lectureZip = storage.getReference("/content/").child(((LectureTransferObject) pair.getKey()).lectureUID).child("Lecture.zip");
@@ -585,7 +585,7 @@ public class UploadProcedure {
 
                 // Add Necessary Files To Lecture Before Zipping
 
-                addNecessaryFilesToLecture(((LectureItem) pair.getValue()).getLecturePath(), ((LectureTransferObject) pair.getKey()).lectureUID);
+                addNecessaryFilesToLecture(((PrevLectureItem) pair.getValue()).getLecturePath(), ((LectureTransferObject) pair.getKey()).lectureUID);
 
                 UploadTask uploadCourseContentZip = lectureZip.putBytes(slideData);
                 uploadCourseContentZip.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -595,7 +595,7 @@ public class UploadProcedure {
                             LectureTransferObject newLTO = (LectureTransferObject) pair.getKey();
                             tidyZipFolder();
 
-                            listener.onDataLoadedInStorageEntireCourse(newLTO.getCourseUID(), newLTO.lectureUID,((LectureItem)pair.getValue()).getLecturePath()) ;
+                            listener.onDataLoadedInStorageEntireCourse(newLTO.getCourseUID(), newLTO.lectureUID,((PrevLectureItem)pair.getValue()).getLecturePath()) ;
                         }
                     }
                 });
@@ -611,17 +611,17 @@ public class UploadProcedure {
     }
 
     private  void addNecessaryFilesToLecture(String path, String key) {
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getCategory(), FileHandler.CATEGORY_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, activity.getContentResolver(), courseItem.getAuthorID(), FileHandler.AUTHOR);
-        FileHandler.createFileForSlideContentAndReturnIt(path + DirectoryConstants.meta, null, activity.getContentResolver(), key, FileHandler.ONLINE_LECTURE_IDENTIFICATION);
+        FileHandler.createFileForSlideContentAndReturnIt(path + FileSystemConstants.meta, null, activity.getContentResolver(), topicItem.getLanguage(), FileHandler.LANGUAGE_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(path + FileSystemConstants.meta, null, activity.getContentResolver(), topicItem.getCategory(), FileHandler.CATEGORY_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(path + FileSystemConstants.meta, null, activity.getContentResolver(), topicItem.getAuthorID(), FileHandler.AUTHOR);
+        FileHandler.createFileForSlideContentAndReturnIt(path + FileSystemConstants.meta, null, activity.getContentResolver(), key, FileHandler.ONLINE_LECTURE_IDENTIFICATION);
 
     }
 
 
 
     private void tidyZipFolder() {
-        File f = new File(activity.getExternalFilesDir(null) + DirectoryConstants.zip);
+        File f = new File(activity.getExternalFilesDir(null) + FileSystemConstants.zip);
 
         File[] files = f.listFiles();
 
@@ -631,30 +631,30 @@ public class UploadProcedure {
     }
 
 
-    private LectureItem retrieveLectureContent(File lecture) {
+    private PrevLectureItem retrieveLectureContent(File lecture) {
         String authorUID = user.getUid();
-        String courseUID = courseItem.getCourseOnlineIdentification();
-        String language = courseItem.getLanguage();
-        String category = courseItem.getCategory();
-        String lectureName = FileReaderHelper.readTextFromFile(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.title);
-        String lectureUID = FileReaderHelper.readTextFromFile(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.lectureIdentifcation);
-        String courseName = courseItem.getCourseName();
+        String courseUID = topicItem.getCourseOnlineIdentification();
+        String language = topicItem.getLanguage();
+        String category = topicItem.getCategory();
+        String lectureName = FileReaderHelper.readTextFromFile(lecture.getPath() + FileSystemConstants.meta + FileSystemConstants.title);
+        String lectureUID = FileReaderHelper.readTextFromFile(lecture.getPath() + FileSystemConstants.meta + FileSystemConstants.lectureIdentifcation);
+        String courseName = topicItem.getCourseName();
 
-        lectureItem = new LectureItem(lectureName, lectureUID, true);
-        lectureItem.setCategory(category);
-        lectureItem.setLanguage(language);
-        lectureItem.setAuthorID(authorUID);
-        lectureItem.setCourseIdentification(courseUID);
-        lectureItem.setCourseName(courseName);
-        lectureItem.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
-        lectureItem.setBluetoothCourse(FileReaderHelper.readTextFromFile(lecture.getPath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
-        lectureItem.setVersion(UUID.randomUUID().toString());
+        prevLectureItem = new PrevLectureItem(lectureName, lectureUID, true);
+        prevLectureItem.setCategory(category);
+        prevLectureItem.setLanguage(language);
+        prevLectureItem.setAuthorID(authorUID);
+        prevLectureItem.setCourseIdentification(courseUID);
+        prevLectureItem.setCourseName(courseName);
+        prevLectureItem.setBluetoothLecture(FileReaderHelper.readTextFromFile(lecture.getPath() + FileSystemConstants.meta + FileSystemConstants.lectureBluetooth));
+        prevLectureItem.setBluetoothCourse(FileReaderHelper.readTextFromFile(lecture.getPath() + FileSystemConstants.meta + FileSystemConstants.courseBluetooth));
+        prevLectureItem.setVersion(UUID.randomUUID().toString());
 
-        return lectureItem;
+        return prevLectureItem;
     }
 
     private int collectNumberSlides(File lecture) {
-        File f = new File(lecture + DirectoryConstants.slides);
+        File f = new File(lecture + FileSystemConstants.slides);
         return f.listFiles().length;
     }
 

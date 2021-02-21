@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.previous.teach.offline.create.audio;
+package com.imperial.word2mouth.create;
 
 import android.media.MediaRecorder;
 

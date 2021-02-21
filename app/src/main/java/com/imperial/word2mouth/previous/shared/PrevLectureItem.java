@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 import java.io.File;
 
-public class LectureItem implements Parcelable {
+public class PrevLectureItem implements Parcelable {
 
     private String courseName = null;
     private String lectureName = null;
@@ -30,12 +30,12 @@ public class LectureItem implements Parcelable {
     private String authorUID = "";
 
 
-    public LectureItem(String courseName, String lectureName) {
+    public PrevLectureItem(String courseName, String lectureName) {
         this.courseName = courseName;
         this.lectureName = lectureName;
     }
 
-    public LectureItem(String lectureName, String lectureIdentification, boolean online) {
+    public PrevLectureItem(String lectureName, String lectureIdentification, boolean online) {
         this.lectureIdentification = lectureIdentification;
         this.lectureName = lectureName;
     }
@@ -149,7 +149,7 @@ public class LectureItem implements Parcelable {
         dest.writeString(this.authorUID);
     }
 
-    protected LectureItem(Parcel in) {
+    protected PrevLectureItem(Parcel in) {
         this.courseName = in.readString();
         this.lectureName = in.readString();
         this.thumbnail = (File) in.readSerializable();
@@ -164,15 +164,15 @@ public class LectureItem implements Parcelable {
         this.authorUID = in.readString();
     }
 
-    public static final Parcelable.Creator<LectureItem> CREATOR = new Parcelable.Creator<LectureItem>() {
+    public static final Parcelable.Creator<PrevLectureItem> CREATOR = new Parcelable.Creator<PrevLectureItem>() {
         @Override
-        public LectureItem createFromParcel(Parcel source) {
-            return new LectureItem(source);
+        public PrevLectureItem createFromParcel(Parcel source) {
+            return new PrevLectureItem(source);
         }
 
         @Override
-        public LectureItem[] newArray(int size) {
-            return new LectureItem[size];
+        public PrevLectureItem[] newArray(int size) {
+            return new PrevLectureItem[size];
         }
     };
 

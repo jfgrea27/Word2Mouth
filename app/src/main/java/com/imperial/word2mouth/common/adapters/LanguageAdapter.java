@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.previous.shared.adapters;
+package com.imperial.word2mouth.common.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,12 +11,13 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.Languages;
+import com.imperial.word2mouth.common.Languages;
 
 import java.util.ArrayList;
 
-public class ArrayAdapterLanguage extends ArrayAdapter<String> {
+public class LanguageAdapter extends ArrayAdapter<String> {
 
     private Languages languagesData = new Languages();
     private static ArrayList<String> languages;
@@ -24,7 +25,7 @@ public class ArrayAdapterLanguage extends ArrayAdapter<String> {
     private int layout;
     private Context context;
 
-    public ArrayAdapterLanguage(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
+    public LanguageAdapter(@NonNull Context context, int resource, @NonNull ArrayList<String> objects) {
         super(context, resource, objects);
 
         layout = resource;
@@ -53,9 +54,10 @@ public class ArrayAdapterLanguage extends ArrayAdapter<String> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        holder.language.setText(languages.get(position));
+        ArrayList<String> languageStrings = Lists.newArrayList(Languages.languageIconMap.keySet());
+        holder.language.setText(languageStrings.get(position));
 
-        holder.languageThumbnail.setImageResource(languagesData.languageIconMap.get(languages.get(position)));
+        holder.languageThumbnail.setImageResource(Languages.getLanguageIcon(languageStrings.get(position)));
         return convertView;
     }
 

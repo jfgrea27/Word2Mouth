@@ -26,12 +26,12 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.imperial.word2mouth.previous.main.LearnActivityMain;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
-import com.imperial.word2mouth.previous.shared.IntentNames;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+import com.imperial.word2mouth.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.main.offline.share.bluetooth.ShareBluetoothActivity;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOffline;
-import com.imperial.word2mouth.previous.shared.CourseItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
 
@@ -61,8 +61,8 @@ public class LearnOfflineCourseFragment extends Fragment {
     private ArrayAdapterCourseOffline adapter;
 
     // Model
-    private ArrayList<CourseItem> localCourses = null;
-    private CourseItem courseItem = null;
+    private ArrayList<TopicItem> localCourses = null;
+    private TopicItem topicItem = null;
 
     private boolean selectedCourse = false;
     private String courseName = null;
@@ -205,8 +205,8 @@ public class LearnOfflineCourseFragment extends Fragment {
                             if (delete != null) {
                                 delete.setColorFilter(null);
                             }
-                            courseItem = (CourseItem) parent.getAdapter().getItem(position);
-                            courseName = courseItem.getCourseName();
+                            topicItem = (TopicItem) parent.getAdapter().getItem(position);
+                            courseName = topicItem.getCourseName();
                         }
                     }
                 });
@@ -216,27 +216,27 @@ public class LearnOfflineCourseFragment extends Fragment {
 
     }
 
-    private ArrayList<CourseItem> retrieveLocalCourses() {
-        ArrayList<CourseItem> courseItems = new ArrayList<>();
+    private ArrayList<TopicItem> retrieveLocalCourses() {
+        ArrayList<TopicItem> topicItems = new ArrayList<>();
 
-        File directory = new File(getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline);
+        File directory = new File(getView().getContext().getExternalFilesDir(null) + FileSystemConstants.offline);
 
         File[] courses = directory.listFiles();
 
         for (File f : courses) {
 
-            String courseName = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.title);
-            String courseLanguage = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.language);
-            String courseCategory = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.category);
+            String courseName = FileReaderHelper.readTextFromFile(f.getPath()+ FileSystemConstants.meta + FileSystemConstants.title);
+            String courseLanguage = FileReaderHelper.readTextFromFile(f.getPath()+ FileSystemConstants.meta + FileSystemConstants.language);
+            String courseCategory = FileReaderHelper.readTextFromFile(f.getPath()+ FileSystemConstants.meta + FileSystemConstants.category);
 
-            CourseItem courseItem= new CourseItem(courseName, f.getPath());
+            TopicItem topicItem = new TopicItem(courseName, f.getPath());
 
-            courseItem.setCategory(courseCategory);
-            courseItem.setLanguage(courseLanguage);
+            topicItem.setCategory(courseCategory);
+            topicItem.setLanguage(courseLanguage);
 
-            courseItems.add(courseItem);
+            topicItems.add(topicItem);
         }
-        return courseItems;
+        return topicItems;
     }
 
 
@@ -251,7 +251,7 @@ public class LearnOfflineCourseFragment extends Fragment {
 
                     Intent sharingIntent = new Intent(getView().getContext(), ShareBluetoothActivity.class);
                     if (selectedCourse) {
-                        sharingIntent.putExtra(IntentNames.COURSE_PATH, courseItem.getCoursePath());
+                        sharingIntent.putExtra(IntentNames.COURSE_PATH, topicItem.getCoursePath());
                         sharingIntent.putExtra(IntentNames.COURSE_NAME, courseName);
                     }
 
@@ -292,7 +292,7 @@ public class LearnOfflineCourseFragment extends Fragment {
                         if (courseName != null) {
                             Intent learnIntent = new Intent(getView().getContext(), LearnOfflineCourseSummary.class);
                             learnIntent.putExtra(IntentNames.COURSE_NAME, courseName);
-                            learnIntent.putExtra(IntentNames.COURSE_PATH, getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName);
+                            learnIntent.putExtra(IntentNames.COURSE_PATH, getView().getContext().getExternalFilesDir(null) + FileSystemConstants.offline + courseName);
                             startActivity(learnIntent);
                         }
                     }
@@ -331,13 +331,13 @@ public class LearnOfflineCourseFragment extends Fragment {
                 if (hasReadWriteStorageAccess) {
                     if (selectedCourse) {
                         if (courseName != null) {
-                            File courseFile = new File(courseItem.getCoursePath());
-                            File lectureFolder = new File(courseFile.getPath() + DirectoryConstants.lectures);
+                            File courseFile = new File(topicItem.getCoursePath());
+                            File lectureFolder = new File(courseFile.getPath() + FileSystemConstants.lectures);
                             File[] lectures = lectureFolder.listFiles();
 
                             for (File l : lectures) {
-                                String version = FileReaderHelper.readTextFromFile(l.getPath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
-                                File f = new File(getActivity().getExternalFilesDir(null )+ DirectoryConstants.cache + version + ".txt");
+                                String version = FileReaderHelper.readTextFromFile(l.getPath() + FileSystemConstants.meta + FileSystemConstants.versionLecture);
+                                File f = new File(getActivity().getExternalFilesDir(null )+ FileSystemConstants.cache + version + ".txt");
                                 if (f.exists()) {
                                     f.delete();
                                 }
@@ -345,7 +345,7 @@ public class LearnOfflineCourseFragment extends Fragment {
 
                             if (courseFile.exists()) {
                                 FileHandler.deleteRecursive(courseFile);
-                                adapter.remove(courseItem);
+                                adapter.remove(topicItem);
                                 adapter.notifyDataSetChanged();
                                 adapter.notifyDataSetInvalidated();
                             }

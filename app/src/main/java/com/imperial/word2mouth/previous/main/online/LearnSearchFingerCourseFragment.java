@@ -26,8 +26,8 @@ import com.imperial.word2mouth.previous.main.LearnActivityMain;
 import com.imperial.word2mouth.previous.main.online.dialog.DialogCategory;
 import com.imperial.word2mouth.previous.main.online.dialog.DialogLanguage;
 import com.imperial.word2mouth.previous.main.online.teacher.TeacherSearchFragment;
-import com.imperial.word2mouth.previous.shared.Categories;
-import com.imperial.word2mouth.previous.shared.Languages;
+import com.imperial.word2mouth.common.Categories;
+import com.imperial.word2mouth.common.Languages;
 
 import static com.imperial.word2mouth.previous.main.online.LearnOnlineMainFragment.*;
 

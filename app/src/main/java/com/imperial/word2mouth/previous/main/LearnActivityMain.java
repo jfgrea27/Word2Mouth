@@ -30,7 +30,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.Word2Mouth;
 import com.imperial.word2mouth.previous.background.ConnectivityReceiver;
 import com.imperial.word2mouth.previous.background.NewLecturesDialog;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.main.ui.SectionsPagerAdapter;
 import com.imperial.word2mouth.previous.shared.FileHandler;
@@ -153,32 +153,32 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void fileManagement() {
-        File f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.zip);
+        File f = new File(getExternalFilesDir(null).getPath() + FileSystemConstants.zip);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.offline);
+        f = new File(getExternalFilesDir(null).getPath() + FileSystemConstants.offline);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.online);
+        f = new File(getExternalFilesDir(null).getPath() + FileSystemConstants.online);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.cache);
+        f = new File(getExternalFilesDir(null).getPath() + FileSystemConstants.cache);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.followFoder);
+        f = new File(getExternalFilesDir(null).getPath() + FileSystemConstants.followFoder);
         if (!f.exists()) {
             f.mkdirs();
         }
 
-        f = new File(getExternalFilesDir(null).getPath() + DirectoryConstants.lecturerTracking);
+        f = new File(getExternalFilesDir(null).getPath() + FileSystemConstants.lecturerTracking);
         if (!f.exists()) {
             f.mkdirs();
         }
@@ -310,7 +310,7 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
     }
 
     private void uploadTrackingData() {
-        File trackingFolder = new File(getExternalFilesDir(null) + DirectoryConstants.cache);
+        File trackingFolder = new File(getExternalFilesDir(null) + FileSystemConstants.cache);
         File[] trackingLectures = trackingFolder.listFiles();
 
         for (File trackLecture : trackingLectures) {
@@ -395,7 +395,7 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
 
 
     private void followingFetch() {
-        File followingFolder = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder);
+        File followingFolder = new File(getExternalFilesDir(null) + FileSystemConstants.followFoder);
         File[] followingCourses = followingFolder.listFiles();
 
         int numberCourseFollowing = followingCourses.length;
@@ -520,7 +520,7 @@ public class LearnActivityMain extends AppCompatActivity implements Connectivity
                                     String courseUID = entry.getKey();
                                     ArrayList<String> toDelete = entry.getValue();
 
-                                    File f = new File(LearnActivityMain.this.getExternalFilesDir(null) + DirectoryConstants.followFoder + courseUID + ".txt");
+                                    File f = new File(LearnActivityMain.this.getExternalFilesDir(null) + FileSystemConstants.followFoder + courseUID + ".txt");
                                     for (String lectureCode : toDelete) {
                                         try {
                                             FileReaderHelper.removesAnyLineMatchingPatternInFile(LearnActivityMain.this, f,lectureCode );

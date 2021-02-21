@@ -30,13 +30,13 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.imperial.word2mouth.previous.main.online.dialog.DialogCategory;
 import com.imperial.word2mouth.previous.main.online.dialog.DialogLanguage;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOffline;
-import com.imperial.word2mouth.previous.shared.CourseItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.previous.shared.IntentNames;
+import com.imperial.word2mouth.IntentNames;
 import com.imperial.word2mouth.previous.teach.TeachActivityMain;
 import com.imperial.word2mouth.previous.teach.offline.upload.UploadProcedure;
 
@@ -67,14 +67,14 @@ public class TeachOfflineMainFragment extends Fragment {
 
     // Model
     private boolean selectedCourse = false;
-    private CourseItem courseItem = null;
+    private TopicItem topicItem = null;
     private String courseName = null;
     private String courseIdentification = null;
     private File courseDirectory;
     private String coursePath = null;
 
     // Adapter for the ListView
-    private ArrayList<CourseItem> localCourses = null;
+    private ArrayList<TopicItem> localCourses = null;
     private ArrayAdapterCourseOffline adapter = null;
 
     // Upload Listener
@@ -221,10 +221,10 @@ public class TeachOfflineMainFragment extends Fragment {
         }
     }
 
-    private ArrayList<CourseItem> retrieveLocalCourses() {
-        ArrayList<CourseItem> courseItems = new ArrayList<>();
+    private ArrayList<TopicItem> retrieveLocalCourses() {
+        ArrayList<TopicItem> topicItems = new ArrayList<>();
 
-        File directory = new File(getView().getContext().getExternalFilesDir(null) + DirectoryConstants.offline);
+        File directory = new File(getView().getContext().getExternalFilesDir(null) + FileSystemConstants.offline);
 
         File[] courses = directory.listFiles();
 
@@ -232,12 +232,12 @@ public class TeachOfflineMainFragment extends Fragment {
             String courseName = FileReaderHelper.readTextFromFile(f.getPath()+ "/meta/title.txt");
             String courseIdentification = FileReaderHelper.readTextFromFile(f.getPath() + "/meta/identification.txt");
 
-            CourseItem courseItem= new CourseItem(courseName, f.getPath());
-            courseItem.setCourseOnlineIdentification(courseIdentification);
+            TopicItem topicItem = new TopicItem(courseName, f.getPath());
+            topicItem.setCourseOnlineIdentification(courseIdentification);
 
-            courseItems.add(courseItem);
+            topicItems.add(topicItem);
         }
-        return courseItems;
+        return topicItems;
     }
 
     // Delete Button
@@ -250,12 +250,12 @@ public class TeachOfflineMainFragment extends Fragment {
             public void onClick(View v) {
                 if (courseNumber > -1) {
                     File courseFile = new File(localCourses.get(courseNumber).getCoursePath());
-                    File lectureFolder = new File(courseFile.getPath() + DirectoryConstants.lectures);
+                    File lectureFolder = new File(courseFile.getPath() + FileSystemConstants.lectures);
                     File[] lectures = lectureFolder.listFiles();
 
                     for (File l : lectures) {
-                        String version = FileReaderHelper.readTextFromFile(l.getPath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
-                        File f = new File(getActivity().getExternalFilesDir(null )+ DirectoryConstants.cache + version + ".txt");
+                        String version = FileReaderHelper.readTextFromFile(l.getPath() + FileSystemConstants.meta + FileSystemConstants.versionLecture);
+                        File f = new File(getActivity().getExternalFilesDir(null )+ FileSystemConstants.cache + version + ".txt");
                         if (f.exists()) {
                             f.delete();
                         }
@@ -352,10 +352,9 @@ public class TeachOfflineMainFragment extends Fragment {
             createIntent.putExtra(IntentNames.COURSE, localCourses.get(courseNumber));
             startActivity(createIntent);
         } else {
-            CourseItem newCourse = new CourseItem(courseName, coursePath);
+            TopicItem newCourse = new TopicItem(courseName, coursePath);
 
-            courseItem = new CourseItem(courseName, coursePath);
-            newCourse.setCourseBluetooth(FileReaderHelper.readTextFromFile(coursePath + DirectoryConstants.courseBluetooth));
+            topicItem = new TopicItem(courseName, coursePath);
             newCourse.setLanguage(selectedLanguage);
             newCourse.setCategory(selectedCategory);
             newCourse.setCourseName(courseName);
@@ -369,7 +368,7 @@ public class TeachOfflineMainFragment extends Fragment {
 
 
     private boolean checkNewAuthor() {
-        File f = new File(coursePath + DirectoryConstants.meta + DirectoryConstants.author);
+        File f = new File(coursePath + FileSystemConstants.meta + FileSystemConstants.author);
 
         if (f.length() == 0) {
             return true;
@@ -407,7 +406,7 @@ public class TeachOfflineMainFragment extends Fragment {
                 if(courseNumber > -1) {
 
                     if (user != null) {
-                        String authorCourse = FileReaderHelper.readTextFromFile(localCourses.get(courseNumber).getCoursePath() + DirectoryConstants.meta + DirectoryConstants.author);
+                        String authorCourse = FileReaderHelper.readTextFromFile(localCourses.get(courseNumber).getCoursePath() + FileSystemConstants.meta + FileSystemConstants.author);
 
                         if (user.getUid().equals(authorCourse) || authorCourse == "") {
                             localCourses.get(courseNumber).setAuthorID(authorCourse);
@@ -429,7 +428,6 @@ public class TeachOfflineMainFragment extends Fragment {
     private void  uploadCourse() {
             uploadProgress.setVisibility(View.VISIBLE);
             uploadProgress.bringToFront();
-            localCourses.get(courseNumber).setCourseBluetooth(FileReaderHelper.readTextFromFile(localCourses.get(courseNumber).getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
             UploadProcedure uploadProcedure = new UploadProcedure(localCourses.get(courseNumber), getActivity());
 
             uploadProcedure.setListener(new UploadProcedure.UploadListener() {
@@ -456,12 +454,12 @@ public class TeachOfflineMainFragment extends Fragment {
 
     private void setLectureIdentification(String identification, String lecturePath) {
 
-        File course = new File(localCourses.get(courseNumber).getCoursePath() + DirectoryConstants.lectures);
+        File course = new File(localCourses.get(courseNumber).getCoursePath() + FileSystemConstants.lectures);
 
         File[] lectures = course.listFiles();
         for (File lecture : lectures) {
             if (lecture.getPath().equals(lecturePath)) {
-                FileHandler.createFileForSlideContentAndReturnIt(lecture.getPath() + DirectoryConstants.meta , null, null, identification, FileHandler.ONLINE_LECTURE_IDENTIFICATION);
+                FileHandler.createFileForSlideContentAndReturnIt(lecture.getPath() + FileSystemConstants.meta , null, null, identification, FileHandler.ONLINE_LECTURE_IDENTIFICATION);
             }
         }
     }
@@ -482,13 +480,13 @@ public class TeachOfflineMainFragment extends Fragment {
     private void setCourseIdentification(String identification) {
         if (courseIdentification == "") {
             courseIdentification = identification;
-           courseItem.setCourseOnlineIdentification(identification);
+           topicItem.setCourseOnlineIdentification(identification);
            updateCourseIdentificationFile();
         }
     }
 
     private void updateCourseIdentificationFile() {
-        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_COURSE_IDENTIFICATION);
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + FileSystemConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_COURSE_IDENTIFICATION);
     }
 
 
@@ -536,8 +534,8 @@ public class TeachOfflineMainFragment extends Fragment {
         courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
         coursePath = courseDirectory.getPath();
         FileHandler.createDirectoryAndReturnIt(courseDirectory.getPath(), FileHandler.META);
-        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, selectedLanguage, FileHandler.LANGUAGE_SELECTION);
-        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null,selectedCategory, FileHandler.CATEGORY_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + FileSystemConstants.meta , null, null, selectedLanguage, FileHandler.LANGUAGE_SELECTION);
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + FileSystemConstants.meta , null, null,selectedCategory, FileHandler.CATEGORY_SELECTION);
         intentToCreateCourseAndStartActivity();
     }
 

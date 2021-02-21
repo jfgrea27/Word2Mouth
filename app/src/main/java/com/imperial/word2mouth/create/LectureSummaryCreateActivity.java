@@ -1,10 +1,4 @@
-package com.imperial.word2mouth.previous.teach.offline.create;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+package com.imperial.word2mouth.create;
 
 import android.Manifest;
 import android.content.Intent;
@@ -25,14 +19,20 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.imperial.word2mouth.previous.shared.TopicItem;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+
+import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.previous.shared.FileHandler;
+import com.imperial.word2mouth.previous.shared.FileReaderHelper;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.IntentNames;
-import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.previous.shared.FileHandler;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterSlideName;
-import com.imperial.word2mouth.create.AudioRecorder;
+import com.imperial.word2mouth.previous.teach.offline.create.TeachLectureCreationSlideActivity;
 import com.imperial.word2mouth.previous.teach.offline.create.video.ImageDialog;
 
 import org.apache.commons.io.FileUtils;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 import java.util.UUID;
 
-public class TeachLectureCreationSummaryActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
+public class LectureSummaryCreateActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
 
     // Permissions
     private final int CAMERA_PERMISSION = 1;
@@ -118,35 +118,32 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
         // get Intents
         getIntents();
 
-
-        // Permissions
-        getPermissions();
-
-        if (hasReadWriteStorageAccess) {
-            fileCreation();
-
-            // List of Slides
-            configureListViewSlides();
-            // Create Button
-            configureCreateButton();
-            // Delete
-            configureDeleteButton();
-            // Name
-            configureLectureName();
-            // Thumbnail
-            configureLectureThumbnail();
-            // Audio
-            configureAudio();
-
-            configureTextToSpeech();
-            configureLongClicks();
-
-        } else {
-            finish();
-        }
-
-
-
+//
+//        // Permissions
+//        getPermissions();
+//
+//        if (hasReadWriteStorageAccess) {
+//            fileCreation();
+//
+//            // List of Slides
+//            configureListViewSlides();
+//            // Create Button
+//            configureCreateButton();
+//            // Delete
+//            configureDeleteButton();
+//            // Name
+//            configureLectureName();
+//            // Thumbnail
+//            configureLectureThumbnail();
+//            // Audio
+//            configureAudio();
+//
+//            configureTextToSpeech();
+//            configureLongClicks();
+//
+//        } else {
+//            finish();
+//        }
     }
 
     private void getIntents() {
@@ -261,7 +258,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
         localSlides = retrieveLocalSlides();
 
         if (localSlides.size() > 0) {
-            adapter = new ArrayAdapterSlideName(TeachLectureCreationSummaryActivity.this, R.layout.list_slide, localSlides);
+            adapter = new ArrayAdapterSlideName(LectureSummaryCreateActivity.this, R.layout.list_slide, localSlides);
             slides.setAdapter(adapter);
         }
 
@@ -334,12 +331,12 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
             public void onClick(View v) {
                 if (hasAudioRecordingPermission) {
                     if (!recording) {
-                        Toast.makeText(TeachLectureCreationSummaryActivity.this, R.string.startRecording, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LectureSummaryCreateActivity.this, R.string.startRecording, Toast.LENGTH_SHORT).show();
                         audioButton.setColorFilter(Color.RED);
                         recorder.startRecording(audioFile.getPath());
                         recording = true;
                     } else {
-                        Toast.makeText(TeachLectureCreationSummaryActivity.this,  R.string.stopRecording, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LectureSummaryCreateActivity.this,  R.string.stopRecording, Toast.LENGTH_SHORT).show();
                         recorder.stopRecording();
                         audioButton.setColorFilter(Color.BLACK);
                         audioUri = Uri.fromFile(audioFile);
@@ -347,7 +344,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
                         recording = false;
                     }
                 } else {
-                    Toast.makeText(TeachLectureCreationSummaryActivity.this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LectureSummaryCreateActivity.this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
                 }
 
             }
@@ -358,7 +355,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
             @Override
             public void onClick(View v) {
                 if (audioUri != null) {
-                    player = MediaPlayer.create(TeachLectureCreationSummaryActivity.this, audioUri);
+                    player = MediaPlayer.create(LectureSummaryCreateActivity.this, audioUri);
                     player.start();
                 }
             }
@@ -385,7 +382,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
                     ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL);
                     imageDialog.show(getSupportFragmentManager(), "Video Dialog");
                 } else {
-                    Toast.makeText(TeachLectureCreationSummaryActivity.this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LectureSummaryCreateActivity.this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
 
                 }
             }
@@ -461,7 +458,7 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
             public void onClick(View v) {
                 saveMetaData();
 
-                Intent createEditIntent = new Intent(TeachLectureCreationSummaryActivity.this, TeachLectureCreationSlideActivity.class);
+                Intent createEditIntent = new Intent(LectureSummaryCreateActivity.this, TeachLectureCreationSlideActivity.class);
                 // starts at 0
                 if (slideNumber > -1) {
                     createEditIntent.putExtra("slide number", slideNumber);
@@ -592,10 +589,10 @@ public class TeachLectureCreationSummaryActivity extends AppCompatActivity imple
 
                     if (result == TextToSpeech.LANG_MISSING_DATA
                             || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(TeachLectureCreationSummaryActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LectureSummaryCreateActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
                     }
                 } else {
-                    Toast.makeText(TeachLectureCreationSummaryActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LectureSummaryCreateActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
                 }
             }
         });

@@ -22,11 +22,11 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-import com.imperial.word2mouth.previous.shared.IntentNames;
+import com.imperial.word2mouth.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
 import com.imperial.word2mouth.previous.shared.FileHandler;
-import com.imperial.word2mouth.previous.teach.offline.create.audio.AudioRecorder;
+import com.imperial.word2mouth.create.AudioRecorder;
 import com.imperial.word2mouth.previous.teach.offline.create.video.ImageDialog;
 
 import java.io.File;

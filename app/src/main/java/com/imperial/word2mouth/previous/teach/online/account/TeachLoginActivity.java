@@ -30,7 +30,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.previous.teach.offline.create.video.ImageDialog;
 
 import java.io.File;
@@ -333,7 +333,7 @@ public class TeachLoginActivity extends AppCompatActivity implements ImageDialog
 
                 case CAMERA_ROLL_SELECTION:
                     if (imageBitmap != null) {
-                        File f = new File(getBaseContext().getExternalFilesDir(null) + DirectoryConstants.zip + "pp.jpg");
+                        File f = new File(getBaseContext().getExternalFilesDir(null) + FileSystemConstants.zip + "pp.jpg");
                         if (!f.exists()) {
                             try {
                                 f.createNewFile();

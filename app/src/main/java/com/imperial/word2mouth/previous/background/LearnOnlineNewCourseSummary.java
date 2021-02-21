@@ -27,9 +27,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.main.online.DownloadProcedure;
-import com.imperial.word2mouth.previous.shared.CourseItem;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterLectureOnline;
 
 import java.io.File;
@@ -48,9 +48,9 @@ public class LearnOnlineNewCourseSummary extends AppCompatActivity {
     private ProgressBar progress;
     private ImageButton downloadButton;
     private TextView courseNameView;
-    private CourseItem course;
+    private TopicItem course;
     private int lectureNumber = -1;
-    private ArrayList<LectureItem> lectures;
+    private ArrayList<PrevLectureItem> lectures;
     private ImageView thumbnail;
     private Uri imageUri;
     private ImageButton audioButton;
@@ -84,7 +84,7 @@ public class LearnOnlineNewCourseSummary extends AppCompatActivity {
 
     private void getExtras() {
         newLectures = (ArrayList<String>) getIntent().getExtras().get("newLectures");
-        course = (CourseItem) getIntent().getExtras().get("course");
+        course = (TopicItem) getIntent().getExtras().get("course");
     }
 
 
@@ -97,7 +97,7 @@ public class LearnOnlineNewCourseSummary extends AppCompatActivity {
 
     private void retrieveLectures() {
 
-        ArrayList<LectureItem> temp = new ArrayList<>();
+        ArrayList<PrevLectureItem> temp = new ArrayList<>();
         int counter = 0;
         int totalNumberOfCourses = newLectures.size();
 
@@ -110,17 +110,17 @@ public class LearnOnlineNewCourseSummary extends AppCompatActivity {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    LectureItem lectureItem = null;
+                    PrevLectureItem prevLectureItem = null;
                     for (DocumentSnapshot lecture: queryDocumentSnapshots.getDocuments()) {
-                        lectureItem = new LectureItem((String) lecture.get("lectureName"), (String) lecture.get("lectureUID"), true);
-                        lectureItem.setCourseIdentification(course.getCourseOnlineIdentification());
-                        lectureItem.setLanguage(course.getLanguage());
-                        lectureItem.setCategory(course.getCategory());
-                        lectureItem.setAuthorID((String) lecture.get("authorUID"));
-                        lectureItem.setCourseName(course.getCourseName());
+                        prevLectureItem = new PrevLectureItem((String) lecture.get("lectureName"), (String) lecture.get("lectureUID"), true);
+                        prevLectureItem.setCourseIdentification(course.getCourseOnlineIdentification());
+                        prevLectureItem.setLanguage(course.getLanguage());
+                        prevLectureItem.setCategory(course.getCategory());
+                        prevLectureItem.setAuthorID((String) lecture.get("authorUID"));
+                        prevLectureItem.setCourseName(course.getCourseName());
                     }
 
-                    temp.add(lectureItem);
+                    temp.add(prevLectureItem);
 
                     if (finalCounter == totalNumberOfCourses) {
                          lectures = temp;
@@ -284,7 +284,7 @@ public class LearnOnlineNewCourseSummary extends AppCompatActivity {
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void updateFollowing(String lectureIdentification) {
-        File f = new File(getExternalFilesDir(null) + DirectoryConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
+        File f = new File(getExternalFilesDir(null) + FileSystemConstants.followFoder  + course.getCourseOnlineIdentification() + ".txt");
 
         try {
             Files.write(Paths.get(String.valueOf(f)), lectureIdentification.getBytes(), StandardOpenOption.APPEND);

@@ -1,26 +1,29 @@
-package com.imperial.word2mouth.previous.shared;
+package com.imperial.word2mouth.helpers;
 
-public class DirectoryConstants {
+public class FileSystemConstants {
 
+    // Used
     public static final String offline = "/offline/";
     public static final String zip = "/zip/";
     public static final String online = "/online/";
     public static final String followFoder = "/following/";
     public static final String slides = "/slides/";
+    public static final String metaFile = "meta-file.json";
+
+    public static final String photoThumbnail = "thumbnail.jpg";
+    public static final String audioThumbnail = "audio.3gp";
 
 
     // Meta Directory and Files
     public static final String meta = "/meta/";
     public static String lectures = "/lectures/";
     public static final String COURSE = "COURSE";
-    public static final String LECTURE = "LECTURE";
 
 
     // Fles
     public static final String identification = "identification.txt";
     public static final String lectureIdentifcation = "lectureIdentification.txt";
-    public static final String photoThumbnail = "thumbnail.jpg";
-    public static final String soundThumbnail = "audio.3gp";
+
     public static String language = "language.txt";
     public static String category = "category.txt";
     public static String cache = "/cache/";

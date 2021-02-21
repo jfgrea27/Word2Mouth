@@ -26,7 +26,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.CourseItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,9 +34,9 @@ import java.util.HashMap;
 import java.util.Locale;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public class ArrayAdapterCourseOnline extends ArrayAdapter<CourseItem> {
+public class ArrayAdapterCourseOnline extends ArrayAdapter<TopicItem> {
 
-    private static ArrayList<CourseItem> courseItems = new ArrayList<>();
+    private static ArrayList<TopicItem> topicItems = new ArrayList<>();
     private final Context context;
 
     private int layout;
@@ -53,20 +53,20 @@ public class ArrayAdapterCourseOnline extends ArrayAdapter<CourseItem> {
     private ArrayMap<String, Uri> photoThumbnails = new ArrayMap<>();
 
 
-    private ArrayList<CourseItem> queryCourses;
+    private ArrayList<TopicItem> queryCourses;
 
 
 
 
-    public ArrayAdapterCourseOnline(@NonNull Context context, int resource, @NonNull ArrayList<CourseItem> objects) {
+    public ArrayAdapterCourseOnline(@NonNull Context context, int resource, @NonNull ArrayList<TopicItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
         this.context = context;
         queryCourses = objects;
 
-        courseItems.clear();
-        courseItems.addAll(queryCourses);
+        topicItems.clear();
+        topicItems.addAll(queryCourses);
     }
 
 
@@ -77,7 +77,7 @@ public class ArrayAdapterCourseOnline extends ArrayAdapter<CourseItem> {
         soundThumbnails.clear();
         photoThumbnails.clear();
 
-        for (CourseItem course : courseItems) {
+        for (TopicItem course : topicItems) {
             StorageReference imageRef = teacherRef.child(course.getCourseOnlineIdentification() + "/Photo Thumbnail");
             StorageReference soundRef = teacherRef.child(course.getCourseOnlineIdentification()  + "/Sound Thumbnail");
 
@@ -122,12 +122,12 @@ public class ArrayAdapterCourseOnline extends ArrayAdapter<CourseItem> {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        if (courseItems.get(position).getCategory() != null) {
-            holder.category.setImageResource(categories.categoryIconMap.get(courseItems.get(position).getCategory()));
+        if (topicItems.get(position).getCategory() != null) {
+            holder.category.setImageResource(categories.categoryIconMap.get(topicItems.get(position).getCategory()));
         }
 
-        if (courseItems.get(position).getLanguage() != null) {
-            holder.language.setImageResource(languages.languageIconMap.get(courseItems.get(position).getLanguage()));
+        if (topicItems.get(position).getLanguage() != null) {
+            holder.language.setImageResource(languages.languageIconMap.get(topicItems.get(position).getLanguage()));
         }
 
         // Retrieve image
@@ -195,9 +195,9 @@ public class ArrayAdapterCourseOnline extends ArrayAdapter<CourseItem> {
         queryCourses.clear();
 
         if (query.length() == 0) {
-            queryCourses.addAll(courseItems);
+            queryCourses.addAll(topicItems);
         } else {
-            for (CourseItem wp : courseItems) {
+            for (TopicItem wp : topicItems) {
                 if (wp.getCourseName().toLowerCase(Locale.getDefault()).contains(query)) {
                     queryCourses.add(wp);
                 }

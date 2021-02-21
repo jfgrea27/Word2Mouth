@@ -31,10 +31,10 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.shared.FileHandler;
-import com.imperial.word2mouth.previous.shared.IntentNames;
+import com.imperial.word2mouth.IntentNames;
 
 import net.lingala.zip4j.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
@@ -299,7 +299,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
     ///////// RECEIVE
     private void createReceiveZipFile() {
         zipReceiveLecturePath = getApplicationContext().getExternalFilesDir(null).getPath() +
-                DirectoryConstants.zip + "ReceivedLecture.zip";
+                FileSystemConstants.zip + "ReceivedLecture.zip";
 
     }
 
@@ -308,7 +308,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
     private void createSendZipFile() {
 
         zipSendLectureZipPath = getApplicationContext().getExternalFilesDir(null).getPath() +
-                DirectoryConstants.zip + lectureName + ".zip";
+                FileSystemConstants.zip + lectureName + ".zip";
 
         File zipFile = new File(zipSendLectureZipPath);
         try {
@@ -803,7 +803,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
             String path = null;
             try {
                 path = new String(getApplicationContext().getExternalFilesDir(null).getAbsolutePath() +
-                        DirectoryConstants.zip + "Unzipped");
+                        FileSystemConstants.zip + "Unzipped");
                 zipFile.extractAll(path);
             } catch (ZipException e) {
                 e.printStackTrace();
@@ -839,7 +839,7 @@ public class ShareBluetoothActivity extends AppCompatActivity {
         String courseName =file.getName();
 
         try {
-            FileHandler.copyDirectoryOneLocationToAnotherLocation(file, new File(getApplicationContext().getExternalFilesDir(null) + DirectoryConstants.offline + courseName));
+            FileHandler.copyDirectoryOneLocationToAnotherLocation(file, new File(getApplicationContext().getExternalFilesDir(null) + FileSystemConstants.offline + courseName));
         } catch (IOException e) {
             e.printStackTrace();
             Toast.makeText(ShareBluetoothActivity.this, getString(R.string.notreceivedproperly), Toast.LENGTH_SHORT).show();

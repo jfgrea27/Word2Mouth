@@ -3,6 +3,8 @@ package com.imperial.word2mouth.previous.shared;
 import android.content.Context;
 import android.util.Log;
 
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -54,7 +56,7 @@ public class FileReaderHelper {
 
     public static boolean removesAnyLineMatchingPatternInFile(Context c, File f, String pattern) throws IOException {
         File inputFile = new File(f.getPath());
-        File tempFile = new File(c.getExternalFilesDir(null) + DirectoryConstants.cache + "temp");
+        File tempFile = new File(c.getExternalFilesDir(null) + FileSystemConstants.cache + "temp");
         tempFile.createNewFile();
 
         BufferedReader reader = new BufferedReader(new FileReader(inputFile));

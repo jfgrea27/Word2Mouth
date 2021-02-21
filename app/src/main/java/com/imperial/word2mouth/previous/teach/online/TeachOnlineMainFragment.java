@@ -35,10 +35,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
-import com.imperial.word2mouth.previous.shared.IntentNames;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+import com.imperial.word2mouth.IntentNames;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOnline;
-import com.imperial.word2mouth.previous.shared.CourseItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.previous.teach.TeachActivityMain;
 
 import java.io.File;
@@ -65,7 +65,7 @@ public class TeachOnlineMainFragment extends Fragment {
     private ImageButton courseSummaryButton;
 
     // Courses
-    private ArrayList<CourseItem> onlineCourses = null;
+    private ArrayList<TopicItem> onlineCourses = null;
 
 
     // Adapter
@@ -81,7 +81,7 @@ public class TeachOnlineMainFragment extends Fragment {
 
     // Course data
     private String courseName = null;
-    private CourseItem courseItem = null;
+    private TopicItem topicItem = null;
     private String courseIdentification = null;
 
     private ImageButton delete;
@@ -190,7 +190,7 @@ public class TeachOnlineMainFragment extends Fragment {
                                         doc.getReference().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                File f = new File(getActivity().getExternalFilesDir(null) + DirectoryConstants.lecturerTracking + version + ".txt");
+                                                File f = new File(getActivity().getExternalFilesDir(null) + FileSystemConstants.lecturerTracking + version + ".txt");
                                                 if (f.exists()) {
                                                     f.delete();
                                                 }
@@ -397,19 +397,19 @@ public class TeachOnlineMainFragment extends Fragment {
         }
     }
 
-    private ArrayList<CourseItem> getCourses(List<DocumentSnapshot> courses) {
+    private ArrayList<TopicItem> getCourses(List<DocumentSnapshot> courses) {
 
-        ArrayList<CourseItem> courseItems = new ArrayList<>();
+        ArrayList<TopicItem> topicItems = new ArrayList<>();
 
 
         for (DocumentSnapshot course: courses) {
-            CourseItem courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("courseUID"), true);
-            courseItem.setLanguage((String) course.get("language"));
-            courseItem.setCategory((String) course.get("category"));
+            TopicItem topicItem = new TopicItem((String) course.get("courseName"), (String) course.get("courseUID"), true);
+            topicItem.setLanguage((String) course.get("language"));
+            topicItem.setCategory((String) course.get("category"));
 
-            courseItems.add(courseItem);
+            topicItems.add(topicItem);
         }
-        return courseItems;
+        return topicItems;
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////

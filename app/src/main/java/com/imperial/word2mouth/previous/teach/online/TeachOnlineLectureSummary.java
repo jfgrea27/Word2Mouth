@@ -18,9 +18,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.previous.shared.FileHandler;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.teach.online.fakeDataProducer.FakeDataProducer;
 import com.imperial.word2mouth.previous.teach.online.lectureData.LectureTrackingData;
 import com.jjoe64.graphview.DefaultLabelFormatter;
@@ -51,7 +51,7 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
 
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private LectureItem lecture;
+    private PrevLectureItem lecture;
 
     private String lectureVersion = null;
     private LectureTrackingData ltd;
@@ -185,7 +185,7 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
 
                     lectureVersion = version;
 
-                    File trackingData = new File(getExternalFilesDir(null) + DirectoryConstants.lecturerTracking + version + ".txt");
+                    File trackingData = new File(getExternalFilesDir(null) + FileSystemConstants.lecturerTracking + version + ".txt");
                     if (!trackingData.exists()) {
                         try {
                             trackingData.createNewFile();
@@ -220,7 +220,7 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
                                 doc.getReference().update("time", time);
                                 doc.getReference().update("video", video);
 
-                                ltd = new LectureTrackingData(new File(getExternalFilesDir(null) + DirectoryConstants.lecturerTracking + lectureVersion + ".txt"));
+                                ltd = new LectureTrackingData(new File(getExternalFilesDir(null) + FileSystemConstants.lecturerTracking + lectureVersion + ".txt"));
 
 
                                 // time
@@ -279,7 +279,7 @@ public class TeachOnlineLectureSummary extends AppCompatActivity {
 
 
     private void getExtras() {
-        lecture = (LectureItem) getIntent().getExtras().get("lecture");
+        lecture = (PrevLectureItem) getIntent().getExtras().get("lecture");
     }
 
     private void setUpUI() {

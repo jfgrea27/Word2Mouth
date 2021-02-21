@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.previous.shared;
+package com.imperial.word2mouth;
 
 public class IntentNames {
 
@@ -9,5 +9,6 @@ public class IntentNames {
     public static String COURSE_PATH = "Course Path";
     public static String LECTURE_NAME = "Lecture Name";
     public static String LECTURE_PATH = "Lecture Path";
+    public static String LECTURE = "Lecture";
 
 }

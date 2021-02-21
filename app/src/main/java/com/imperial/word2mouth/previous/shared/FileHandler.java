@@ -9,6 +9,7 @@ import android.os.Build;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.previous.main.offline.tracker.LectureTracker;
 import com.imperial.word2mouth.previous.main.offline.tracker.SlideTracker;
 
@@ -53,13 +54,13 @@ public class FileHandler {
 
 
     public static File createDirectoryForCourseAndReturnIt(String courseName, Context context) {
-        File file = new File(context.getExternalFilesDir(null), DirectoryConstants.offline + courseName);
+        File file = new File(context.getExternalFilesDir(null), FileSystemConstants.offline + courseName);
 
         if (file.exists()) {
             int directoryNumber = 0;
             while (file.exists()) {
                 directoryNumber++;
-                file = new File(context.getExternalFilesDir(null), DirectoryConstants.offline + courseName + " (" + directoryNumber + ")");
+                file = new File(context.getExternalFilesDir(null), FileSystemConstants.offline + courseName + " (" + directoryNumber + ")");
             }
         }
         file.mkdirs();
@@ -67,7 +68,7 @@ public class FileHandler {
     }
 
     public static File createDirectoryForSlideAndReturnIt(String coursePath, int slideNumber) {
-        File file = new File(coursePath, DirectoryConstants.slides+ slideNumber);
+        File file = new File(coursePath, FileSystemConstants.slides+ slideNumber);
         file.mkdirs();
         return file;
     }
@@ -76,13 +77,13 @@ public class FileHandler {
         File file = null;
         switch (type) {
             case META:
-                file = new File(coursePath, DirectoryConstants.meta);
+                file = new File(coursePath, FileSystemConstants.meta);
                 break;
             case SLIDES:
-                file = new File(coursePath, DirectoryConstants.slides);
+                file = new File(coursePath, FileSystemConstants.slides);
                 break;
             case LECTURES_DIRECTORY:
-                file = new File(coursePath, DirectoryConstants.lectures);
+                file = new File(coursePath, FileSystemConstants.lectures);
                 break;
             default:
                 throw new IllegalStateException("Unexpected value: " + type);
@@ -92,7 +93,7 @@ public class FileHandler {
     }
 
     public static File retrieveSlideDirectoryByNumber(String coursePath, int slideNumber) {
-        File slideDirectory = new File(coursePath, DirectoryConstants.slides + slideNumber);
+        File slideDirectory = new File(coursePath, FileSystemConstants.slides + slideNumber);
         if (slideDirectory.exists()) {
             return slideDirectory;
         } else {
@@ -119,34 +120,34 @@ public class FileHandler {
                 outputAddress += "/thumbnail.jpg";
                 return copyVideoToFile(outputAddress, originalUriPath, content);
             case ONLINE_COURSE_IDENTIFICATION:
-                outputAddress += DirectoryConstants.identification;
+                outputAddress += FileSystemConstants.identification;
                 return copyTextToFile(outputAddress, script);
             case LANGUAGE_SELECTION:
-                outputAddress += DirectoryConstants.language;
+                outputAddress += FileSystemConstants.language;
                 return copyTextToFile(outputAddress, script);
             case CATEGORY_SELECTION:
-                outputAddress += DirectoryConstants.category;
+                outputAddress += FileSystemConstants.category;
                 return copyTextToFile(outputAddress, script);
             case AUTHOR:
-                outputAddress += DirectoryConstants.author;
+                outputAddress += FileSystemConstants.author;
                 return copyTextToFile(outputAddress, script);
             case COURSE_LECTURE_DISTINGUISHING:
-                outputAddress += DirectoryConstants.type;
+                outputAddress += FileSystemConstants.type;
                 return copyTextToFile(outputAddress, script);
             case BLUETOOTH_UUID_COURSE:
-                outputAddress += DirectoryConstants.courseBluetooth;
+                outputAddress += FileSystemConstants.courseBluetooth;
                 return copyTextToFile(outputAddress, script);
             case ONLINE_LECTURE_IDENTIFICATION:
-                outputAddress += DirectoryConstants.lectureIdentifcation;
+                outputAddress += FileSystemConstants.lectureIdentifcation;
                 return copyTextToFile(outputAddress, script);
             case LECTURE_UUID_BLUETOOTH:
-                outputAddress += DirectoryConstants.lectureBluetooth;
+                outputAddress += FileSystemConstants.lectureBluetooth;
                 return copyTextToFile(outputAddress, script);
             case VERSION:
-                outputAddress += DirectoryConstants.versionLecture;
+                outputAddress += FileSystemConstants.versionLecture;
                 return copyTextToFile(outputAddress, script);
             case LECTURE_TRACKING:
-                outputAddress += DirectoryConstants.lectureTracking;
+                outputAddress += FileSystemConstants.lectureTracking;
                 return copyTextToFile(outputAddress, script);
             default:
                 return null;
@@ -334,13 +335,13 @@ public class FileHandler {
         }
     }
 
-    public static void createFileForLectureTracking(LectureItem lectureItem, Activity activity) {
+    public static void createFileForLectureTracking(PrevLectureItem prevLectureItem, Activity activity) {
 
-        File lectureDirectory = new File(lectureItem.getLecturePath() + DirectoryConstants.slides);
+        File lectureDirectory = new File(prevLectureItem.getLecturePath() + FileSystemConstants.slides);
         int numberSlides = lectureDirectory.listFiles().length;
 
 
-        File trackerSlides = new File(activity.getExternalFilesDir(null).getPath() + DirectoryConstants.cache + lectureItem.getVersion() + ".txt");
+        File trackerSlides = new File(activity.getExternalFilesDir(null).getPath() + FileSystemConstants.cache + prevLectureItem.getVersion() + ".txt");
         if (!trackerSlides.exists()) {
             try {
                 trackerSlides.createNewFile();
@@ -359,7 +360,7 @@ public class FileHandler {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 
         try {
-            bw.write(lectureItem.getVersion());
+            bw.write(prevLectureItem.getVersion());
             bw.newLine();
 
             for (int i = 0; i < numberSlides; i++) {
@@ -375,7 +376,7 @@ public class FileHandler {
 
     public static void createFileForLectureTracking(String version, int numberSlides, Activity activity) {
 
-        File trackerSlides = new File(activity.getExternalFilesDir(null).getPath() + DirectoryConstants.cache + version + ".txt");
+        File trackerSlides = new File(activity.getExternalFilesDir(null).getPath() + FileSystemConstants.cache + version + ".txt");
         if (!trackerSlides.exists()) {
             try {
                 trackerSlides.createNewFile();
@@ -410,8 +411,8 @@ public class FileHandler {
     public static void updateTracker(LectureTracker lectureTracker, Activity activity, String lecturePath) {
         int counter = 0;
 
-        String version = FileReaderHelper.readTextFromFile(lecturePath + DirectoryConstants.meta + DirectoryConstants.versionLecture);
-        File lectureTrackerFile = new File(activity.getExternalFilesDir(null).getPath() + DirectoryConstants.cache + version + ".txt");
+        String version = FileReaderHelper.readTextFromFile(lecturePath + FileSystemConstants.meta + FileSystemConstants.versionLecture);
+        File lectureTrackerFile = new File(activity.getExternalFilesDir(null).getPath() + FileSystemConstants.cache + version + ".txt");
 
         if (lectureTrackerFile.exists()) {
             FileInputStream fis = null;

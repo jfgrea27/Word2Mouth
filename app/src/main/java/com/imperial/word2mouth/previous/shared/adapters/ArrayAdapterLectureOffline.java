@@ -18,25 +18,25 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 
 import java.io.File;
 import java.util.ArrayList;
 
-public class ArrayAdapterLectureOffline extends ArrayAdapter<LectureItem>
+public class ArrayAdapterLectureOffline extends ArrayAdapter<PrevLectureItem>
 {
-    private static ArrayList<LectureItem> lectureItems;
+    private static ArrayList<PrevLectureItem> prevLectureItems;
 
     private int layout;
     private Context context;
 
     private ViewHolder holder = new ViewHolder();
 
-    public ArrayAdapterLectureOffline(@NonNull Context context, int resource, @NonNull ArrayList<LectureItem> objects) {
+    public ArrayAdapterLectureOffline(@NonNull Context context, int resource, @NonNull ArrayList<PrevLectureItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
-        lectureItems = objects;
+        prevLectureItems = objects;
         this.context = context;
     }
 
@@ -61,13 +61,13 @@ public class ArrayAdapterLectureOffline extends ArrayAdapter<LectureItem>
         }
 
         /// Title
-        holder.title.setText(lectureItems.get(position).getLectureName());
+        holder.title.setText(prevLectureItems.get(position).getLectureName());
 
 
         // Thumbnail
-        if (lectureItems.get(position).getThumbnail() != null) {
+        if (prevLectureItems.get(position).getThumbnail() != null) {
 
-            File thumbnailFile = new File(lectureItems.get(position).getThumbnail().getPath());
+            File thumbnailFile = new File(prevLectureItems.get(position).getThumbnail().getPath());
             if (thumbnailFile.exists()) {
                 holder.thumbnail.setImageURI(Uri.parse(thumbnailFile.getPath()));
             }
@@ -78,11 +78,11 @@ public class ArrayAdapterLectureOffline extends ArrayAdapter<LectureItem>
 
         // Audio
 
-        if (lectureItems.get(position).getAudio() != null) {
-            final File audioFile = new File(lectureItems.get(position).getAudio().getPath());
+        if (prevLectureItems.get(position).getAudio() != null) {
+            final File audioFile = new File(prevLectureItems.get(position).getAudio().getPath());
             Uri audioUri = null;
             if (audioFile.exists()) {
-                audioUri =  Uri.parse(lectureItems.get(position).getAudio().getPath());
+                audioUri =  Uri.parse(prevLectureItems.get(position).getAudio().getPath());
             }
 
             final Uri finalAudioUri = audioUri;

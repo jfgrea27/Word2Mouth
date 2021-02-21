@@ -34,15 +34,15 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.CourseItem;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
+import com.imperial.word2mouth.previous.shared.TopicItem;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.previous.shared.IntentNames;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterLectureOffline;
 import com.imperial.word2mouth.previous.teach.offline.create.TeachLectureCreationSummaryActivity;
-import com.imperial.word2mouth.previous.teach.offline.create.audio.AudioRecorder;
+import com.imperial.word2mouth.create.AudioRecorder;
 import com.imperial.word2mouth.previous.teach.offline.create.video.ImageDialog;
 import com.imperial.word2mouth.previous.teach.offline.upload.UploadProcedure;
 
@@ -110,7 +110,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     // View
     private ListView lecturesView;
     // Model
-    private ArrayList<LectureItem> localLectures;
+    private ArrayList<PrevLectureItem> localLectures;
     private int lectureNumber = -1;
 
     // Controller
@@ -139,10 +139,10 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
     private UploadProcedure uploadProcedure;
     private String courseAuthorID;
-    private CourseItem courseItem;
+    private TopicItem topicItem;
     private String courseLanguage;
     private String courseCategory;
-    private LectureItem lectureItem;
+    private PrevLectureItem prevLectureItem;
     private String courseIdentification = "";
     private boolean completedDatabase = false;
     private boolean completedStorage = false;
@@ -210,7 +210,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
                 if (selectedLecture) {
                     if (user != null) {
 
-                        String authorID = FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.author);
+                        String authorID = FileReaderHelper.readTextFromFile(topicItem.getCoursePath() + FileSystemConstants.meta + FileSystemConstants.author);
 
                         if (user.getUid().equals(authorID) || authorID == "") {
                             uploadCourse();
@@ -233,14 +233,13 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
         uploadProgress.bringToFront();
 
         setCourseAuthorIdentification();
-        localLectures.get(lectureNumber).setLanguage(courseItem.getLanguage());
-        localLectures.get(lectureNumber).setCategory(courseItem.getCategory());
+        localLectures.get(lectureNumber).setLanguage(topicItem.getLanguage());
+        localLectures.get(lectureNumber).setCategory(topicItem.getCategory());
         localLectures.get(lectureNumber).setLectureIdentification(getLectureIdentification());
-        courseItem.setCourseBluetooth(FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
-        localLectures.get(lectureNumber).setBluetoothCourse(FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
-        localLectures.get(lectureNumber).setBluetoothLecture(FileReaderHelper.readTextFromFile(lectureItem.getLecturePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
+        localLectures.get(lectureNumber).setBluetoothCourse(FileReaderHelper.readTextFromFile(topicItem.getCoursePath() + FileSystemConstants.meta + FileSystemConstants.courseBluetooth));
+        localLectures.get(lectureNumber).setBluetoothLecture(FileReaderHelper.readTextFromFile(prevLectureItem.getLecturePath() + FileSystemConstants.meta + FileSystemConstants.lectureBluetooth));
 
-        uploadProcedure = new UploadProcedure(courseItem, localLectures.get(lectureNumber), TeachOfflineCourseSummary.this);
+        uploadProcedure = new UploadProcedure(topicItem, localLectures.get(lectureNumber), TeachOfflineCourseSummary.this);
 
         uploadProcedure.setListener(new UploadProcedure.UploadListener() {
             @Override
@@ -265,51 +264,51 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     }
 
     private String getLectureIdentification() {
-        return FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + DirectoryConstants.meta + DirectoryConstants.lectureIdentifcation);
+        return FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + FileSystemConstants.meta + FileSystemConstants.lectureIdentifcation);
     }
 
 
     private void setCourseIdentification(String identification) {
         if (courseIdentification == "") {
             courseIdentification = identification;
-            courseItem.setCourseOnlineIdentification(identification);
-            lectureItem.setCourseIdentification(identification);
+            topicItem.setCourseOnlineIdentification(identification);
+            prevLectureItem.setCourseIdentification(identification);
             updateCourseIdentificationFile();
         }
     }
 
     private void updateCourseIdentificationFile() {
-        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_COURSE_IDENTIFICATION);
-        FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_COURSE_IDENTIFICATION);
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + FileSystemConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_COURSE_IDENTIFICATION);
+        FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta , null, null, courseIdentification, FileHandler.ONLINE_COURSE_IDENTIFICATION);
 
     }
 
 
     private void setCourseAuthorIdentification() {
-        if (courseItem.getAuthorID().isEmpty()) {
+        if (topicItem.getAuthorID().isEmpty()) {
             courseAuthorID = user.getUid();
-            courseItem.setAuthorID(user.getUid());
+            topicItem.setAuthorID(user.getUid());
             updateCourseAuthorFile(user.getUid());
         }
     }
 
     private void updateCourseAuthorFile(String uid) {
-        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, uid, FileHandler.AUTHOR);
-        FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta , null, null, uid, FileHandler.AUTHOR);
+        FileHandler.createFileForSlideContentAndReturnIt(coursePath + FileSystemConstants.meta , null, null, uid, FileHandler.AUTHOR);
+        FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta , null, null, uid, FileHandler.AUTHOR);
 
     }
 
 
     private void setLectureIdentification(String identification) {
-        if (lectureItem.getLectureIdentification().isEmpty()) {
-            lectureItem.setLectureIdentification(identification);
+        if (prevLectureItem.getLectureIdentification().isEmpty()) {
+            prevLectureItem.setLectureIdentification(identification);
             updateLectureIdentification();
 
         }
     }
 
     private void updateLectureIdentification() {
-        FileHandler.createFileForSlideContentAndReturnIt(lectureItem.getLecturePath() + DirectoryConstants.meta , null, null, lectureItem.getLectureIdentification(), FileHandler.ONLINE_LECTURE_IDENTIFICATION);
+        FileHandler.createFileForSlideContentAndReturnIt(prevLectureItem.getLecturePath() + FileSystemConstants.meta , null, null, prevLectureItem.getLectureIdentification(), FileHandler.ONLINE_LECTURE_IDENTIFICATION);
 
     }
 
@@ -324,8 +323,8 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
         audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, FileHandler.AUDIO );
         FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseName, FileHandler.TITLE);
 
-        courseLanguage = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.language);
-        courseCategory = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.category);
+        courseLanguage = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + FileSystemConstants.language);
+        courseCategory = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + FileSystemConstants.category);
 
     }
 
@@ -333,7 +332,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
 
     private boolean checkIsAuthorOfCourse() {
-        File f = new File(coursePath + DirectoryConstants.meta + DirectoryConstants.author);
+        File f = new File(coursePath + FileSystemConstants.meta + FileSystemConstants.author);
 
         if (f.length() == 0) {
             return true;
@@ -355,17 +354,10 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     }
 
     private void configureFirstCreationCourse() {
-        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), DirectoryConstants.COURSE, FileHandler.COURSE_LECTURE_DISTINGUISHING);
+        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), FileSystemConstants.COURSE, FileHandler.COURSE_LECTURE_DISTINGUISHING);
 
-        String courseBluetooth = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.courseBluetooth);
+        String courseBluetooth = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + FileSystemConstants.courseBluetooth);
 
-        if (courseBluetooth.isEmpty()) {
-            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), courseUID.toString(), FileHandler.BLUETOOTH_UUID_COURSE);
-            courseBluetooth = FileReaderHelper.readTextFromFile(metaDirectory.getAbsolutePath() + DirectoryConstants.courseBluetooth);
-            courseItem.setCourseBluetooth(courseBluetooth);
-        } else {
-            courseItem.setCourseBluetooth(courseBluetooth);
-        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -389,7 +381,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
     }
 
-    private void intentEditLecture(LectureItem item) {
+    private void intentEditLecture(PrevLectureItem item) {
         Intent createEditIntent = new Intent(TeachOfflineCourseSummary.this, TeachLectureCreationSummaryActivity.class);
 
         createEditIntent.putExtra(IntentNames.LECTURE_NAME, item.getLectureName());
@@ -401,8 +393,8 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
         Intent createEditIntent = new Intent(TeachOfflineCourseSummary.this, TeachLectureCreationSummaryActivity.class);
 
         createEditIntent.putExtra(IntentNames.LECTURE_NAME, lectureName);
-        createEditIntent.putExtra(IntentNames.LECTURE_PATH, coursePath + DirectoryConstants.lectures + lectureName);
-        createEditIntent.putExtra(IntentNames.COURSE, courseItem);
+        createEditIntent.putExtra(IntentNames.LECTURE_PATH, coursePath + FileSystemConstants.lectures + lectureName);
+        createEditIntent.putExtra(IntentNames.COURSE, topicItem);
         startActivity(createEditIntent);
     }
 
@@ -437,13 +429,13 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
     }
 
     private void getExtras() {
-        courseItem = (CourseItem) getIntent().getExtras().get(IntentNames.COURSE);
+        topicItem = (TopicItem) getIntent().getExtras().get(IntentNames.COURSE);
 
-        coursePath = courseItem.getCoursePath();
-        courseName = courseItem.getCourseName();
+        coursePath = topicItem.getCoursePath();
+        courseName = topicItem.getCourseName();
 
 
-        lectureItem = new LectureItem(courseName, lectureName);
+        prevLectureItem = new PrevLectureItem(courseName, lectureName);
 
     }
 
@@ -457,8 +449,8 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
                 if (selectedLecture) {
 
-                    String version = FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + DirectoryConstants.meta + DirectoryConstants.versionLecture);
-                    File f = new File(getExternalFilesDir(null) + DirectoryConstants.cache + version + ".txt");
+                    String version = FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + FileSystemConstants.meta + FileSystemConstants.versionLecture);
+                    File f = new File(getExternalFilesDir(null) + FileSystemConstants.cache + version + ".txt");
                     if (f.exists()) {
                         f.delete();
                     }
@@ -603,7 +595,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
                 } else {
                     selectedLecture = true;
                     lectureNumber = position;
-                    lectureItem.setPath(localLectures.get(position).getLecturePath());
+                    prevLectureItem.setPath(localLectures.get(position).getLecturePath());
                     view.setBackgroundColor(Color.LTGRAY);
                     if (delete != null) {
                         delete.setColorFilter(null);
@@ -617,9 +609,9 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
     }
 
-    private ArrayList<LectureItem> retrieveLocalLectures() {
+    private ArrayList<PrevLectureItem> retrieveLocalLectures() {
 
-        ArrayList<LectureItem> lectureItems = new ArrayList<>();
+        ArrayList<PrevLectureItem> prevLectureItems = new ArrayList<>();
 
         File[] lectureItemsFiles = lecturesDirectory.listFiles();
         if (lectureItemsFiles != null) {
@@ -630,15 +622,15 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
 
                 // Title
-                lectureName = FileReaderHelper.readTextFromFile(f.getPath()+ DirectoryConstants.meta + DirectoryConstants.title);
-                LectureItem item = new LectureItem(courseName, lectureName);
+                lectureName = FileReaderHelper.readTextFromFile(f.getPath()+ FileSystemConstants.meta + FileSystemConstants.title);
+                PrevLectureItem item = new PrevLectureItem(courseName, lectureName);
                 item.setPath(f.getPath());
 
-                lectureItems.add(item);
+                prevLectureItems.add(item);
             }
         }
 
-        return lectureItems;
+        return prevLectureItems;
 
     }
 
@@ -780,7 +772,7 @@ public class    TeachOfflineCourseSummary extends AppCompatActivity implements I
 
     private void configureCourseName() {
         courseNameView = findViewById(R.id.list_item_text);
-        courseNameView.setText(courseItem.getCourseName());
+        courseNameView.setText(topicItem.getCourseName());
     }
 
 

@@ -23,7 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.CourseItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOnline;
 
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class LearnOnlineNewLecturesSelectionFragment extends Fragment {
     private int courseNumber = -1;
     private boolean selectedCourse = false;
 
-    private ArrayList<CourseItem> onlineCourses;
+    private ArrayList<TopicItem> onlineCourses;
     private ArrayAdapterCourseOnline adapter;
     private ArrayList<ListNewLectures> listLectures;
 
@@ -130,7 +130,7 @@ public class LearnOnlineNewLecturesSelectionFragment extends Fragment {
 
     private void retrieveCourses() {
 
-        ArrayList<CourseItem> courseItems = new ArrayList<>();
+        ArrayList<TopicItem> topicItems = new ArrayList<>();
         int counter = 0;
         int totalNumberOfCourses = newLectures.size();
 
@@ -143,18 +143,17 @@ public class LearnOnlineNewLecturesSelectionFragment extends Fragment {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                    CourseItem courseItem = null;
+                    TopicItem topicItem = null;
                     for (DocumentSnapshot course: queryDocumentSnapshots.getDocuments()) {
-                        courseItem = new CourseItem((String) course.get("courseName"), (String) course.get("courseUID"), true);
-                        courseItem.setAuthorID((String) course.get("authorUID"));
-                        courseItem.setLanguage((String) course.get("language"));
-                        courseItem.setCategory((String) course.get("category"));
-                        courseItem.setCourseBluetooth((String) course.get("bluetoothCourse"));
+                        topicItem = new TopicItem((String) course.get("courseName"), (String) course.get("courseUID"), true);
+                        topicItem.setAuthorID((String) course.get("authorUID"));
+                        topicItem.setLanguage((String) course.get("language"));
+                        topicItem.setCategory((String) course.get("category"));
                     }
-                    courseItems.add(courseItem);
+                    topicItems.add(topicItem);
 
                     if (finalCounter == totalNumberOfCourses) {
-                        onlineCourses = courseItems;
+                        onlineCourses = topicItems;
                         updateListView();
                     }
                 }

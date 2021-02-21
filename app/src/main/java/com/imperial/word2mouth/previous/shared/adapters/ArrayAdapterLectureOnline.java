@@ -27,15 +27,15 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 
 import java.util.ArrayList;
 
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-public class ArrayAdapterLectureOnline extends ArrayAdapter<LectureItem> {
+public class ArrayAdapterLectureOnline extends ArrayAdapter<PrevLectureItem> {
 
 
-    private final ArrayList<LectureItem> lectureItems;
+    private final ArrayList<PrevLectureItem> prevLectureItems;
     private final Context context;
     private final int layout;
 
@@ -49,11 +49,11 @@ public class ArrayAdapterLectureOnline extends ArrayAdapter<LectureItem> {
     private ViewHolder holder;
 
 
-    public ArrayAdapterLectureOnline(@NonNull Context context, int resource, @NonNull ArrayList<LectureItem> objects) {
+    public ArrayAdapterLectureOnline(@NonNull Context context, int resource, @NonNull ArrayList<PrevLectureItem> objects) {
         super(context, resource, objects);
 
         layout = resource;
-        lectureItems = objects;
+        prevLectureItems = objects;
         this.context = context;
     }
 
@@ -66,7 +66,7 @@ public class ArrayAdapterLectureOnline extends ArrayAdapter<LectureItem> {
         soundThumbnails.clear();
         photoThumbnails.clear();
 
-        for (LectureItem lecture : lectureItems) {
+        for (PrevLectureItem lecture : prevLectureItems) {
 
             StorageReference imageRef = lectureRef.child(lecture.getLectureIdentification() + "/Photo Thumbnail");
             StorageReference soundRef = lectureRef.child(lecture.getLectureIdentification() + "/Sound Thumbnail");
@@ -114,15 +114,15 @@ public class ArrayAdapterLectureOnline extends ArrayAdapter<LectureItem> {
         }
 
         /// Title
-        holder.title.setText(lectureItems.get(position).getLectureName());
+        holder.title.setText(prevLectureItems.get(position).getLectureName());
 
 
         // Thumbnail
-        holder.thumbnail.setImageURI(photoThumbnails.get(lectureItems.get(position).getLectureIdentification()));
+        holder.thumbnail.setImageURI(photoThumbnails.get(prevLectureItems.get(position).getLectureIdentification()));
 
 
         // Audio
-        holder.audioUri = soundThumbnails.get(lectureItems.get(position).getLectureIdentification());
+        holder.audioUri = soundThumbnails.get(prevLectureItems.get(position).getLectureIdentification());
 
 
         final Uri finalAudioUri = holder.audioUri;

@@ -29,10 +29,10 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.previous.shared.CourseItem;
-import com.imperial.word2mouth.previous.shared.DirectoryConstants;
-import com.imperial.word2mouth.previous.shared.IntentNames;
-import com.imperial.word2mouth.previous.shared.LectureItem;
+import com.imperial.word2mouth.previous.shared.TopicItem;
+import com.imperial.word2mouth.helpers.FileSystemConstants;
+import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterLectureOnline;
 
 import java.io.File;
@@ -48,7 +48,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
     private TextView title;
     private ListView lecturesView;
     private ImageButton delete;
-    private CourseItem courseItem;
+    private TopicItem topicItem;
     private ImageButton statistics;
 
     private ImageButton lectureSummaryButton;
@@ -59,9 +59,9 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
     private MediaPlayer player;
     private FirebaseUser user;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private ArrayList<LectureItem> lectures = new ArrayList<>();
+    private ArrayList<PrevLectureItem> lectures = new ArrayList<>();
     private ArrayAdapterLectureOnline adapter;
-    private LectureItem lecture;
+    private PrevLectureItem lecture;
     private boolean selectedLecture = false;
     private int lectureNumber = -1;
     private Uri imageUri;
@@ -91,7 +91,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent courseStat = new Intent(TeachOnlineCourseSummary.this, TeachOnlineCourseStatistics.class);
-                courseStat.putExtra(IntentNames.COURSE, courseItem);
+                courseStat.putExtra(IntentNames.COURSE, topicItem);
                 startActivity(courseStat);
             }
         });
@@ -158,7 +158,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
                                         doc.getReference().delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                                             @Override
                                             public void onSuccess(Void aVoid) {
-                                                File f = new File(getExternalFilesDir(null) + DirectoryConstants.lecturerTracking + version + ".txt");
+                                                File f = new File(getExternalFilesDir(null) + FileSystemConstants.lecturerTracking + version + ".txt");
                                                 if (f.exists()) {
                                                     f.delete();
                                                 }
@@ -192,7 +192,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
 
     private void getExtras() {
-        courseItem = (CourseItem) getIntent().getExtras().get(IntentNames.COURSE);
+        topicItem = (TopicItem) getIntent().getExtras().get(IntentNames.COURSE);
     }
 
 
@@ -219,7 +219,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
         // Title Course
         title = findViewById(R.id.list_item_text);
-        title.setText(courseItem.getCourseName());
+        title.setText(topicItem.getCourseName());
 
         lecturesView = findViewById(R.id.lecture_list_view);
         delete = findViewById(R.id.delete_button);
@@ -230,7 +230,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
     private void fetchThumbnailCourse() {
 
-        StorageReference soundRef = storage.getReference().child("content").child(courseItem.getCourseOnlineIdentification()).child("Sound Thumbnail");
+        StorageReference soundRef = storage.getReference().child("content").child(topicItem.getCourseOnlineIdentification()).child("Sound Thumbnail");
 
         soundRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -240,7 +240,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
         });
 
 
-        StorageReference imageRef = storage.getReference().child("content").child(courseItem.getCourseOnlineIdentification()).child("Photo Thumbnail");
+        StorageReference imageRef = storage.getReference().child("content").child(topicItem.getCourseOnlineIdentification()).child("Photo Thumbnail");
 
         imageRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
@@ -257,7 +257,7 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
         if (user != null) {
 
-            db.collection("content").whereEqualTo("type", "Lecture").whereEqualTo("courseUID", courseItem.getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            db.collection("content").whereEqualTo("type", "Lecture").whereEqualTo("courseUID", topicItem.getCourseOnlineIdentification()).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
@@ -321,11 +321,11 @@ public class TeachOnlineCourseSummary extends AppCompatActivity {
 
 
 
-    private ArrayList<LectureItem> retrieveCourses(List<DocumentSnapshot> documents) {
-        ArrayList<LectureItem> items = new ArrayList<>();
+    private ArrayList<PrevLectureItem> retrieveCourses(List<DocumentSnapshot> documents) {
+        ArrayList<PrevLectureItem> items = new ArrayList<>();
 
         for (DocumentSnapshot doc : documents) {
-            LectureItem lecture = new LectureItem((String) doc.get("lectureName"), (String) doc.get("lectureUID"), true);
+            PrevLectureItem lecture = new PrevLectureItem((String) doc.get("lectureName"), (String) doc.get("lectureUID"), true);
             items.add(lecture);
         }
         return items;
