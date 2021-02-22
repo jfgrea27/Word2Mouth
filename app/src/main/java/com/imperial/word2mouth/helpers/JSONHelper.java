@@ -9,7 +9,7 @@ import org.json.JSONObject;
 public class JSONHelper {
 
 
-    public static String prepareMetaDataCourseCreation(CourseItem courseItem) {
+    public static JSONObject prepareMetadataCourse(CourseItem courseItem) {
         JSONObject jsonCourseMetaData = new JSONObject();
 
         try {
@@ -24,10 +24,10 @@ public class JSONHelper {
             e.printStackTrace();
         }
 
-        return jsonCourseMetaData.toString();
+        return jsonCourseMetaData;
     }
 
-    public static String prepareMetaDataLectureCreation(LectureItem lectureItem) {
+    public static JSONObject prepareMetaDataLectureCreation(LectureItem lectureItem) {
         JSONObject jsonLectureMetaData = new JSONObject();
 
         try {
@@ -37,16 +37,13 @@ public class JSONHelper {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return jsonLectureMetaData.toString();
+        return jsonLectureMetaData;
     }
 
-    public static JSONObject getJSONFromString(String jsonString) {
+    public static JSONObject getJSONFromString(String jsonString) throws JSONException {
         JSONObject jsonObject = null;
-        try {
-            jsonObject = new JSONObject(jsonString);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        jsonObject = new JSONObject(jsonString);
+
         return jsonObject;
     }
 }

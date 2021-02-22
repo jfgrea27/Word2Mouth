@@ -117,7 +117,6 @@ public class CreateContentActivity extends AppCompatActivity {
 ////                Intent createIntent = new Intent(getApplicationContext(), TeachOfflineCourseSummary.class);
 //
 //                if (selectedContent > -1) {
-//                    createIntent.putExtra(IntentNames.COURSE, localCourses.get(selectedContent));
 //                    startActivity(createIntent);
 //                } else {
 //                    ();

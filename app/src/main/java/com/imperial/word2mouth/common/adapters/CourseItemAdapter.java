@@ -85,6 +85,7 @@ public class CourseItemAdapter extends RecyclerView.Adapter<CourseItemAdapter.Vi
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+
                 }
             });
             photoThumbnail = v.findViewById(R.id.courseThumbnailButton);

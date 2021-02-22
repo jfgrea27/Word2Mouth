@@ -41,7 +41,7 @@ public class FileSystemHelper {
         File courseMetaDataFile = createFile(courseRootFile, FileSystemConstants.metaFile);
         courseItem.setCourseJSONMetaDataPath(courseMetaDataFile.getAbsolutePath());
         // Write to JSON meta file
-        String jsonMetaData = JSONHelper.prepareMetaDataCourseCreation(courseItem);
+        String jsonMetaData = JSONHelper.prepareMetadataCourse(courseItem).toString();
         writeTextToFile(courseMetaDataFile, jsonMetaData);
         // Create Image Thumbnail file
         File courseImageThumbnailFile = createFile(courseRootFile, FileSystemConstants.photoThumbnail);
@@ -67,7 +67,7 @@ public class FileSystemHelper {
         // Creating JSON meta file
         File lectureMetaDataFile = createFile(lectureRootFile, FileSystemConstants.metaFile);
         // Write to JSON meta file
-        String jsonMetaData = JSONHelper.prepareMetaDataLectureCreation(lectureItem);
+        String jsonMetaData = JSONHelper.prepareMetaDataLectureCreation(lectureItem).toString();
         writeTextToFile(lectureMetaDataFile, jsonMetaData);
         // Create Image Thumbnail file
         File courseImageThumbnailFile = createFile(lectureRootFile, FileSystemConstants.photoThumbnail);
