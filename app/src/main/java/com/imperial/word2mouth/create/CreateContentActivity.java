@@ -73,15 +73,13 @@ public class CreateContentActivity extends AppCompatActivity {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void configureUI() {
-        this.deleteButton = findViewById(R.id.delete_button);
-        this.deleteButton.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-
-        this.createButton = findViewById(R.id.create_button);
-
-        this.courseListView = findViewById(R.id.recycleCourseView);
-
-        configureOnClick();
+        configureCreateButton();
         configureRecycleView();
+    }
+
+    private void configureCreateButton() {
+        createButton = findViewById(R.id.create_button);
+        createButton.setOnClickListener(v -> dialogCourseCreation());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -107,41 +105,6 @@ public class CreateContentActivity extends AppCompatActivity {
         }
         return courseItems;
     }
-
-
-
-    private void configureOnClick() {
-        this.createButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-////                Intent createIntent = new Intent(getApplicationContext(), TeachOfflineCourseSummary.class);
-//
-//                if (selectedContent > -1) {
-//                    startActivity(createIntent);
-//                } else {
-//                    ();
-////                    CourseItem newCourse = new CourseItem(courseName, courseLanguage, courseTopic);
-////                    createIntent.putExtra(IntentNames.COURSE, newCourse);
-//                }
-//                startActivity(createIntent);
-                dialogCourseCreation();
-            }
-        });
-        this.deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(CreateContentActivity.this,
-                        "Delete content",
-                        Toast.LENGTH_LONG);
-            }
-        });
-    }
-
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Pop Up Dialogs
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-
 
     private void dialogCourseCreation() {
 
@@ -178,28 +141,15 @@ public class CreateContentActivity extends AppCompatActivity {
 
     private void intentToCreateCourseAndStartActivity() {
         Intent createIntent = new Intent(getApplicationContext(), CourseSummaryCreateActivity.class);
-
-
         createIntent.putExtra(IntentNames.COURSE, (Parcelable) this.courseItem);
         startActivity(createIntent);
-
-        // TODO Complete this when you have lectures
-//        if (courseNumber > -1) {
-//            createIntent.putExtra(IntentNames.COURSE, localCourses.get(courseNumber));
-//            startActivity(createIntent);
-//        } else {
-//            createIntent.putExtra(IntentNames.COURSE, newCourse);
-//            startActivity(createIntent);
-//        }
-
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Text To Speech
     ////////////////////////////////////////////////////////////////////////////////////////////////
     private void configureTTS() {
-        this.textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
+        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
             @Override
             public void onInit(int status) {
                 if (status == TextToSpeech.SUCCESS) {
@@ -221,18 +171,7 @@ public class CreateContentActivity extends AppCompatActivity {
     }
 
     private void configureOnLongClick() {
-        this.deleteButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                CreateContentActivity.this.textToSpeech.speak(
-                        // TODO Check whether text TTS suitable
-                        getString(R.string.delete),
-                        TextToSpeech.QUEUE_FLUSH,
-                        null);
-                return true;
-            }
-        });
-        this.createButton.setOnLongClickListener(new View.OnLongClickListener() {
+        createButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 CreateContentActivity.this.textToSpeech.speak(
@@ -244,18 +183,4 @@ public class CreateContentActivity extends AppCompatActivity {
             }
         });
     }
-
-
-
-//    public void createCourse() {
-//        courseDirectory = FileHandler.createDirectoryForCourseAndReturnIt(courseName, getView().getContext());
-//        coursePath = courseDirectory.getPath();
-//        FileHandler.createDirectoryAndReturnIt(courseDirectory.getPath(), FileHandler.META);
-//        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null, selectedLanguage, FileHandler.LANGUAGE_SELECTION);
-//        FileHandler.createFileForSlideContentAndReturnIt(coursePath + DirectoryConstants.meta , null, null,selectedCategory, FileHandler.CATEGORY_SELECTION);
-//        intentToCreateCourseAndStartActivity();
-//    }
-
-
-
 }

@@ -6,21 +6,6 @@
     android:layout_height="match_parent">
 
 
-
-    <ImageButton
-        android:id="@+id/delete_button"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:backgroundTint="@color/colorWhite"
-        android:scaleType="fitCenter"
-        app:layout_constraintBottom_toTopOf="@+id/text_delete_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/create_button"
-        app:srcCompat="@drawable/ic_delete"
-        tools:targetApi="lollipop"
-        tools:ignore="ContentDescription" />
-
     <ImageButton
         android:id="@+id/create_button"
         android:layout_width="100dp"
@@ -28,12 +13,11 @@
         android:backgroundTint="@color/colorWhite"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toTopOf="@+id/text_create_button"
-        app:layout_constraintEnd_toStartOf="@+id/delete_button"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_teach_black"
-        tools:targetApi="lollipop"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription"
+        tools:targetApi="lollipop" />
 
     <TextView
         android:id="@+id/text_create_button"
@@ -43,15 +27,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/create_button"
         app:layout_constraintStart_toStartOf="@+id/create_button" />
-
-    <TextView
-        android:id="@+id/text_delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/delete"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/delete_button"
-        app:layout_constraintStart_toStartOf="@+id/delete_button" />
 
     <TextView
         android:id="@+id/create_menu"

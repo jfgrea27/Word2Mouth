@@ -1,4 +1,4 @@
-package com.imperial.word2mouth;
+package com.imperial.word2mouth.helpers;
 
 import com.google.gson.JsonParseException;
 import com.imperial.word2mouth.helpers.JSONHelper;

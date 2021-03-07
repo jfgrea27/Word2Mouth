@@ -20,6 +20,7 @@ import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.common.Categories;
 import com.imperial.word2mouth.common.Languages;
 import com.imperial.word2mouth.create.CourseSummaryCreateActivity;
+import com.imperial.word2mouth.helpers.FileSystemHelper;
 import com.imperial.word2mouth.model.CourseItem;
 
 import java.io.File;
@@ -66,6 +67,20 @@ public class CourseItemAdapter extends RecyclerView.Adapter<CourseItemAdapter.Vi
                 }
             }
         });
+
+        holder.getDeleteCourseItem().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int newPosition = holder.getAdapterPosition();
+                File courseItem = new File(courseItems.get(position).getCoursePath());
+                FileSystemHelper.deleteRecursive(courseItem);
+                courseItems.remove(position);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(newPosition, courseItems.size());
+
+
+            }
+        });
     }
 
     @Override
@@ -73,19 +88,20 @@ public class CourseItemAdapter extends RecyclerView.Adapter<CourseItemAdapter.Vi
         return courseItems.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public class ViewHolder extends RecyclerView.ViewHolder {
         private final TextView courseName;
         private final ImageButton photoThumbnail;
         private final ImageButton soundThumbnail;
         private final ImageView languageImage;
         private final ImageView categoryImage;
+        private final ImageButton deleteCourseItem;
 
         public ViewHolder(View v) {
             super(v);
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    Toast.makeText(CourseItemAdapter.this.activity.getApplicationContext(), "Testing", Toast.LENGTH_SHORT);
                 }
             });
             photoThumbnail = v.findViewById(R.id.courseThumbnailButton);
@@ -93,7 +109,7 @@ public class CourseItemAdapter extends RecyclerView.Adapter<CourseItemAdapter.Vi
             languageImage = v.findViewById(R.id.languageImage);
             categoryImage = v.findViewById(R.id.categoryImage);
             courseName = v.findViewById(R.id.courseTitle);
-
+            deleteCourseItem = v.findViewById(R.id.delete_button);
         }
 
 
@@ -117,6 +133,7 @@ public class CourseItemAdapter extends RecyclerView.Adapter<CourseItemAdapter.Vi
             return categoryImage;
         }
 
+        public ImageButton getDeleteCourseItem() { return  deleteCourseItem; }
 
     }
 
