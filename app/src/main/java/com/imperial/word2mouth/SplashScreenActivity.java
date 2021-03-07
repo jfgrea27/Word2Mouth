@@ -11,6 +11,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
+import com.imperial.word2mouth.common.tags.AppCodes;
+
 public class SplashScreenActivity extends AppCompatActivity {
     //////////////////////////////////////////////////////////////////////////////////////////////
     private boolean hasReadWriteStorageAccess = false;

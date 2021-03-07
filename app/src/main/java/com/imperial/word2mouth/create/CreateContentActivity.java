@@ -10,7 +10,6 @@ import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.speech.tts.TextToSpeech;
 import android.widget.ImageButton;
 
 import com.imperial.word2mouth.R;
@@ -21,7 +20,7 @@ import com.imperial.word2mouth.helpers.CourseLectureItemBuilder;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.helpers.FileSystemHelper;
 import com.imperial.word2mouth.model.CourseItem;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 
 import org.json.JSONException;
 
@@ -29,16 +28,13 @@ import java.util.ArrayList;
 
 public class CreateContentActivity extends AppCompatActivity {
 
-    /////////////////////// UI //////////////////////
+    /////////////////////// Create Button //////////////////////
     private ImageButton createButton;
-    private ImageButton deleteButton;
-
 
     /////////////////////// TTS //////////////////////
-    private TextToSpeech textToSpeech;
+    private SpeakIcon textToSpeech;
 
-
-    /////////////////////// ListView //////////////////////
+    /////////////////////// RecycleView  //////////////////////
     private int selectedContent = -1;
     private RecyclerView courseRecycleView;
     private CourseItemAdapter courseItemAdapter;
@@ -60,7 +56,9 @@ public class CreateContentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_create_content);
 
-        configureUI();
+        configureCreateButton();
+        configureRecycleView();
+
         configureTTS();
     }
 
@@ -71,25 +69,14 @@ public class CreateContentActivity extends AppCompatActivity {
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Configure UI
+    // Create Button
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    @RequiresApi(api = Build.VERSION_CODES.O)
-    private void configureUI() {
-        configureCreateButton();
-        configureRecycleView();
-    }
-
-    // Create New Course
     private void configureCreateButton() {
         createButton = findViewById(R.id.create_button);
         createButton.setOnClickListener(v -> dialogCourseCreation());
         // TTS
         createButton.setOnLongClickListener(v -> {
-            CreateContentActivity.this.textToSpeech.speak(
-                    // TODO Check whether text TTS suitable
-                    getString(R.string.create_button),
-                    TextToSpeech.QUEUE_FLUSH,
-                    null);
+            CreateContentActivity.this.textToSpeech.speak(getString(R.string.create_button));
             return true;
         });
     }
@@ -112,14 +99,17 @@ public class CreateContentActivity extends AppCompatActivity {
         this.courseItem = courseItem;
         intentToCourseSummaryActivity();
     }
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Intent to CourseSummaryActivity
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     private void intentToCourseSummaryActivity() {
         Intent createIntent = new Intent(getApplicationContext(), CourseSummaryCreateActivity.class);
         createIntent.putExtra(IntentNames.COURSE, (Parcelable) this.courseItem);
         startActivity(createIntent);
     }
-
-    // RecycleView
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Course Items RecycleView
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void configureRecycleView() {
         courseRecycleView = findViewById(R.id.recycleCourseView);
@@ -144,10 +134,6 @@ public class CreateContentActivity extends AppCompatActivity {
         return courseItems;
     }
 
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Model - Used in Dialogs
-    ///////////////////////////////////////////////////////////////////////////////////////////////
     public void setCourseLanguage(String courseLanguage) {
         this.courseLanguage = courseLanguage;
     }
@@ -164,7 +150,7 @@ public class CreateContentActivity extends AppCompatActivity {
     // Text To Speech
     ////////////////////////////////////////////////////////////////////////////////////////////////
     private void configureTTS() {
-        textToSpeech = SpeakIcon.setUpTTS(this);
+        textToSpeech = new SpeakIcon(this);
     }
 
 }

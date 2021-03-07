@@ -29,10 +29,10 @@ import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterLectureOnline;
-import com.imperial.word2mouth.create.AudioRecorder;
+import com.imperial.word2mouth.common.audio.AudioRecorder;
 
 import java.io.File;
 import java.io.IOException;

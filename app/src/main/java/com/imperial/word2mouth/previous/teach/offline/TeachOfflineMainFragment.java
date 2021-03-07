@@ -36,7 +36,7 @@ import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOfflin
 import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.previous.teach.TeachActivityMain;
 import com.imperial.word2mouth.previous.teach.offline.upload.UploadProcedure;
 

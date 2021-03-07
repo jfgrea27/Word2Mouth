@@ -31,7 +31,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.main.LearnActivityMain;
 import com.imperial.word2mouth.previous.main.online.teacher.Teacher;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.previous.shared.StringEditor;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOnline;
 import com.imperial.word2mouth.previous.shared.TopicItem;

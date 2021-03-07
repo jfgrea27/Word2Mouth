@@ -23,7 +23,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.previous.teach.online.courseData.CourseTrackingData;
 import com.imperial.word2mouth.previous.teach.online.lectureData.LectureTrackingData;
 import com.jjoe64.graphview.DefaultLabelFormatter;

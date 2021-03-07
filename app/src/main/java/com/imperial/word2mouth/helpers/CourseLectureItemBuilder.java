@@ -6,23 +6,22 @@ import android.os.Build;
 import androidx.annotation.RequiresApi;
 
 import com.imperial.word2mouth.model.CourseItem;
+import com.imperial.word2mouth.model.LectureItem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.UUID;
 
 public class CourseLectureItemBuilder {
 
 
     @RequiresApi(api = Build.VERSION_CODES.O)
-    public static ArrayList<CourseItem> getCourseItemFromDirectory(String parentStringDirectory, Context context) throws JSONException {
+    public static ArrayList<CourseItem> getCourseItemFromDirectory(String courseDirectoryString, Context context) throws JSONException {
 
         ArrayList<CourseItem> courseItems = new ArrayList<>();
-        ArrayList<JSONObject> jsonCourses = FileSystemHelper.getJSON(parentStringDirectory, context);
+        ArrayList<JSONObject> jsonCourses = FileSystemHelper.getCourseJSON(courseDirectoryString, context);
 
         for (JSONObject jsonCourse : jsonCourses) {
 
@@ -43,4 +42,25 @@ public class CourseLectureItemBuilder {
         return courseItems;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public static ArrayList<LectureItem> getLectureItemsFromCourseDirectory(CourseItem courseItem, Context context) throws JSONException {
+        String lectureDirectoryString = courseItem.getCourseLecturePath();
+        ArrayList<LectureItem> lectureItems = new ArrayList<>();
+        ArrayList<JSONObject> jsonLectures=  FileSystemHelper.getLectureJSON(lectureDirectoryString, context);
+
+        for (JSONObject jsonLecture : jsonLectures) {
+
+            String lecture_uuid = jsonLecture.getString("lecture-uuid");
+            String lecture_name = jsonLecture.getString("lecture-name");
+
+            LectureItem lectureItem = new LectureItem(courseItem, lecture_name);
+            lectureItem.setLecturePath(String.valueOf(Paths.get(lectureDirectoryString, lecture_uuid)));
+
+            lectureItem.setSlidePath(Paths.get(lectureDirectoryString, FileSystemConstants.slides).toString());
+            lectureItem.setLectureAudioThumbnailPath(Paths.get(lectureDirectoryString, FileSystemConstants.audioThumbnail).toString());
+            lectureItem.setLectureImageThumbnailPath(Paths.get(lectureDirectoryString, FileSystemConstants.photoThumbnail).toString());
+            lectureItems.add(lectureItem);
+        }
+        return lectureItems;
+    }
 }

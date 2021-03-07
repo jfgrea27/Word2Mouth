@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.create;
+package com.imperial.word2mouth.common.audio;
 
 import android.media.MediaRecorder;
 

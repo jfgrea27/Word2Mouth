@@ -30,35 +30,14 @@
             android:layout_height="60dp"
             android:background="@color/colorWhite"
             android:scaleType="fitXY"
-            app:layout_constraintBottom_toBottomOf="@+id/categoryImage"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.615"
             app:layout_constraintStart_toEndOf="@+id/slideTitle"
-            app:layout_constraintTop_toTopOf="@+id/languageImage"
-            app:layout_constraintVertical_bias="0.4"
+            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/ic_speak">
 
         </ImageButton>
-
-        <ImageView
-            android:id="@+id/languageImage"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            app:layout_constraintBottom_toTopOf="@+id/categoryImage"
-            app:layout_constraintEnd_toStartOf="@+id/courseSoundThumbnailButton"
-            app:layout_constraintHorizontal_bias="0.879"
-            app:layout_constraintStart_toEndOf="@+id/slideTitle"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageView
-            android:id="@+id/categoryImage"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/courseSoundThumbnailButton"
-            app:layout_constraintHorizontal_bias="0.879"
-            app:layout_constraintStart_toEndOf="@+id/slideTitle"
-            app:layout_constraintTop_toBottomOf="@+id/languageImage" />
 
         <TextView
             android:id="@+id/slideTitle"

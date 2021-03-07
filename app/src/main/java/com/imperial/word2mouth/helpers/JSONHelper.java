@@ -33,6 +33,8 @@ public class JSONHelper {
         try {
             jsonLectureMetaData.put("course-uuid", lectureItem.getCourseItem().getUuidCourse().toString());
             jsonLectureMetaData.put("lecture-uuid", lectureItem.getUuidLecture().toString());
+            jsonLectureMetaData.put("lecture-name", lectureItem.getLectureName());
+
             // TODO add firebase data here
         } catch (JSONException e) {
             e.printStackTrace();

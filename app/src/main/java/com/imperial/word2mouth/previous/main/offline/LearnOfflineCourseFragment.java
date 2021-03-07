@@ -27,7 +27,7 @@ import android.widget.Toast;
 
 import com.imperial.word2mouth.previous.main.LearnActivityMain;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.main.offline.share.bluetooth.ShareBluetoothActivity;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOffline;

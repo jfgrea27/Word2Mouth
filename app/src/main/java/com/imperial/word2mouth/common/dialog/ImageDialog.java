@@ -1,8 +1,6 @@
 package com.imperial.word2mouth.common.dialog;//        configureCourseName();
 
 
-import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,9 +13,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDialogFragment;
-import androidx.fragment.app.DialogFragment;
 
-import com.imperial.word2mouth.AppCodes;
+import com.imperial.word2mouth.common.tags.AppCodes;
 import com.imperial.word2mouth.R;
 
 public class ImageDialog extends AppCompatDialogFragment {

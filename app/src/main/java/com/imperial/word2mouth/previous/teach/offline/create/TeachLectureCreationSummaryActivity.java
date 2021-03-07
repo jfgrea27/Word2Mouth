@@ -27,12 +27,12 @@ import android.widget.Toast;
 
 import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterSlideName;
-import com.imperial.word2mouth.create.AudioRecorder;
+import com.imperial.word2mouth.common.audio.AudioRecorder;
 import com.imperial.word2mouth.previous.teach.offline.create.video.ImageDialog;
 
 import org.apache.commons.io.FileUtils;

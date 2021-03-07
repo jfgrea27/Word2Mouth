@@ -1,4 +1,4 @@
-package com.imperial.word2mouth;
+package com.imperial.word2mouth.common.tags;
 
 public class IntentNames {
 

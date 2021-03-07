@@ -15,7 +15,7 @@ import android.widget.VideoView;
 
 import com.imperial.word2mouth.previous.main.offline.tracker.LectureTracker;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
 import com.imperial.word2mouth.previous.shared.FileHandler;

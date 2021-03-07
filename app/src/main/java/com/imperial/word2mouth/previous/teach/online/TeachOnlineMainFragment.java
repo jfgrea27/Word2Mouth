@@ -36,7 +36,7 @@ import com.google.firebase.storage.ListResult;
 import com.google.firebase.storage.StorageReference;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterCourseOnline;
 import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.previous.teach.TeachActivityMain;

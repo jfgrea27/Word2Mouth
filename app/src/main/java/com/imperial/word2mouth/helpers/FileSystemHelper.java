@@ -80,8 +80,9 @@ public class FileSystemHelper {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // GET JSON
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    public static ArrayList<JSONObject> getJSON(String parentStringDirectory, Context context) throws JSONException {
+    public static ArrayList<JSONObject> getCourseJSON(String parentStringDirectory, Context context) throws JSONException {
         File parentDirectory = new File(context.getExternalFilesDir(null), parentStringDirectory);
+
         ArrayList<JSONObject> jsonObjects = new ArrayList<>();
         File[] files = parentDirectory.listFiles();
         for (File file: files) {
@@ -91,6 +92,20 @@ public class FileSystemHelper {
         }
         return jsonObjects;
     }
+
+    public static ArrayList<JSONObject> getLectureJSON(String parentStringDirectory, Context context) throws JSONException {
+        File parentDirectory = new File(parentStringDirectory);
+
+        ArrayList<JSONObject> jsonObjects = new ArrayList<>();
+        File[] files = parentDirectory.listFiles();
+        for (File file: files) {
+            File jsonFile = new File(file, FileSystemConstants.metaFile);
+            JSONObject courseJSON = getJSONFromString(readFile(jsonFile));
+            jsonObjects.add(courseJSON);
+        }
+        return jsonObjects;
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Helpers

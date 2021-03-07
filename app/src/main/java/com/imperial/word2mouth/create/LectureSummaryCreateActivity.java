@@ -1,8 +1,6 @@
 package com.imperial.word2mouth.create;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -11,7 +9,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -19,17 +16,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.imperial.word2mouth.common.tags.AppCodes;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.common.adapters.SlideItemAdapter;
+import com.imperial.word2mouth.common.audio.AudioRecorder;
+import com.imperial.word2mouth.common.tts.SpeakIcon;
+import com.imperial.word2mouth.model.LectureItem;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterSlideName;
 import com.imperial.word2mouth.previous.teach.offline.create.TeachLectureCreationSlideActivity;
@@ -42,25 +43,31 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Locale;
 import java.util.UUID;
 
 public class LectureSummaryCreateActivity extends AppCompatActivity implements ImageDialog.OnInputListener  {
 
-    // Permissions
-    private final int CAMERA_PERMISSION = 1;
-    private final int AUDIO_RECORDING_PERMISSION = 2;
-    private final int READ_WRITE_PERMISSION = 3;
 
-    private boolean hasInternetAccess = false;
-    private boolean hasReadWriteStorageAccess = false;
-    private boolean hasAudioRecordingPermission = false;
-    private boolean hasCameraPermission = false;
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    // Data Members
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////// Create Buttons //////////////////////
+    private ImageButton createButton;
+
+    /////////////////////// TTS //////////////////////
+    private SpeakIcon textToSpeech;
+
+    /////////////////////// RecycleView  //////////////////////
+    private int selectedContent = -1;
+    private RecyclerView slideRecycleView;
+    private SlideItemAdapter slideItemAdapter;
+    private ArrayList<LectureItem> lectureItems;
 
 
-    // Camera Choice
-    public final int CAMERA_ROLL_SELECTION = 0;
-    public final int GALLERY_SELECTION = 1;
+    //////////////////Model////////////////////////////
+    // Extras
+    private LectureItem lectureItem;
+
 
     // Thumbnail Image
     private ImageButton thumbnail = null;
@@ -107,7 +114,6 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
     private TopicItem topicItem;
     private String lectureBluetoothUUID;
     private String courseBluetoothUUID;
-    private TextToSpeech textToSpeech;
     private boolean recording = false;
 
     @Override
@@ -116,42 +122,52 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
         setContentView(R.layout.activity_teach_lecture_summary);
 
         // get Intents
-        getIntents();
-
-//
-//        // Permissions
-//        getPermissions();
-//
-//        if (hasReadWriteStorageAccess) {
-//            fileCreation();
-//
-//            // List of Slides
+        getExtras();
 //            configureListViewSlides();
-//            // Create Button
-//            configureCreateButton();
-//            // Delete
 //            configureDeleteButton();
-//            // Name
 //            configureLectureName();
-//            // Thumbnail
 //            configureLectureThumbnail();
-//            // Audio
 //            configureAudio();
-//
-//            configureTextToSpeech();
+
+//            configureTTS();
 //            configureLongClicks();
-//
-//        } else {
-//            finish();
-//        }
-    }
-
-    private void getIntents() {
-        lectureName = (String) getIntent().getExtras().get(IntentNames.LECTURE_NAME);
-        lecturePath = (String) getIntent().getExtras().get(IntentNames.LECTURE_PATH);
-        topicItem = (TopicItem) getIntent().getExtras().get(IntentNames.COURSE);
 
     }
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Get Extras
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    private void getExtras() {
+        lectureItem = (LectureItem) getIntent().getExtras().get(IntentNames.LECTURE);
+
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Create Button
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    private void configureCreateButton() {
+        create = findViewById(R.id.edit_button);
+        create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveMetaData();
+
+                Intent createEditIntent = new Intent(LectureSummaryCreateActivity.this, TeachLectureCreationSlideActivity.class);
+                // starts at 0
+                if (slideNumber > -1) {
+                    createEditIntent.putExtra("slide number", slideNumber);
+                } else {
+                    createEditIntent.putExtra("slide number", 0);
+
+                }
+                // meta not included
+                createEditIntent.putExtra(IntentNames.COURSE_PATH, lecturePath);
+                createEditIntent.putExtra("number of slides", numberOfSlides);
+                startActivity(createEditIntent);
+            }
+        });
+    }
+
 
     private void fileCreation() {
 
@@ -195,58 +211,6 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
         super.onBackPressed();
         saveMetaData();
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Permissions
-
-    private void getPermissions() {
-        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED )) {
-            Toast.makeText(this, R.string.accessStorage, Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, READ_WRITE_PERMISSION);
-        } else{
-            hasReadWriteStorageAccess = true;
-        }
-
-        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED)) {
-            Toast.makeText(this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION);
-        } else{
-            hasCameraPermission = true;
-        }
-
-
-        if (!(ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED)){
-            Toast.makeText(this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, AUDIO_RECORDING_PERMISSION);
-        } else{
-            hasAudioRecordingPermission = true;
-        }
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == READ_WRITE_PERMISSION) {
-            if(permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED &&
-                    permissions[1].equals(Manifest.permission.READ_EXTERNAL_STORAGE) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                hasReadWriteStorageAccess = true;
-            }
-        }
-
-        if (requestCode == AUDIO_RECORDING_PERMISSION) {
-            if(permissions[0].equals(Manifest.permission.RECORD_AUDIO) && grantResults[0] == PackageManager.PERMISSION_GRANTED ) {
-                hasAudioRecordingPermission = true;
-            }
-        }
-
-        if (requestCode == CAMERA_PERMISSION) {
-            if(permissions[0].equals(Manifest.permission.CAMERA) && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                hasCameraPermission = true;
-            }
-        }
-    }
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // UI
@@ -329,24 +293,19 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
         audioButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (hasAudioRecordingPermission) {
-                    if (!recording) {
-                        Toast.makeText(LectureSummaryCreateActivity.this, R.string.startRecording, Toast.LENGTH_SHORT).show();
-                        audioButton.setColorFilter(Color.RED);
-                        recorder.startRecording(audioFile.getPath());
-                        recording = true;
-                    } else {
-                        Toast.makeText(LectureSummaryCreateActivity.this,  R.string.stopRecording, Toast.LENGTH_SHORT).show();
-                        recorder.stopRecording();
-                        audioButton.setColorFilter(Color.BLACK);
-                        audioUri = Uri.fromFile(audioFile);
-                        audioPreview.setVisibility(View.VISIBLE);
-                        recording = false;
-                    }
+                if (!recording) {
+                    Toast.makeText(LectureSummaryCreateActivity.this, R.string.startRecording, Toast.LENGTH_SHORT).show();
+                    audioButton.setColorFilter(Color.RED);
+                    recorder.startRecording(audioFile.getPath());
+                    recording = true;
                 } else {
-                    Toast.makeText(LectureSummaryCreateActivity.this, R.string.accesAudio, Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LectureSummaryCreateActivity.this,  R.string.stopRecording, Toast.LENGTH_SHORT).show();
+                    recorder.stopRecording();
+                    audioButton.setColorFilter(Color.BLACK);
+                    audioUri = Uri.fromFile(audioFile);
+                    audioPreview.setVisibility(View.VISIBLE);
+                    recording = false;
                 }
-
             }
         });
 
@@ -371,20 +330,17 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
     }
 
 
-    // Thumbnail
-    private void configureLectureThumbnail() {
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Photo Thumbnail
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    private void configurePhotoThumbnail() {
         thumbnail = findViewById(R.id.list_item_thumbnail);
 
         thumbnail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (hasCameraPermission) {
-                    ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL);
-                    imageDialog.show(getSupportFragmentManager(), "Video Dialog");
-                } else {
-                    Toast.makeText(LectureSummaryCreateActivity.this, R.string.accessCamera, Toast.LENGTH_SHORT).show();
-
-                }
+                ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL);
+                imageDialog.show(getSupportFragmentManager(), "Video Dialog");
             }
         });
     }
@@ -396,7 +352,7 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
 
         if (resultCode == RESULT_OK && data != null) {
             switch (requestCode) {
-                case GALLERY_SELECTION:
+                case AppCodes.GALLERY_SELECTION:
                     imageUri= data.getData();
                     if (imageUri != null) {
                         FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
@@ -404,7 +360,7 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
                     }
                     break;
 
-                case CAMERA_ROLL_SELECTION: {
+                case AppCodes.CAMERA_ROLL_SELECTION: {
                     Bitmap bitMapImage = null;
                     bitMapImage = (Bitmap) data.getExtras().get("data");
 
@@ -429,50 +385,27 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
             }
         }
     }
-
     @Override
     public void sendInput(int choice) {
         switch (choice) {
-            case GALLERY_SELECTION: {
+            case AppCodes.GALLERY_SELECTION: {
                 Intent galleryIntent = new Intent();
                 galleryIntent.setType("image/*");
                 galleryIntent.setAction(Intent.ACTION_OPEN_DOCUMENT);
-                startActivityForResult(Intent.createChooser(galleryIntent,"Select Image"), GALLERY_SELECTION);
+                startActivityForResult(Intent.createChooser(galleryIntent,"Select Image"), AppCodes.GALLERY_SELECTION);
                 break;
             }
-            case CAMERA_ROLL_SELECTION: {
+            case AppCodes.CAMERA_ROLL_SELECTION: {
                 Intent rollIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(rollIntent, CAMERA_ROLL_SELECTION);
+                startActivityForResult(rollIntent, AppCodes.CAMERA_ROLL_SELECTION);
                 break;
             }
         }
     }
 
-
     // Create Button
 
-    private void configureCreateButton() {
-        create = findViewById(R.id.edit_button);
-        create.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                saveMetaData();
 
-                Intent createEditIntent = new Intent(LectureSummaryCreateActivity.this, TeachLectureCreationSlideActivity.class);
-                // starts at 0
-                if (slideNumber > -1) {
-                    createEditIntent.putExtra("slide number", slideNumber);
-                } else {
-                    createEditIntent.putExtra("slide number", 0);
-
-                }
-                // meta not included
-                createEditIntent.putExtra(IntentNames.COURSE_PATH, lecturePath);
-                createEditIntent.putExtra("number of slides", numberOfSlides);
-                startActivity(createEditIntent);
-            }
-        });
-    }
 
 
     // Delete Button
@@ -549,54 +482,26 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
 
     // Saving Data for Course Selection
     private void saveMetaData() {
-        if (imageUri != null) {
-            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
-        }
-
-        if (audioUri != null) {
-            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), audioUri, getContentResolver(), null, AUDIO);
-        }
-
-        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, null, lectureName, TITLE);
+//        if (imageUri != null) {
+//            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), imageUri, getContentResolver(), null, IMAGE);
+//        }
+//
+//        if (audioUri != null) {
+//            FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), audioUri, getContentResolver(), null, AUDIO);
+//        }
+//
+//        FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, null, lectureName, TITLE);
 
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    protected void onDestroy() {
-        if (textToSpeech != null) {
-            textToSpeech.stop();
-            textToSpeech.shutdown();
-        }
-        super.onDestroy();
+    /////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void configureTTS() {
+        textToSpeech = new SpeakIcon(this);
     }
 
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    public void speak(String string) {
-        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
-    }
-
-    private void configureTextToSpeech() {
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = textToSpeech.setLanguage(Locale.getDefault());
-
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(LectureSummaryCreateActivity.this, "Language not supported", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(LectureSummaryCreateActivity.this, "Initialization failed", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -605,28 +510,21 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
         create.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if (!selectedSlide) {
-                   speak(getString(R.string.createSlide));
-                } else {
-                    speak(getString(R.string.editSlide));
-                }
+//                if (!selectedSlide) {
+//                   speak(getString(R.string.createSlide));
+//                } else {
+//                    speak(getString(R.string.editSlide));
+//                }
                 return true;
             }
         });
 
-        delete.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                speak(getString(R.string.delete));
-                return true;
-            }
-        });
 
 
         audioButton.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                speak(getString(R.string.recordWithMicrophone));
+//                speak(getString(R.string.recordWithMicrophone));
                 return true;
             }
         });
@@ -634,7 +532,7 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
         thumbnail.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                speak(getString(R.string.addPhotoThumbnail));
+//                speak(getString(R.string.addPhotoThumbnail));
                 return true;
             }
         });

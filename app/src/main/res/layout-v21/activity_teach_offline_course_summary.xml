@@ -11,19 +11,20 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:background="@color/colorAccent"
+        android:background="?attr/colorPrimary"
+        android:backgroundTint="@color/colorAccent"
         android:gravity="center"
         android:text="@string/course_summary"
         android:textAlignment="center"
         android:textColor="@android:color/white"
         android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:targetApi="lollipop">
 
     </TextView>
-
 
     <ImageButton
         android:id="@+id/list_item_thumbnail"
@@ -37,11 +38,10 @@
         android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="@+id/list_item_text"
         app:layout_constraintEnd_toStartOf="@+id/list_item_text"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/course_name"
-        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/ic_picture" />
+
 
     <TextView
         android:id="@+id/list_item_text"
@@ -52,15 +52,13 @@
         android:layout_toLeftOf="@+id/list_audio_button"
         android:layout_toEndOf="@id/list_item_thumbnail"
         android:layout_toRightOf="@id/list_item_thumbnail"
-        android:gravity="center_horizontal"
-        android:textAlignment="center"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/course_name" />
 
     <ImageButton
-        android:id="@+id/audio_button"
+        android:id="@+id/list_audio_button"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:layout_alignParentEnd="true"
@@ -74,38 +72,26 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/list_item_text"
         app:layout_constraintTop_toBottomOf="@+id/course_name"
-        app:srcCompat="@drawable/ic_speak" />
-
-
-    <TextView
-        android:id="@+id/slideTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:background="@color/colorAccent"
-        android:gravity="center"
-        android:text="Lectures Under this Course"
-        android:textAlignment="center"
-        android:textColor="@android:color/white"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@+id/list_item_text"
-        tools:targetApi="lollipop">
-
-    </TextView>
-
-
-    <ListView
-        android:id="@+id/lecture_list_view"
-        android:layout_width="match_parent"
-        android:layout_height="400dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/slideTitle">
-
-    </ListView>
+        app:srcCompat="@drawable/ic_microphone" />
 
     <ImageButton
-        android:id="@+id/lecture_summary_button"
+        android:id="@+id/course_audio_play"
+        android:layout_width="41dp"
+        android:layout_height="47dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_gravity="end"
+        android:background="@color/colorWhite"
+        android:contentDescription="@string/todo"
+        android:scaleType="fitCenter"
+        android:visibility="invisible"
+        app:layout_constraintEnd_toEndOf="@+id/list_audio_button"
+        app:layout_constraintStart_toStartOf="@+id/list_audio_button"
+        app:layout_constraintTop_toBottomOf="@+id/list_audio_button"
+        app:srcCompat="@drawable/ic_play_button_black" />
+
+    <ImageButton
+        android:id="@+id/upload_button"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:background="@android:color/transparent"
@@ -113,10 +99,39 @@
         android:paddingTop="25dp"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/delete_button"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/statistics"
-        app:srcCompat="@drawable/ic_teach_black">
+        app:layout_constraintStart_toEndOf="@+id/edit_button"
+        app:srcCompat="@drawable/upload">
+
+    </ImageButton>
+
+
+    <ProgressBar
+        android:id="@+id/progress_upload"
+        android:layout_width="68dp"
+        android:layout_height="74dp"
+        android:visibility="invisible"
+
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"></ProgressBar>
+
+
+    <ImageButton
+        android:id="@+id/edit_button"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="@string/todo"
+        android:paddingTop="25dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/upload_button"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/delete_button"
+        app:srcCompat="@drawable/ic_create">
 
     </ImageButton>
 
@@ -131,26 +146,34 @@
         android:paddingTop="25dp"
         android:scaleType="fitCenter"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/edit_button"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/lecture_summary_button"
+        app:layout_constraintStart_toStartOf="parent"
         app:srcCompat="@drawable/ic_delete">
 
     </ImageButton>
 
-
-    <ImageButton
-        android:id="@+id/statistics"
-        android:layout_width="85dp"
-        android:layout_height="85dp"
-        android:background="@color/colorWhite"
-        android:scaleType="fitXY"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/lecture_summary_button"
-        app:layout_constraintHorizontal_bias="0.5"
+    <ListView
+        android:id="@+id/lecture_list_view"
+        android:layout_width="match_parent"
+        android:layout_height="316dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:srcCompat="@drawable/ic_statistics">
+        app:layout_constraintTop_toBottomOf="@+id/textView">
 
-    </ImageButton>
+    </ListView>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:textAlignment="center"
+        android:backgroundTint="@color/fui_bgAnonymous"
+        android:text="Lecture Items"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/course_audio_play"
+        android:layout_gravity="center_horizontal" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

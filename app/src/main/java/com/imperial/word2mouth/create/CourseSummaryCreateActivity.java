@@ -3,65 +3,64 @@ package com.imperial.word2mouth.create;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.imperial.word2mouth.AppCodes;
+import com.imperial.word2mouth.common.tags.AppCodes;
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.common.adapters.LectureItemAdapter;
+import com.imperial.word2mouth.common.audio.AudioRecorder;
 import com.imperial.word2mouth.common.dialog.ImageDialog;
 import com.imperial.word2mouth.common.dialog.LectureNameDialog;
+import com.imperial.word2mouth.common.tts.SpeakIcon;
+import com.imperial.word2mouth.helpers.CourseLectureItemBuilder;
 import com.imperial.word2mouth.helpers.FileSystemHelper;
 import com.imperial.word2mouth.model.CourseItem;
 import com.imperial.word2mouth.model.LectureItem;
-import com.imperial.word2mouth.helpers.FileSystemConstants;
-import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.IntentNames;
-import com.imperial.word2mouth.previous.shared.PrevLectureItem;
-import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterLectureOffline;
-import com.imperial.word2mouth.previous.teach.offline.upload.UploadProcedure;
+import com.imperial.word2mouth.common.tags.IntentNames;
+import com.imperial.word2mouth.model.SlideItem;
+
+import org.json.JSONException;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class CourseSummaryCreateActivity extends AppCompatActivity implements ImageDialog.OnInputListener {
 
-    //////////////////////////////////////////////////////////////////////////////////////////////
-    // Extras
-    private CourseItem courseItem;
 
     //////////////////////////////////////////////////////////////////////////////////////////////
-    // UI
-    //////////////////////////////////////////////////////////////////////////////////////////////
+    // Data Members
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////// Create Buttons //////////////////////
+    private ImageButton createButton;
 
-    /////////// Image Thumbnail
-    // View
-    private ImageView thumbnail;
-    // Model
+    /////////////////////// TTS //////////////////////
+    private SpeakIcon textToSpeech;
+
+    /////////////////////// RecycleView  //////////////////////
+    private int selectedContent = -1;
+    private RecyclerView lectureRecycleView;
+    private LectureItemAdapter lectureItemAdapter;
+    private ArrayList<LectureItem> lectureItems;
+
+    //////////////////Image Thumbnail////////////////////////////
+    private ImageView photoThumbnail;
     private Uri imageUri = null;
 
-    //////// Audio Thumbnail
+    //////////////////Sound Thumbnail////////////////////////////
     // View
     private ImageButton audioPreview;
     private ImageButton audioButton;
@@ -73,86 +72,39 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
     private MediaPlayer player;
     private boolean recording = false;
 
+    //////////////////Course Title////////////////////////////
+    private TextView courseTitleView;
 
-    ////// Title Course
-    // View
-    private TextView courseNameView;
 
-    ////// List View of Lectures
-    // View
-    private ListView lecturesView;
-    // Model
-//    private ArrayList<LectureItem> localLectures;
-    private int lectureNumber = -1;
 
-    // Controller
-    private ArrayAdapterLectureOffline adapter;
-    private boolean selectedLecture = false;
-
-    /////// Delete Button
-    // View
-    private ImageButton delete;
-    // Controller
-
-    /////// Create Button
-    // View
-    private ImageButton create;
-    // Model
+    //////////////////Model////////////////////////////
+    // Extras
+    private CourseItem courseItem;
+    // Create Lecture
     private String lectureName;
-    // Controller
-
-    /////// Upload Button
-    // View
-    private ImageButton upload;
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    // Model
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // Firebase
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // TODO complete this when you get to it
-    private UploadProcedure uploadProcedure;
-    private String courseAuthorID;
-    private String courseLanguage;
-    private String courseCategory;
-    private PrevLectureItem prevLectureItem;
-    private String courseIdentification = "";
-    private boolean completedDatabase = false;
-    private boolean completedStorage = false;
-    private ProgressBar uploadProgress;
-    // Controller
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // TTS
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    private TextToSpeech textToSpeech;
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
-    // Model
-    ///////////////////////////////////////////////////////////////////////////////////////////
     private LectureItem lectureItem;
+
 
     //////////////////////////////////////////////////////////////////////////////////////////////
     // Activity Lifecycle
     ///////////////////////////////////////////////////////////////////////////////////////////////
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_teach_offline_course_summary);
+        setContentView(R.layout.activity_course_summary);
 
+
+        // TODO save thumbnail image in a different thread and display once it has been saved.
 
         getExtras();
 
-        // UI
-        //configureListViewLectures();
         configureCreateButton();
-//        configureDeleteButton();
-//        configureCourseName();
-        configureCourseThumbnail();
+        configureLectureRecycleView();
+        configureCourseName();
+        configurePhotoThumbnail();
         configureAudio();
-//        configureUploadButton();
-//
-//        // TTS
-//        configureTTS();
+        configureTTS();
     }
 
     @Override
@@ -164,147 +116,117 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        saveMetaData();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (textToSpeech != null) {
-            textToSpeech.stop();
-            textToSpeech.shutdown();
-        }
-        super.onDestroy();
-    }
-
-    // Saving Data for Course Selection
-    private void saveMetaData() {
-        if (imageUri != null) {
-            FileSystemHelper.saveImageVideoFile(courseItem.getCourseImageThumbnailPath(), imageUri, getContentResolver());
-        }
-
-        if (audioUri != null) {
-            FileSystemHelper.saveAudioFile(courseItem.getCourseAudioThumbnailPath(), audioUri, getContentResolver());
-        }
-
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Get Extras
     ////////////////////////////////////////////////////////////////////////////////////////////////
-
     private void getExtras() {
         courseItem = (CourseItem) getIntent().getParcelableExtra(IntentNames.COURSE);
     }
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    // Getters and Setters
-    /////////////////////////////////////////////////////////////////////////////////////////////////
-    public void setLectureName(String lectureName) {
-        this.lectureName = lectureName;
-    }
-    ////////////////////////////////////////////////////////////////////////////////////////////
-    // UI
-    /////////////////////////////////////////////////////////////////////////////////////////////
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Create Button
-
+    ///////////////////////////////////////////////////////////////////////////////////////////////
     private void configureCreateButton() {
-        create = findViewById(R.id.edit_button);
-        create.setOnClickListener(new View.OnClickListener() {
+        createButton = findViewById(R.id.create_button);
+        createButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveMetaData();
-
-                if (lectureNumber > -1) {
-                    //CourseSummaryCreateActivity.this.lectureItem = localLectures.get(lectureNumber);
-                    intentCreateEditLecture();
-                } else {
-                    dialogLectureName();
-                }
-
+                dialogLectureName();
+            }
+        });
+        // TTS
+        createButton.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                textToSpeech.speak(getString(R.string.createLecture));
+                return true;
             }
         });
 
     }
-
-    // Create New Lecture
     private void dialogLectureName() {
         LectureNameDialog lectureNameDialog = new LectureNameDialog(CourseSummaryCreateActivity.this);
         lectureNameDialog.show(getSupportFragmentManager(), getString(R.string.lecture_name));
     }
 
     public void createLecture() {
-        this.lectureItem = new LectureItem(this.courseItem, this.lectureName);
-        this.lectureItem= FileSystemHelper.createLectureFileSystem(lectureItem, getApplicationContext());
-        intentCreateEditLecture();
+        lectureItem = new LectureItem(courseItem, lectureName);
+        lectureItem = FileSystemHelper.createLectureFileSystem(lectureItem, getApplicationContext());
+        intentLectureSummaryCreateActivity();
     }
 
-    // Create/Edit Lecture
-    private void intentCreateEditLecture() {
+    public void enterLecture(LectureItem lectureItem) {
+        this.lectureItem = lectureItem;
+        intentLectureSummaryCreateActivity();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // Intent to LectureSummaryCreateActivity
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    private void intentLectureSummaryCreateActivity() {
         Intent createEditIntent = new Intent(CourseSummaryCreateActivity.this, LectureSummaryCreateActivity.class);
         createEditIntent.putExtra(IntentNames.LECTURE, lectureItem);
         startActivity(createEditIntent);
     }
 
-
-    // Pop Up Dialogs
-
-    private void fetchAndCreateInformationAboutCourse() {
-
-        // TODO Add audio file if person presses buttont to add one
-//        audioFile = FileHandler.createFileForSlideContentAndReturnIt(metaDirectory.getAbsolutePath(), null, getContentResolver(), null, FileHandler.AUDIO );
-        // TODO Implement JSON Reader metadata
+    public void setLectureName(String lectureName) {
+        this.lectureName = lectureName;
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Delete Button
-    private void configureDeleteButton() {
-        delete = findViewById(R.id.delete_button);
-//
-//        delete.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//
-//                if (selectedLecture) {
-//
-//                    String version = FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + FileSystemConstants.meta + FileSystemConstants.versionLecture);
-//                    File f = new File(getExternalFilesDir(null) + FileSystemConstants.cache + version + ".txt");
-//                    if (f.exists()) {
-//                        f.delete();
-//                    }
-//
-//                    FileHandler.deleteRecursive(new File (lectureItem.getLecturePath() + "/" + localLectures.get(lectureNumber).getLectureName()));
-//                    selectedLecture = false;
-//
-//                    delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-//                    delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-//                    adapter.remove(localLectures.get(lectureNumber));
-//                    adapter.notifyDataSetInvalidated();
-//                    adapter.notifyDataSetChanged();
-//                    lectureNumber = -1;
-//                }
-//            }
-//        });
-//
-//
-//        if (delete != null) {
-//            delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-//        }
-    }
-
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    //Image Thumbnail
+    // RecycleView
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void configureLectureRecycleView() {
+        lectureRecycleView = findViewById(R.id.recycleCourseView);
 
-    // Thumbnail
-    private void configureCourseThumbnail() {
-        thumbnail = findViewById(R.id.list_item_thumbnail);
+        lectureItems = getFileLectureItems();
+        lectureItemAdapter = new LectureItemAdapter(lectureItems, this);
 
-        thumbnail.setOnClickListener(new View.OnClickListener() {
+        lectureRecycleView.setAdapter(lectureItemAdapter);
+        lectureRecycleView.setLayoutManager(new LinearLayoutManager(CourseSummaryCreateActivity.this));
+        lectureRecycleView.scrollToPosition(0);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private ArrayList<LectureItem> getFileLectureItems() {
+        ArrayList<LectureItem> lectureItems = new ArrayList<>();
+        try {
+            lectureItems = CourseLectureItemBuilder.getLectureItemsFromCourseDirectory(courseItem, getApplicationContext());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return lectureItems;
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Course Name
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    private void configureCourseName() {
+        courseTitleView = findViewById(R.id.list_item_text);
+        courseTitleView.setText(courseItem.getCourseName());
+        courseTitleView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(View v) {
-                ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL, CourseSummaryCreateActivity.this);
-                imageDialog.show(getSupportFragmentManager(), getString(R.string.thumbnail_selection));
+            public boolean onLongClick(View v) {
+                textToSpeech.speak(courseTitleView.getText().toString());
+                return true;
             }
+        });
+    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Photo Thumbnail
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    private void configurePhotoThumbnail() {
+        photoThumbnail = findViewById(R.id.list_item_thumbnail);
+
+        photoThumbnail.setImageURI(Uri.fromFile(new File(courseItem.getCourseImageThumbnailPath())));
+        photoThumbnail.setOnClickListener(v -> {
+            ImageDialog imageDialog = new ImageDialog(ImageDialog.THUMBNAIL, CourseSummaryCreateActivity.this);
+            imageDialog.show(getSupportFragmentManager(), getString(R.string.thumbnail_selection));
+        });
+        // TTS
+        photoThumbnail.setOnLongClickListener(v -> {
+            textToSpeech.speak(getString(R.string.addPhotoThumbnail));
+            return true;
         });
     }
 
@@ -314,27 +236,23 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
         super.onActivityResult(requestCode, resultCode, data);
 
         if (resultCode == RESULT_OK && data != null) {
-            Bitmap bitmapImage = null;
+            Uri imageUri = null;
             switch (requestCode) {
                 case AppCodes.GALLERY_SELECTION:
-                    try {
-                        bitmapImage = MediaStore.Images.Media.getBitmap(this.getContentResolver(), data.getData());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    imageUri = data.getData();
+                    FileSystemHelper.saveImageVideoFile(courseItem.getCourseImageThumbnailPath(), imageUri, getContentResolver());
+                    photoThumbnail.setImageURI(imageUri);
+
                     break;
 
                 case AppCodes.CAMERA_ROLL_SELECTION: {
-                    bitmapImage = (Bitmap) data.getExtras().get("data");
+                    Bitmap bitmapImage = (Bitmap) data.getExtras().get("data");
+                    FileSystemHelper.saveImageVideoFile(courseItem.getCourseImageThumbnailPath(),bitmapImage);
+                    photoThumbnail.setImageBitmap(bitmapImage);
                     break;
                 }
                 default:
                     throw new IllegalStateException("Unexpected value: " + requestCode);
-            }
-            if (bitmapImage != null) {
-                FileSystemHelper.saveImageVideoFile(courseItem.getCourseImageThumbnailPath(), bitmapImage);
-                imageUri = Uri.fromFile(new File(courseItem.getCourseImageThumbnailPath()));
-                thumbnail.setImageBitmap(bitmapImage);
             }
         }
     }
@@ -357,8 +275,8 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
         }
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    // Audio Button
-
+    // Sound Thumbnail
+    ////////////////////////////////////////////////////////////////////////////////////////////////
     private void configureAudio() {
         recorder = new AudioRecorder();
         // play button
@@ -369,17 +287,16 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
             @Override
             public void onClick(View v) {
                 if (!recording) {
-                    Toast.makeText(CourseSummaryCreateActivity.this, R.string.startRecording, Toast.LENGTH_SHORT).show();
                     audioButton.setColorFilter(Color.RED);
                     recorder.startRecording(audioFile.getPath());
                     recording = true;
                 } else {
-                    Toast.makeText(CourseSummaryCreateActivity.this, R.string.stopRecording, Toast.LENGTH_SHORT).show();
                     recorder.stopRecording();
                     audioButton.setColorFilter(Color.BLACK);
                     audioUri = Uri.fromFile(audioFile);
                     audioPreview.setVisibility(View.VISIBLE);
                     recording = false;
+                    FileSystemHelper.saveAudioFile(courseItem.getCourseAudioThumbnailPath(), audioUri, getContentResolver());
                 }
             }
         });
@@ -393,6 +310,16 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
                 }
             }
         });
+        // TTS
+        audioButton.setOnLongClickListener(v -> {
+            textToSpeech.speak(getString(R.string.recordWithMicrophone));
+            return true;
+        });
+
+        audioPreview.setOnLongClickListener(v -> {
+            // TODO add some TTS
+            return true;
+        });
 
         audioFile = new File(courseItem.getCourseAudioThumbnailPath());
         if (audioFile.length() != 0) {
@@ -402,100 +329,38 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
             audioPreview.setVisibility(View.INVISIBLE);
         }
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    // Text To Speech
+    ////////////////////////////////////////////////////////////////////////////////////////////////
+    private void configureTTS() {
+        textToSpeech = new SpeakIcon(this);
+    }
+
+    public void enterSlide(SlideItem slideItem) {
+        // TODO
+    }
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    // List of Lectures
-
-    private void configureListViewLectures() {
-        lecturesView = findViewById(R.id.lecture_list_view);
-
-//        localLectures = retrieveLocalLectures();
-//
-//        if (localLectures.size() > 0) {
-//            adapter = new ArrayAdapterLectureOffline(CourseSummaryCreateActivity.this, R.layout.list_lectures, localLectures);
-//            lecturesView.setAdapter(adapter);
-//        }
-//
-//        lecturesView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//
-//                for (int i = 0; i < adapter.getCount(); i++) {
-//                    View item = lecturesView.getChildAt(i);
-//                    if (item != null) {
-//                        item.setBackgroundColor(Color.WHITE);
-//                    }
-//                }
-//
-//
-//                if (selectedLecture) {
-//                    view.setBackgroundColor(Color.WHITE);
-//                    selectedLecture = false;
-//                    if (delete != null) {
-//                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-//                    }
-//                    if (upload != null) {
-//                        upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-//
-//                    }
-//                    lectureNumber = -1;
-//
-//
-//                } else {
-//                    selectedLecture = true;
-//                    lectureNumber = position;
-//                    prevLectureItem.setPath(localLectures.get(position).getLecturePath());
-//                    view.setBackgroundColor(Color.LTGRAY);
-//                    if (delete != null) {
-//                        delete.setColorFilter(null);
-//                    }
-//                    if (upload != null) {
-//                        upload.setColorFilter(null);
-//                    }
-//                }
-//            }
-//        });
-
-    }
-
-    private ArrayList<PrevLectureItem> retrieveLocalLectures() {
-
-        ArrayList<PrevLectureItem> prevLectureItems = new ArrayList<>();
-
-        File lectureDirectory = new File(courseItem.getCourseLecturePath());
-        File[] lectureItemsFiles = lectureDirectory.listFiles();
-        if (lectureItemsFiles != null) {
-
-            for (File f : lectureItemsFiles) {
-
-                String lectureName;
+    // TODO move this somewhere else? Discuss with Jake
 
 
-                // Title
-                lectureName = FileReaderHelper.readTextFromFile(f.getPath()+ FileSystemConstants.meta + FileSystemConstants.title);
-                PrevLectureItem item = new PrevLectureItem(courseItem.getCourseName(), lectureName);
-                item.setPath(f.getPath());
 
-                prevLectureItems.add(item);
-            }
-        }
-
-        return prevLectureItems;
-
-    }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////
-
-    // Title
-
-
-    private void configureCourseName() {
-        courseNameView = findViewById(R.id.list_item_text);
-        courseNameView.setText(courseItem.getCourseName());
-    }
-
-
+//    //////////////////Upload Button////////////////////////////
+//    private ImageButton upload;
+//    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+//    // Firebase - // TODO complet this when you get to it - Could be in the Share part
+//    private UploadProcedure uploadProcedure;
+//    private String courseAuthorID;
+//    private String courseLanguage;
+//    private String courseCategory;
+//    private PrevLectureItem prevLectureItem;
+//    private String courseIdentification = "";
+//    private boolean completedDatabase = false;
+//    private boolean completedStorage = false;
+//    private ProgressBar uploadProgress;
+    // TODO Discuss with Jake where we could implement the upload? Otherwise need to go to the other side of the app...
 
 
 
@@ -503,72 +368,72 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Upload Button
 
-    private void configureUploadButton() {
-        upload = findViewById(R.id.upload_button);
-
-        uploadProgress = findViewById(R.id.progress_upload);
-        uploadProgress.bringToFront();
-
-        upload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (selectedLecture) {
-                    if (user != null) {
-
-                        String authorID = FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + FileSystemConstants.meta + FileSystemConstants.author);
-
-                        if (user.getUid().equals(authorID) || authorID == "") {
-                            uploadCourse();
-                        } else {
-                            // TODO Think of a better way than Toast?
-                            Toast.makeText(CourseSummaryCreateActivity.this, R.string.creatingTeacherOnly, Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Toast.makeText(CourseSummaryCreateActivity.this, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
-                    }
-                }
-            }
-        });
-
-        upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-    }
-
-    //TODO Complete this method for Firebase (Methdos are comented below)
-
-    private void uploadCourse() {
-//        uploadProgress.setVisibility(View.VISIBLE);
+//    private void configureUploadButton() {
+//        upload = findViewById(R.id.upload_button);
+//
+//        uploadProgress = findViewById(R.id.progress_upload);
 //        uploadProgress.bringToFront();
 //
-//        setCourseAuthorIdentification();
-//        localLectures.get(lectureNumber).setLanguage(courseItem.getCourseLanguage());
-//        localLectures.get(lectureNumber).setCategory(courseItem.getCourseTopic());
-//        localLectures.get(lectureNumber).setLectureIdentification(getLectureIdentification());
-//        localLectures.get(lectureNumber).setBluetoothCourse(FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
-//        localLectures.get(lectureNumber).setBluetoothLecture(FileReaderHelper.readTextFromFile(lectureItem.getLecturePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
-//
-//        uploadProcedure = new UploadProcedure(courseItem, localLectures.get(lectureNumber), CourseSummaryCreateActivity.this);
-//
-//        uploadProcedure.setListener(new UploadProcedure.UploadListener() {
+//        upload.setOnClickListener(new View.OnClickListener() {
 //            @Override
-//            public void onDataLoadedInDatabase() {
-//                uploadDataBaseSuccessful();
-//            }
+//            public void onClick(View v) {
+//                if (selectedLecture) {
+//                    if (user != null) {
 //
-//            @Override
-//            public void onDataLoadedInStorage(String courseIdentification, String lectureIdentification) {
-//                setCourseIdentification(courseIdentification);
-//                setLectureIdentification(lectureIdentification);
-//                uploadStorageSuccessful();
-//            }
+//                        String authorID = FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + FileSystemConstants.meta + FileSystemConstants.author);
 //
-//            @Override
-//            public void onDataLoadedInStorageEntireCourse(String courseIdentification, String lectureIdentification, String lecturePath) {
-//
+//                        if (user.getUid().equals(authorID) || authorID == "") {
+//                            uploadCourse();
+//                        } else {
+//                            // TODO Think of a better way than Toast?
+//                            Toast.makeText(CourseSummaryCreateActivity.this, R.string.creatingTeacherOnly, Toast.LENGTH_SHORT).show();
+//                        }
+//                    } else {
+//                        Toast.makeText(CourseSummaryCreateActivity.this, R.string.mustCreateAccount, Toast.LENGTH_SHORT).show();
+//                    }
+//                }
 //            }
 //        });
 //
-//        uploadProcedure.uploadCourse();
-    }
+//        upload.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+//    }
+
+    //TODO Complete this method for Firebase (Methdos are comented below)
+//
+//    private void uploadCourse() {
+////        uploadProgress.setVisibility(View.VISIBLE);
+////        uploadProgress.bringToFront();
+////
+////        setCourseAuthorIdentification();
+////        localLectures.get(lectureNumber).setLanguage(courseItem.getCourseLanguage());
+////        localLectures.get(lectureNumber).setCategory(courseItem.getCourseTopic());
+////        localLectures.get(lectureNumber).setLectureIdentification(getLectureIdentification());
+////        localLectures.get(lectureNumber).setBluetoothCourse(FileReaderHelper.readTextFromFile(courseItem.getCoursePath() + DirectoryConstants.meta + DirectoryConstants.courseBluetooth));
+////        localLectures.get(lectureNumber).setBluetoothLecture(FileReaderHelper.readTextFromFile(lectureItem.getLecturePath() + DirectoryConstants.meta + DirectoryConstants.lectureBluetooth));
+////
+////        uploadProcedure = new UploadProcedure(courseItem, localLectures.get(lectureNumber), CourseSummaryCreateActivity.this);
+////
+////        uploadProcedure.setListener(new UploadProcedure.UploadListener() {
+////            @Override
+////            public void onDataLoadedInDatabase() {
+////                uploadDataBaseSuccessful();
+////            }
+////
+////            @Override
+////            public void onDataLoadedInStorage(String courseIdentification, String lectureIdentification) {
+////                setCourseIdentification(courseIdentification);
+////                setLectureIdentification(lectureIdentification);
+////                uploadStorageSuccessful();
+////            }
+////
+////            @Override
+////            public void onDataLoadedInStorageEntireCourse(String courseIdentification, String lectureIdentification, String lecturePath) {
+////
+////            }
+////        });
+////
+////        uploadProcedure.uploadCourse();
+//    }
 //    private String getLectureIdentification() {
 //        return FileReaderHelper.readTextFromFile(localLectures.get(lectureNumber).getLecturePath() + DirectoryConstants.meta + DirectoryConstants.lectureIdentifcation);
 //    }
@@ -618,126 +483,49 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
 //
 //    }
 
-    private boolean checkIsAuthorOfCourse() {
-//        File f = new File(coursePath + DirectoryConstants.meta + DirectoryConstants.author);
-//
-//        if (f.length() == 0) {
-//            return true;
-//        }
-//
-//        Scanner fileReader = null;
-//        try {
-//            fileReader = new Scanner(f);
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        }
-//        String s = fileReader.nextLine();
-//
-//        if (user.getUid().equals(s)) {
-//            return true;
-//        }
-//
+//    private boolean checkIsAuthorOfCourse() {
+////        File f = new File(coursePath + DirectoryConstants.meta + DirectoryConstants.author);
+////
+////        if (f.length() == 0) {
+////            return true;
+////        }
+////
+////        Scanner fileReader = null;
+////        try {
+////            fileReader = new Scanner(f);
+////        } catch (FileNotFoundException e) {
+////            e.printStackTrace();
+////        }
+////        String s = fileReader.nextLine();
+////
+////        if (user.getUid().equals(s)) {
+////            return true;
+////        }
+////
+////        return false;
 //        return false;
-        return false;
-    }
+//    }
 
-    private void uploadDataBaseSuccessful() {
-        completedDatabase = true;
-        uploadSuccessful();
-    }
-
-
-    private void uploadStorageSuccessful() {
-        completedStorage = true;
-        uploadSuccessful();
-
-    }
-
-    private void uploadSuccessful() {
-        if (completedDatabase && completedStorage) {
-            uploadProgress.setVisibility(View.GONE);
-            Toast.makeText(CourseSummaryCreateActivity.this, R.string.uploadSuccessful, Toast.LENGTH_SHORT).show();
-            upload.setEnabled(true);
-
-        }
-    }
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// TTS
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    public void speak(String string) {
-        textToSpeech.speak(string, TextToSpeech.QUEUE_FLUSH, null);
-    }
-
-    private void configureTTS() {
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = textToSpeech.setLanguage(Locale.getDefault());
-
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(CourseSummaryCreateActivity.this, R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(CourseSummaryCreateActivity.this, R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-        configureLongClicks();
-    }
-
-    public void configureLongClicks() {
-        delete.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                speak(getString(R.string.delete));
-                return true;
-            }
-        });
-
-        upload.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                speak(getString(R.string.uploadLesson));
-                return true;
-            }
-        });
-
-        create.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if (selectedLecture) {
-                    speak(getString(R.string.editLecture));
-                } else {
-                    speak(getString(R.string.createLecture));
-                }
-                return true;
-            }
-        });
-
-        audioButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                speak(getString(R.string.recordWithMicrophone));
-                return true;
-            }
-        });
-
-        thumbnail.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                speak(getString(R.string.addPhotoThumbnail));
-                return true;
-            }
-        });
-    }
-
+//    private void uploadDataBaseSuccessful() {
+//        completedDatabase = true;
+//        uploadSuccessful();
+//    }
+//
+//
+//    private void uploadStorageSuccessful() {
+//        completedStorage = true;
+//        uploadSuccessful();
+//
+//    }
+//
+//    private void uploadSuccessful() {
+//        if (completedDatabase && completedStorage) {
+//            uploadProgress.setVisibility(View.GONE);
+//            Toast.makeText(CourseSummaryCreateActivity.this, R.string.uploadSuccessful, Toast.LENGTH_SHORT).show();
+//            upload.setEnabled(true);
+//
+//        }
+//    }
+//
 
 }

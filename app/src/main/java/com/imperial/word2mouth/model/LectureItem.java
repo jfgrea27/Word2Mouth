@@ -36,8 +36,6 @@ public class LectureItem implements Parcelable {
         uuidLecture = UUID.randomUUID();
     }
 
-
-
     public static final Creator<LectureItem> CREATOR = new Creator<LectureItem>() {
         @Override
         public LectureItem createFromParcel(Parcel in) {
@@ -49,6 +47,10 @@ public class LectureItem implements Parcelable {
             return new LectureItem[size];
         }
     };
+
+    public String getLectureName() {return lectureName;}
+
+
 
     public String getLectureFirebaseAuthorID() {
         return lectureFirebaseAuthorID;
@@ -133,6 +135,9 @@ public class LectureItem implements Parcelable {
         lectureAudioThumbnailPath = in.readString();
         lectureFirebaseAuthorID = in.readString();
         lectureFirebaseLectureID = in.readString();
+    }
+
+    public void setLectureSlidesPath(String toString) {
     }
 }
 

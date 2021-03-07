@@ -38,11 +38,11 @@ import com.imperial.word2mouth.previous.shared.TopicItem;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
-import com.imperial.word2mouth.IntentNames;
+import com.imperial.word2mouth.common.tags.IntentNames;
 import com.imperial.word2mouth.previous.shared.PrevLectureItem;
 import com.imperial.word2mouth.previous.shared.adapters.ArrayAdapterLectureOffline;
 import com.imperial.word2mouth.previous.teach.offline.create.TeachLectureCreationSummaryActivity;
-import com.imperial.word2mouth.create.AudioRecorder;
+import com.imperial.word2mouth.common.audio.AudioRecorder;
 import com.imperial.word2mouth.previous.teach.offline.create.video.ImageDialog;
 import com.imperial.word2mouth.previous.teach.offline.upload.UploadProcedure;
 

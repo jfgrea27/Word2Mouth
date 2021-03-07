@@ -15,7 +15,7 @@ import java.util.Locale;
 public class SpeakIcon {
     private static TextToSpeech tts;
 
-    public static TextToSpeech setUpTTS(Activity activity) {
+    public SpeakIcon(Activity activity) {
         tts = new TextToSpeech(activity.getApplicationContext(), status -> {
             if (status == TextToSpeech.SUCCESS) {
                 int result = tts.setLanguage(Locale.getDefault());
@@ -30,6 +30,10 @@ public class SpeakIcon {
                         R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
             }
         });
-        return tts;
     }
+
+    public void speak(String string) {
+        tts.speak(string, TextToSpeech.QUEUE_FLUSH, null);
+    }
+
 }
