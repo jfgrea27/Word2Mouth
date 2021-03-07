@@ -17,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.imperial.word2mouth.R;
+import com.imperial.word2mouth.create.CreateContentActivity;
 import com.imperial.word2mouth.model.Categories;
 import com.imperial.word2mouth.model.Languages;
 import com.imperial.word2mouth.helpers.FileSystemHelper;
@@ -76,8 +77,6 @@ public class CourseItemAdapter extends RecyclerView.Adapter<CourseItemAdapter.Vi
                 courseItems.remove(position);
                 notifyItemRemoved(position);
                 notifyItemRangeChanged(newPosition, courseItems.size());
-
-
             }
         });
     }
@@ -100,7 +99,8 @@ public class CourseItemAdapter extends RecyclerView.Adapter<CourseItemAdapter.Vi
             v.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Toast.makeText(CourseItemAdapter.this.activity.getApplicationContext(), "Testing", Toast.LENGTH_SHORT);
+                    CreateContentActivity activity = (CreateContentActivity) CourseItemAdapter.this.activity;
+                    activity.enterCourse(courseItems.get(getAdapterPosition()));
                 }
             });
             photoThumbnail = v.findViewById(R.id.courseThumbnailButton);

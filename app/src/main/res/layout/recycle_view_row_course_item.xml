@@ -15,6 +15,9 @@
             android:id="@+id/courseThumbnailButton"
             android:layout_width="85dp"
             android:layout_height="85dp"
+            android:scaleType="fitCenter"
+            android:backgroundTint="@color/colorWhite"
+            app:srcCompat="@drawable/ic_picture"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">

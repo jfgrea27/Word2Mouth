@@ -11,9 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.speech.tts.TextToSpeech;
-import android.view.View;
 import android.widget.ImageButton;
-import android.widget.Toast;
 
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.common.dialog.CourseNameDialog;
@@ -28,7 +26,6 @@ import com.imperial.word2mouth.IntentNames;
 import org.json.JSONException;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class CreateContentActivity extends AppCompatActivity {
 
@@ -66,6 +63,13 @@ public class CreateContentActivity extends AppCompatActivity {
         configureUI();
         configureTTS();
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        courseItemAdapter.notifyDataSetChanged();
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Configure UI
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,11 +100,20 @@ public class CreateContentActivity extends AppCompatActivity {
         courseNameDialog.show(getSupportFragmentManager(), getString(R.string.course_name));
     }
     public void createCourse() {
-        this.courseItem = new CourseItem(this.courseName, this.courseLanguage, this.courseTopic);
-        this.courseItem = FileSystemHelper.createCourseFileSystem(courseItem, getApplicationContext());
-        intentToCreateCourseAndStartActivity();
+        courseItem = new CourseItem(this.courseName, this.courseLanguage, this.courseTopic);
+        courseItem = FileSystemHelper.createCourseFileSystem(courseItem, getApplicationContext());
+
+        // Updating the RecycleView
+        courseItems.add(this.courseItem);
+        intentToCourseSummaryActivity();
     }
-    private void intentToCreateCourseAndStartActivity() {
+
+    public void enterCourse(CourseItem courseItem) {
+        this.courseItem = courseItem;
+        intentToCourseSummaryActivity();
+    }
+
+    private void intentToCourseSummaryActivity() {
         Intent createIntent = new Intent(getApplicationContext(), CourseSummaryCreateActivity.class);
         createIntent.putExtra(IntentNames.COURSE, (Parcelable) this.courseItem);
         startActivity(createIntent);
@@ -133,10 +146,8 @@ public class CreateContentActivity extends AppCompatActivity {
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Model
+    // Model - Used in Dialogs
     ///////////////////////////////////////////////////////////////////////////////////////////////
-
-
     public void setCourseLanguage(String courseLanguage) {
         this.courseLanguage = courseLanguage;
     }
@@ -148,8 +159,6 @@ public class CreateContentActivity extends AppCompatActivity {
     public void setCourseName(String courseName) {
         this.courseName = courseName;
     }
-
-
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Text To Speech

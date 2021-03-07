@@ -95,7 +95,7 @@ public class FileSystemHelper {
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Helpers
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    private static File createFolder(File parent, String child) {
+    public static File createFolder(File parent, String child) {
         File file = new File(parent, child);
 
         if (!file.exists()) {
@@ -104,7 +104,7 @@ public class FileSystemHelper {
         return file;
     }
 
-    private static File createFile(File parent, String child) {
+    public static File createFile(File parent, String child) {
         File file = new File(parent, child);
 
         if (!file.exists()) {
