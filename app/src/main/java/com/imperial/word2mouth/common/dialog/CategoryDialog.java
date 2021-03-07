@@ -17,7 +17,7 @@ import com.google.common.collect.Lists;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.common.adapters.CategoryAdapter;
 import com.imperial.word2mouth.create.CreateContentActivity;
-import com.imperial.word2mouth.common.Categories;
+import com.imperial.word2mouth.model.Categories;
 
 import java.util.ArrayList;
 
@@ -51,26 +51,12 @@ public class CategoryDialog extends AppCompatDialogFragment {
                 CreateContentActivity createContentActivity = (CreateContentActivity) CategoryDialog.this.activity;
 
                 createContentActivity.setCourseTopic(categories.get(position));
-            }
-        });
-
-        // Set up the buttons
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                CreateContentActivity createContentActivity = (CreateContentActivity) CategoryDialog.this.activity;
+                CategoryDialog.this.dismiss();
 
                 createContentActivity.createCourse();
             }
         });
 
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
         return builder.create();
     }
 }

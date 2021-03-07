@@ -13,7 +13,7 @@ import androidx.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.common.Languages;
+import com.imperial.word2mouth.model.Languages;
 
 import java.util.ArrayList;
 

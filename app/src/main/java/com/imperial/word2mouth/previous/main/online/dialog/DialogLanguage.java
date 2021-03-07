@@ -4,7 +4,7 @@ import android.view.View;
 
 import androidx.fragment.app.Fragment;
 
-import com.imperial.word2mouth.common.Languages;
+import com.imperial.word2mouth.model.Languages;
 
 public class DialogLanguage {
 

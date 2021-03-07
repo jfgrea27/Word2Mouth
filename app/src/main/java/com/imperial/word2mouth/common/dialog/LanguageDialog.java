@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 
 import com.google.common.collect.Lists;
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.common.Languages;
+import com.imperial.word2mouth.model.Languages;
 import com.imperial.word2mouth.common.adapters.LanguageAdapter;
 import com.imperial.word2mouth.create.CreateContentActivity;
 
@@ -56,24 +56,12 @@ public class LanguageDialog extends AppCompatDialogFragment {
                 CreateContentActivity createContentActivity = (CreateContentActivity) LanguageDialog.this.activity;
 
                 createContentActivity.setCourseLanguage(languages.get(position));
-            }
-        });
-
-        builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
                 CategoryDialog categoryDialog = new CategoryDialog(LanguageDialog.this.activity);
                 categoryDialog.show(LanguageDialog.this.activity.getSupportFragmentManager(), getString(R.string.category_selection));
+                LanguageDialog.this.dismiss();
             }
         });
 
-        builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.cancel();
-            }
-        });
         return builder.create();
     }
 }

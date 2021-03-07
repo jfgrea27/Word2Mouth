@@ -1,4 +1,4 @@
-package com.imperial.word2mouth.common;
+package com.imperial.word2mouth.model;
 
 import com.imperial.word2mouth.R;
 

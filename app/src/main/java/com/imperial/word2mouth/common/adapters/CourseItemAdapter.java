@@ -17,9 +17,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.imperial.word2mouth.R;
-import com.imperial.word2mouth.common.Categories;
-import com.imperial.word2mouth.common.Languages;
-import com.imperial.word2mouth.create.CourseSummaryCreateActivity;
+import com.imperial.word2mouth.model.Categories;
+import com.imperial.word2mouth.model.Languages;
 import com.imperial.word2mouth.helpers.FileSystemHelper;
 import com.imperial.word2mouth.model.CourseItem;
 

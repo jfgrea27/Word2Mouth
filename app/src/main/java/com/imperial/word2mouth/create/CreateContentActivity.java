@@ -6,8 +6,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +18,7 @@ import android.widget.Toast;
 import com.imperial.word2mouth.R;
 import com.imperial.word2mouth.common.dialog.CourseNameDialog;
 import com.imperial.word2mouth.common.adapters.CourseItemAdapter;
+import com.imperial.word2mouth.common.tts.SpeakIcon;
 import com.imperial.word2mouth.helpers.CourseLectureItemBuilder;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
 import com.imperial.word2mouth.helpers.FileSystemHelper;
@@ -28,7 +27,6 @@ import com.imperial.word2mouth.IntentNames;
 
 import org.json.JSONException;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -45,7 +43,7 @@ public class CreateContentActivity extends AppCompatActivity {
 
     /////////////////////// ListView //////////////////////
     private int selectedContent = -1;
-    private RecyclerView courseListView;
+    private RecyclerView courseRecycleView;
     private CourseItemAdapter courseItemAdapter;
     private ArrayList<CourseItem> courseItems;
 
@@ -77,21 +75,48 @@ public class CreateContentActivity extends AppCompatActivity {
         configureRecycleView();
     }
 
+    // Create New Course
     private void configureCreateButton() {
         createButton = findViewById(R.id.create_button);
         createButton.setOnClickListener(v -> dialogCourseCreation());
+        // TTS
+        createButton.setOnLongClickListener(v -> {
+            CreateContentActivity.this.textToSpeech.speak(
+                    // TODO Check whether text TTS suitable
+                    getString(R.string.create_button),
+                    TextToSpeech.QUEUE_FLUSH,
+                    null);
+            return true;
+        });
+    }
+    private void dialogCourseCreation() {
+
+        // Chaining of Course Name, Course Language and Course Category in Dialog Fragments
+        CourseNameDialog courseNameDialog = new CourseNameDialog(this);
+        courseNameDialog.show(getSupportFragmentManager(), getString(R.string.course_name));
+    }
+    public void createCourse() {
+        this.courseItem = new CourseItem(this.courseName, this.courseLanguage, this.courseTopic);
+        this.courseItem = FileSystemHelper.createCourseFileSystem(courseItem, getApplicationContext());
+        intentToCreateCourseAndStartActivity();
+    }
+    private void intentToCreateCourseAndStartActivity() {
+        Intent createIntent = new Intent(getApplicationContext(), CourseSummaryCreateActivity.class);
+        createIntent.putExtra(IntentNames.COURSE, (Parcelable) this.courseItem);
+        startActivity(createIntent);
     }
 
+    // RecycleView
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void configureRecycleView() {
-        courseListView = findViewById(R.id.recycleCourseView);
+        courseRecycleView = findViewById(R.id.recycleCourseView);
 
         courseItems = getFileCourseItems();
         courseItemAdapter = new CourseItemAdapter(courseItems, this);
 
-        courseListView.setAdapter(courseItemAdapter);
-        courseListView.setLayoutManager(new LinearLayoutManager(CreateContentActivity.this));
-        courseListView.scrollToPosition(0);
+        courseRecycleView.setAdapter(courseItemAdapter);
+        courseRecycleView.setLayoutManager(new LinearLayoutManager(CreateContentActivity.this));
+        courseRecycleView.scrollToPosition(0);
 
     }
 
@@ -106,12 +131,7 @@ public class CreateContentActivity extends AppCompatActivity {
         return courseItems;
     }
 
-    private void dialogCourseCreation() {
 
-        // Chaining of Course Name, Course Language and Course Category in Dialog Fragments
-        CourseNameDialog courseNameDialog = new CourseNameDialog(this);
-        courseNameDialog.show(getSupportFragmentManager(), getString(R.string.course_name));
-    }
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Model
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,58 +149,13 @@ public class CreateContentActivity extends AppCompatActivity {
         this.courseName = courseName;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////
-    // Create New Course
-    ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void createCourse() {
-        this.courseItem = new CourseItem(this.courseName, this.courseLanguage, this.courseTopic);
-        this.courseItem = FileSystemHelper.createCourseFileSystem(courseItem, getApplicationContext());
-        intentToCreateCourseAndStartActivity();
-    }
-
-    private void intentToCreateCourseAndStartActivity() {
-        Intent createIntent = new Intent(getApplicationContext(), CourseSummaryCreateActivity.class);
-        createIntent.putExtra(IntentNames.COURSE, (Parcelable) this.courseItem);
-        startActivity(createIntent);
-    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // Text To Speech
     ////////////////////////////////////////////////////////////////////////////////////////////////
     private void configureTTS() {
-        textToSpeech = new TextToSpeech(getApplicationContext(), new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                if (status == TextToSpeech.SUCCESS) {
-                    int result = textToSpeech.setLanguage(Locale.getDefault());
-
-                    if (result == TextToSpeech.LANG_MISSING_DATA
-                            || result == TextToSpeech.LANG_NOT_SUPPORTED) {
-                        Toast.makeText(CreateContentActivity.this,
-                                R.string.languageNotSupported, Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(CreateContentActivity.this,
-                            R.string.initializationFailedSST, Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
-
-        configureOnLongClick();
+        textToSpeech = SpeakIcon.setUpTTS(this);
     }
 
-    private void configureOnLongClick() {
-        createButton.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                CreateContentActivity.this.textToSpeech.speak(
-                        // TODO Check whether text TTS suitable
-                        getString(R.string.create_button),
-                        TextToSpeech.QUEUE_FLUSH,
-                        null);
-                return true;
-            }
-        });
-    }
 }
