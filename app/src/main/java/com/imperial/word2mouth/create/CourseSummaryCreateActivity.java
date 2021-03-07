@@ -54,11 +54,9 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
     private int selectedContent = -1;
     private RecyclerView lectureRecycleView;
     private LectureItemAdapter lectureItemAdapter;
-    private ArrayList<LectureItem> lectureItems;
 
     //////////////////Image Thumbnail////////////////////////////
     private ImageView photoThumbnail;
-    private Uri imageUri = null;
 
     //////////////////Sound Thumbnail////////////////////////////
     // View
@@ -74,8 +72,6 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
 
     //////////////////Course Title////////////////////////////
     private TextView courseTitleView;
-
-
 
     //////////////////Model////////////////////////////
     // Extras
@@ -180,7 +176,7 @@ public class CourseSummaryCreateActivity extends AppCompatActivity implements Im
     private void configureLectureRecycleView() {
         lectureRecycleView = findViewById(R.id.recycleCourseView);
 
-        lectureItems = getFileLectureItems();
+        ArrayList<LectureItem> lectureItems = getFileLectureItems();
         lectureItemAdapter = new LectureItemAdapter(lectureItems, this);
 
         lectureRecycleView.setAdapter(lectureItemAdapter);

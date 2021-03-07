@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ import com.imperial.word2mouth.common.adapters.SlideItemAdapter;
 import com.imperial.word2mouth.common.audio.AudioRecorder;
 import com.imperial.word2mouth.common.tts.SpeakIcon;
 import com.imperial.word2mouth.model.LectureItem;
+import com.imperial.word2mouth.model.SlideItem;
 import com.imperial.word2mouth.previous.shared.FileHandler;
 import com.imperial.word2mouth.previous.shared.FileReaderHelper;
 import com.imperial.word2mouth.helpers.FileSystemConstants;
@@ -63,21 +65,34 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
     private SlideItemAdapter slideItemAdapter;
     private ArrayList<LectureItem> lectureItems;
 
+    //////////////////Image Thumbnail////////////////////////////
+    private ImageView photoThumbnail;
+    private Uri imageUri = null;
+
+    //////////////////Sound Thumbnail////////////////////////////
+    // View
+    private ImageButton audioPreview;
+    private ImageButton audioButton;
+    // Model
+    private File audioFile;
+    // Controller
+    private Uri audioUri = null;
+    private AudioRecorder recorder;
+    private MediaPlayer player;
+    private boolean recording = false;
+
+    //////////////////Lecture Title////////////////////////////
+    private TextView lectureTitleView;
 
     //////////////////Model////////////////////////////
     // Extras
     private LectureItem lectureItem;
+    // Create Slide
 
 
     // Thumbnail Image
     private ImageButton thumbnail = null;
 
-    // Audio
-    private ImageButton audioButton = null;
-    private ImageButton audioPreview = null;
-    // Player and Recorder
-    private MediaPlayer player = null;
-    private AudioRecorder recorder = null;
 
     // Text Course Name
     private TextView name = null;
@@ -86,7 +101,7 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
     // List View of Slides
     private ListView slides = null;
 
-    private ArrayList<String> localSlides = null;
+    //private ArrayList<SlideItem> slides = null;
     private ArrayAdapterSlideName adapter = null;
     private boolean selectedSlide = false;
 
@@ -94,12 +109,11 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
     private static final int TITLE = 100;
     private File metaDirectory = null;
     private File slideDirectory = null;
-    private File audioFile = null;
     private String lecturePath = null;
     private int numberOfSlides = 0;
 
-    private Uri imageUri = null;
-    private Uri audioUri = null;
+//    private Uri imageUri = null;
+//    private Uri audioUri = null;
 
     public static final int AUDIO = 103;
 
@@ -114,16 +128,16 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
     private TopicItem topicItem;
     private String lectureBluetoothUUID;
     private String courseBluetoothUUID;
-    private boolean recording = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_teach_lecture_summary);
 
-        // get Intents
         getExtras();
-//            configureListViewSlides();
+
+        configureCreateButton();
+        //            configureListViewSlides();
 //            configureDeleteButton();
 //            configureLectureName();
 //            configureLectureThumbnail();
@@ -141,7 +155,6 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
         lectureItem = (LectureItem) getIntent().getExtras().get(IntentNames.LECTURE);
 
     }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // Create Button
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,12 +163,10 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                saveMetaData();
-
                 Intent createEditIntent = new Intent(LectureSummaryCreateActivity.this, TeachLectureCreationSlideActivity.class);
                 // starts at 0
                 if (slideNumber > -1) {
-                    createEditIntent.putExtra("slide number", slideNumber);
+                    createEditIntent.putExtra("slide", slideNumber);
                 } else {
                     createEditIntent.putExtra("slide number", 0);
 
@@ -217,45 +228,45 @@ public class LectureSummaryCreateActivity extends AppCompatActivity implements I
 
     // List of Slides
     private void configureListViewSlides() {
-        slides = findViewById(R.id.lecture_list_view);
-
-        localSlides = retrieveLocalSlides();
-
-        if (localSlides.size() > 0) {
-            adapter = new ArrayAdapterSlideName(LectureSummaryCreateActivity.this, R.layout.list_slide, localSlides);
-            slides.setAdapter(adapter);
-        }
-
-        slides.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                for (int i = 0; i < adapter.getCount(); i++) {
-                    View item = slides.getChildAt(i);
-                        if (item != null) {
-                            item.setBackgroundColor(Color.WHITE);
-                        }
-                }
-
-                if (selectedSlide) {
-                    view.setBackgroundColor(Color.WHITE);
-                    selectedSlide = false;
-                    if (delete != null) {
-                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
-                    }
-                    slideNumber = -1;
-
-                } else {
-                    selectedSlide = true;
-
-                    slideNumber = position;
-                    view.setBackgroundColor(Color.LTGRAY);
-                    if (delete != null) {
-                        delete.setColorFilter(null);
-                    }
-                 }
-            }
-        });
+//        slides = findViewById(R.id.lecture_list_view);
+//
+//        localSlides = retrieveLocalSlides();
+//
+//        if (localSlides.size() > 0) {
+//            adapter = new ArrayAdapterSlideName(LectureSummaryCreateActivity.this, R.layout.list_slide, localSlides);
+//            slides.setAdapter(adapter);
+//        }
+//
+//        slides.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//
+//                for (int i = 0; i < adapter.getCount(); i++) {
+//                    View item = slides.getChildAt(i);
+//                        if (item != null) {
+//                            item.setBackgroundColor(Color.WHITE);
+//                        }
+//                }
+//
+//                if (selectedSlide) {
+//                    view.setBackgroundColor(Color.WHITE);
+//                    selectedSlide = false;
+//                    if (delete != null) {
+//                        delete.setColorFilter(Color.LTGRAY, PorterDuff.Mode.SRC_IN);
+//                    }
+//                    slideNumber = -1;
+//
+//                } else {
+//                    selectedSlide = true;
+//
+//                    slideNumber = position;
+//                    view.setBackgroundColor(Color.LTGRAY);
+//                    if (delete != null) {
+//                        delete.setColorFilter(null);
+//                    }
+//                 }
+//            }
+//        });
 
     }
 
